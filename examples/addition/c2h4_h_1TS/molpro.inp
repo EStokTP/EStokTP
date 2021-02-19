@@ -1,0 +1,63 @@
+ memory,         300 ,m
+ nosym                                                                 
+ geometry={angstrom
+   c1                                                        
+   c2  c1 rcc1                                               
+   h3  c1 rch1 c2 ahcc1                                      
+   h4  c1 rch2 c2 ahcc2 h3 b1                                
+   h5  c2 rch3 c1 ahcc3 h3 b2                                
+   h6  c2 rch4 c1 ahcc4 h5 b3                                
+   H1          2 rts    1 aabs1    3 babs1                   
+ }
+ RCC1                           =    1.3386000000000000     
+ RCH1                           =    1.0833999999999999     
+ RCH2                           =    1.0833999999999999     
+ RCH3                           =    1.0839000000000001     
+ RCH4                           =    1.0839000000000001     
+ AHCC1                          =    121.45780000000001     
+ AHCC2                          =    121.45750000000000     
+ AHCC3                          =    121.34860000000000     
+ AHCC4                          =    121.35050000000000     
+ B1                             =    181.92560000000000     
+ B2                             =   -5.5297999999999998     
+ B3                             =    189.14410000000001     
+ AABS1                          =    106.58499999999999     
+ BABS1                          =    89.077200000000005     
+ RTS                            =    1.9963000000000000     
+
+ SET,SPIN=           1
+                                                                       
+ !open shell input                                                     
+                                                                       
+ basis=cc-pvdz                                                         
+ uhf                                                                   
+                                                                       
+ basis=cc-pvtz                                                         
+ uhf                                                                   
+ rhf                                                                   
+                                                                       
+ basis=aug-cc-pvtz                                                     
+ rhf                                                                   
+ uccsd(t)                                                              
+ en_cc = energy                                                        
+                                                                       
+ gdirect                                                               
+ basis=aug-cc-pvtz                                                     
+ rhf                                                                   
+ df-rmp2                                                               
+ en_mp2_tz=energy                                                      
+                                                                       
+ basis=aug-cc-pvqz                                                     
+ rhf                                                                   
+ df-rmp2                                                               
+ en_mp2_qz=energy                                                      
+                                                                       
+ !these lines must be always included in molpro input                  
+ ! CBSen should be defined as desired                                  
+ ! the molden line should be left as it is                             
+                                                                       
+ put,molden,molpro.molden                                              
+ CBSen = en_cc+en_mp2_qz-en_mp2_tz                                     
+                                                                       
+ ---                                                                   
+                                                                       

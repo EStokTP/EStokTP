@@ -1,0 +1,1 @@
+ egrep -A25 'K\)    REACS->WR'                                ./rate.out > ./output/kextract.out

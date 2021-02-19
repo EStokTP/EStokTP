@@ -1,0 +1,488 @@
+4
+ok1
+4
+ok1
+4
+ok1
+4
+ok1
+4
+ok1
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      1
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      2
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      3
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      4
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      5
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      6
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      7
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      8
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      9
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      10
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      11
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      12
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      13
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      14
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      15
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      16
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      17
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      18
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      19
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      20
+STEP NUMBER:      0
+using reduced mass:      1.000000
+frequency to animate:      2
+numrotors:      0
+STEP NUMBERread:      21
+STEP NUMBER:      0
+cp: cannot stat `./me_files/*dhr*.dat': No such file or directory
+command is mkdir -p output                                                                                      
+command is mkdir -p geoms                                                                                       
+command is mkdir -p irc_files                                                                                   
+command is mkdir -p me_files                                                                                    
+command is mkdir -p me_blocks                                                                                   
+command is mkdir -p hl_logs                                                                                     
+command is mkdir -p hr_geoms                                                                                    
+command is mkdir -p md_tunn                                                                                     
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/reac1_01.xyz                                                                   
+command is cp -f optgeom.tmp output/reac1_opt_01.out                                                            
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/reac2_01.xyz                                                                   
+command is cp -f optgeom.tmp output/reac2_opt_01.out                                                            
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                  
+command is cp -f geom1.xyz geoms/ts_01.xyz                                        
+command is cp -f tsgeom.tmp output/ts_opt_01.out                                  
+command is cp -f geom.log geoms/ts_01.log                                         
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/reac1_l1.xyz                                                                   
+command is cp -f geom.log geoms/reac1_l1.log                                                                    
+command is cp -f me_files/reac1_ge.me                                       me_files/reac1_1dge.me              
+command is cp -f ./me_files/reac1_fr.me                                            ./me_files/reac1_unpfr.me    
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cp -f me_files/reac2_ge.me                                       me_files/reac2_1dge.me              
+command is cp -f ./me_files/reac2_fr.me                                            ./me_files/reac2_unpfr.me    
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/tsgta_l1.xyz                                                                   
+command is cp -f geom.log geoms/tsgta_l1.log                                                                    
+command is cp -f me_files/ts_ge.me                                          me_files/ts_1dge.me                 
+command is cp -f ./me_files/ts_fr.me                                               ./me_files/ts_unpfr.me       
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is  sed -ie 's/Internal,/modredundant,/g' command.dat                                                                       
+command is  sed -ie 's/internal,/modredundant,/g' command.dat                                                                       
+command is  sed -ie 's/Internal/modredundant/g' command.dat                                                                         
+command is  sed -ie 's/internal/modredundant/g' command.dat                                                                         
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is  sed -ie 's/Internal,/modredundant,/g' command.dat                                                                       
+command is  sed -ie 's/internal,/modredundant,/g' command.dat                                                                       
+command is  sed -ie 's/Internal/modredundant/g' command.dat                                                                         
+command is  sed -ie 's/internal/modredundant/g' command.dat                                                                         
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/wellr_l1.xyz                                                                   
+command is cp -f geom.log geoms/wellr_l1.log                                                                    
+command is cp -f me_files/wellr_ge.me                                       me_files/wellr_1dge.me              
+command is cp -f ./me_files/wellr_fr.me                                            ./me_files/wellr_unpfr.me    
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is  sed -ie 's/Internal,/modredundant,/g' command.dat                                                                       
+command is  sed -ie 's/internal,/modredundant,/g' command.dat                                                                       
+command is  sed -ie 's/Internal/modredundant/g' command.dat                                                                         
+command is  sed -ie 's/internal/modredundant/g' command.dat                                                                         
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/wellp_l1.xyz                                                                   
+command is cp -f geom.log geoms/wellp_l1.log                                                                    
+command is cp -f me_files/wellp_ge.me                                       me_files/wellp_1dge.me              
+command is cp -f ./me_files/wellp_fr.me                                            ./me_files/wellp_unpfr.me    
+command is symmetry_number symm.inp > symm.out                                                                                                          
+command is head -n -3  me_files/reac1_1dge.me                > temp.me                                                                                  
+command is cat temp.me  me_files/reac1_symm.me               > me_files/reac1_ge.me                                                                     
+command is symmetry_number symm.inp > symm.out                                                                                                          
+command is head -n -3  me_files/wellr_1dge.me                > temp.me                                                                                  
+command is cat temp.me  me_files/wellr_symm.me               > me_files/wellr_ge.me                                                                     
+command is symmetry_number symm.inp > symm.out                                                                                                          
+command is head -n -3  me_files/wellp_1dge.me                > temp.me                                                                                  
+command is cat temp.me  me_files/wellp_symm.me               > me_files/wellp_ge.me                                                                     
+command is symmetry_number symm.inp > symm.out                                                                                                          
+command is head -n -3  me_files/ts_1dge.me                   > temp.me                                                                                  
+command is cat temp.me  me_files/ts_symm.me                  > me_files/ts_ge.me                                                                        
+command is cp -f ./data/hl_molpro.dat ./hl_molpro.dat                                                           
+command is sed -ie 's/MW/ /' temp.tmp                                                                           
+command is rm -f molpro.xml                                                                                     
+command is rm -f molpro.log_*                                                                                   
+command is rm -f molpro.out                                                                                     
+command is  molprop -n 4 molpro.inp 
+command is cp -f molpro.out geom.log                                                                            
+command is egrep CBSEN molpro.out > temp.log                                                                    
+command is  egrep RCC1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH2=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH3=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH4=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC2=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC3=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC4=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B1=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B2=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B3=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is grep -q "\[FREQ" molpro.molden && echo 1 > temp.log ||    echo 0 > temp.log                          
+command is cp -f temp.log ./me_files/reac1_en.me                                                                
+command is cp -f molpro.out ./hl_logs/reac1_molpro.out                                                          
+command is cp -f ./data/hl_reac2_molpro.dat                hl_molpro.dat                                        
+command is sed -ie 's/MW/ /' temp.tmp                                                                           
+command is rm -f molpro.xml                                                                                     
+command is rm -f molpro.log_*                                                                                   
+command is rm -f molpro.out                                                                                     
+command is  molprop -n 4 molpro.inp 
+command is cp -f molpro.out geom.log                                                                            
+command is egrep CBSEN molpro.out > temp.log                                                                    
+command is grep -q "\[FREQ" molpro.molden && echo 1 > temp.log ||    echo 0 > temp.log                          
+command is cp -f temp.log ./me_files/reac2_en.me                                                                
+command is cp -f molpro.out ./hl_logs/reac2_molpro.out                                                          
+command is cp -f ./data/hl_molpro.dat ./hl_molpro.dat                                                           
+command is sed -ie 's/MW/ /' temp.tmp                                                                           
+command is rm -f molpro.xml                                                                                     
+command is rm -f molpro.log_*                                                                                   
+command is rm -f molpro.out                                                                                     
+command is  molprop -n 4 molpro.inp 
+command is cp -f molpro.out geom.log                                                                            
+command is egrep CBSEN molpro.out > temp.log                                                                    
+command is  egrep RCC1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH2=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH3=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH4=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC2=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC3=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC4=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B1=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B2=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B3=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AABS1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep BABS1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RTS=                 molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is grep -q "\[FREQ" molpro.molden && echo 1 > temp.log ||    echo 0 > temp.log                          
+command is cp -f temp.log ./me_files/wellr_en.me                                                                
+command is cp -f molpro.out ./hl_logs/wellr_molpro.out                                                          
+command is cp -f ./data/hl_molpro.dat ./hl_molpro.dat                                                           
+command is sed -ie 's/MW/ /' temp.tmp                                                                           
+command is rm -f molpro.xml                                                                                     
+command is rm -f molpro.log_*                                                                                   
+command is rm -f molpro.out                                                                                     
+command is  molprop -n 4 molpro.inp 
+command is cp -f molpro.out geom.log                                                                            
+command is egrep CBSEN molpro.out > temp.log                                                                    
+command is  egrep RCC1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH2=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH3=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH4=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC2=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC3=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC4=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B1=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B2=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B3=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AABS1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep BABS1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RTS=                 molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is grep -q "\[FREQ" molpro.molden && echo 1 > temp.log ||    echo 0 > temp.log                          
+command is cp -f temp.log ./me_files/wellp_en.me                                                                
+command is cp -f molpro.out ./hl_logs/wellp_molpro.out                                                          
+command is cp -f ./data/hl_molpro.dat ./hl_molpro.dat                                                           
+command is sed -ie 's/MW/ /' temp.tmp                                                                           
+command is rm -f molpro.xml                                                                                     
+command is rm -f molpro.log_*                                                                                   
+command is rm -f molpro.out                                                                                     
+command is  molprop -n 4 molpro.inp 
+command is cp -f molpro.out geom.log                                                                            
+command is egrep CBSEN molpro.out > temp.log                                                                    
+command is  egrep RCC1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH2=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH3=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RCH4=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC2=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC3=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AHCC4=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B1=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B2=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep B3=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep AABS1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep BABS1=               molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep RTS=                 molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is grep -q "\[FREQ" molpro.molden && echo 1 > temp.log ||    echo 0 > temp.log                          
+command is cp -f temp.log ./me_files/ts_en.me                                                                   
+command is cp -f molpro.out ./hl_logs/ts_molpro.out                                                             
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cp -f geom.log ./irc_files/irc_g09f.log                                                                                                                                              
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is cp -f geom.log ./irc_files/irc_g09b.log                                                                                                                                              
+command is cp -f ./irc_files/irc_g09f.log                                   ./irc_g09.log                                                                                                       
+command is  egrep -A013 'Input orientation|CHANGE'                ./irc_g09.log > ./temp.tmp                                                                                                    
+command is  egrep -B013 'CHANGE'                                  ./temp.tmp > ./temp1.tmp                                                                                                      
+command is  egrep -A010 'Number'                                  ./temp1.tmp > ./temp2.tmp                                                                                                     
+command is  egrep -v 'Number|Distance|--'                             ./temp2.tmp > ./str1.out                                                                                                  
+command is  rm -f ./*tmp                                                                                                                                                                        
+command is  egrep -A009 '  Forces |CHANGE'                         ./irc_g09.log > grad_tmp1.dat                                                                                                
+command is  egrep -B009 'CHANGE'                                  grad_tmp1.dat > grad1.dat                                                                                                     
+command is  egrep -A060                                            'Force constants in Cartesian coordinates'                       ./irc_g09.log > force_const1.dat                            
+command is  sed -e 's/D/E/g' force_const1.dat                        > force_constants.dat                                                                                                      
+command is  egrep 'Energies reported'                                 ./irc_g09.log > ./tsen_irc_level.tmp                                                                                      
+command is  awk '{print $9}' ./tsen_irc_level.tmp                      > ./tsen.out                                                                                                             
+command is  egrep -A011 'Energy    RxCoord'                       ./irc_g09.log > ./energy1a.tmp                                                                                                
+command is  egrep -A011 'Energy   Rx Coord'                       ./irc_g09.log > ./energy1b.tmp                                                                                                
+command is cat ./energy1a.tmp ./energy1b.tmp                               > ./energy1.tmp                                                                                                      
+command is cp -f ./irc_files/irc_g09b.log                                   ./irc_g09.log                                                                                                       
+command is  egrep -A013 'Input orientation|CHANGE'                ./irc_g09.log > ./temp.tmp                                                                                                    
+command is  egrep -B013 'CHANGE'                                  ./temp.tmp > ./temp1.tmp                                                                                                      
+command is  egrep -A010 'Number'                                  ./temp1.tmp > ./temp2.tmp                                                                                                     
+command is  egrep -v 'Number|Distance|--'                             ./temp2.tmp > ./str1.out                                                                                                  
+command is  rm -f ./*tmp                                                                                                                                                                        
+command is  egrep -A009 '  Forces |CHANGE'                         ./irc_g09.log > grad_tmp1.dat                                                                                                
+command is  egrep -B009 'CHANGE'                                  grad_tmp1.dat > grad1.dat                                                                                                     
+command is  egrep -A060                                            'Force constants in Cartesian coordinates'                       ./irc_g09.log > force_const1.dat                            
+command is  sed -e 's/D/E/g' force_const1.dat                        > force_constants.dat                                                                                                      
+command is  egrep 'Energies reported'                                 ./irc_g09.log > ./tsen_irc_level.tmp                                                                                      
+command is  awk '{print $9}' ./tsen_irc_level.tmp                      > ./tsen.out                                                                                                             
+command is  egrep -A011 'Energy    RxCoord'                       ./irc_g09.log > ./energy1a.tmp                                                                                                
+command is  egrep -A011 'Energy   Rx Coord'                       ./irc_g09.log > ./energy1b.tmp                                                                                                
+command is cat ./energy1a.tmp ./energy1b.tmp                               > ./energy1.tmp                                                                                                      
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input001                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input002                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input003                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input004                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input005                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input006                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input007                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input008                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input009                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input010                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input011                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input012                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input013                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input014                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input015                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input016                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input017                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input018                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input019                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input020                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is  cp -f  RPHt_input_data.dat                               ./irc_files/input021                                                                                                       
+command is RPHt.exe                                                                                                                                                                             
+command is sed -i '/Cartesian/d' RPHt_all_data.dat                                                                                                                                              
+command is  cp -f RPHt_all_data.dat RPHt_input_data.dat                                                                                                                                         
+command is RPHt.exe > ./md_tunn/mdtunn.out                                                                                                                                                      
+command is cp -f trajec.xyz ./md_tunn                                                                                                                                                           
+command is cp -f VaG.txt ./md_tunn                                                                                                                                                              
+command is cp -f mueff.txt ./md_tunn                                                                                                                                                            
+command is cp -f ./me_files/*dhr*.dat ./me_blocks                                                                                                                                                                                                                                                                       
+command is cp -f ./me_files/variational.me ./temp1.me                                                                                                                                                                                                                                                                   
+command is  sed -e 's/\$wdepfor/    1.90 /' ./temp1.me > temp2.me                                                                                                                                                                                                                                                       
+command is  sed -e 's/\$wdepback/   37.98 /' ./temp2.me > temp21.me                                                                                                                                                                                                                                                     
+command is echo End > temp211.me                                                                                                                                                                                                                                                                                        
+command is cat temp21.me temp211.me > temp21a.me                                                                                                                                                                                                                                                                        
+command is  sed -ie 's/Barrier TS REACS WR/                          Barrier VARIATIONAL/g' temp21a.me                                                                                                                                                                                                                  
+command is cp -f temp21a.me ./me_blocks/variational.me                                                                                                                                                                                                                                                                  
+command is echo End > temp211.me                                                                                                                                                                                                                                                                                        
+command is echo End > temp212.me                                                                                                                                                                                                                                                                                        
+command is cat temp211.me temp212.me > temp213.me                                                                                                                                                                                                                                                                       
+command is cat temp21.me temp213.me > temp3.me                                                                                                                                                                                                                                                                          
+command is cat ./me_files/reac1_ge.me                                 ./me_files/reac1_hr.me ./me_files/reac1_fr.me                     ./me_files/reac2_ge.me ./me_files/reac2_hr.me                     ./me_files/reac2_fr.me > reactants.me                                                                         
+command is cp -f reactants.me bimol1.me                                                                                                                                                                                                                                                                                 
+command is sed -ie 's/REACS/BIMOL1/g' bimol1.me                                                                                                                                                                                                                                                                         
+command is cp -f bimol1.me ./me_blocks                                                                                                                                                                                                                                                                                  
+command is cat ./me_files/wellr_ge.me                                 ./me_files/wellr_hr.me ./me_files/wellr_fr.me                     > wellr0.me                                                                                                                                                                     
+command is  sed -e 's/\$wellren/    0.94 /' wellr0.me > wellr.me                                                                                                                                                                                                                                                        
+command is cp -f wellr.me wellr1.me                                                                                                                                                                                                                                                                                     
+command is sed -ie 's/WR/W1/g' wellr1.me                                                                                                                                                                                                                                                                                
+command is sed -i 's/ZeroEnergy.*/ZeroEnergy[au]      -78.91394 /' wellr1.me                                                                                                                                                                                                                                            
+command is cp -f wellr1.me ./me_blocks/w1.me                                                                                                                                                                                                                                                                            
+command is cat ./me_files/wellp_ge.me                                 ./me_files/wellp_hr.me ./me_files/wellp_fr.me                     > wellp0.me                                                                                                                                                                     
+command is  sed -e 's/\$wellpen/  -35.14 /' wellp0.me > wellp.me                                                                                                                                                                                                                                                        
+command is cp -f wellp.me wellp0.me                                                                                                                                                                                                                                                                                     
+command is sed -ie 's/WP/W2/g' wellp0.me                                                                                                                                                                                                                                                                                
+command is sed -i 's/ZeroEnergy.*/ZeroEnergy[au]      -78.97143 /' wellp0.me                                                                                                                                                                                                                                            
+command is cp -f wellp0.me ./me_blocks/w2.me                                                                                                                                                                                                                                                                            
+command is cat wellr.me wellp.me > wells.me                                                                                                                                                                                                                                                                             
+command is echo 0 > temp1.log                                                                                                                                                                                                                                                                                           
+command is  egrep Freq me_files/reac1_fr.me|awk '{print $2}'        > temp.log                                                                                                                                                                                                                                          
+command is cat temp.log temp1.log > temp2.log                                                                                                                                                                                                                                                                           
+command is echo 0 > temp1.log                                                                                                                                                                                                                                                                                           
+command is  egrep Freq me_files/reac2_fr.me|awk '{print $2}'     > temp.log                                                                                                                                                                                                                                             
+command is cat temp.log temp1.log > temp2.log                                                                                                                                                                                                                                                                           
+command is cp -f pstr1.me ./me_blocks/pstr1.me                                                                                                                                                                                                                                                                          
+command is cp -f pstr1.me rpst.me                                                                                                                                                                                                                                                                                       
+command is  sed -ie 's/Barrier TS REACS WR/                       Barrier TS WR WP/g' temp3.me                                                                                                                                                                                                                          
+command is cat ./data/me_head.dat ./reactants.me                      ./wells.me ./rpst.me                                              ./temp3.me > me_ktp.inp                                                                                                                                                         
+command is mess me_ktp.inp                                                                                                                                                                                                                                                                                              
+command is  egrep -A25 'K\)    REACS->WR'                                ./rate.out > ./output/kextract.out                                                                                                                                                                                                             
+command is cp -f rate.out output                                                                                                                                                                                                                                                                                        

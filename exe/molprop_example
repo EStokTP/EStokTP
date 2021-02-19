@@ -1,0 +1,25 @@
+#!/bin/sh               
+
+#to be edited to point to the molpro installation executable
+
+ncpu=$2
+echo $ncpu
+
+
+rm -f /data/scratch/sf_T*
+rm -f /data/scratch/eaf_T*
+
+echo 'ok1'
+
+#/programs/molpro/lib/parallel /programs/molpro/bin/molprop_2008_1_Linux_x86_64_i8.exe
+
+
+#/programs/64b/mpich2014/bin/mpiexec -machinefile ./host.dat  -v -np 6 /programs/molpro2010pp/molprop_2010_1_Linux_x86_64_i8/bin/molpro.exe -d /data/scratch molpro.inp
+
+
+exec /programs/molpro2010p/src/mpich-install/bin/mpiexec  -np $ncpu /programs/molpro2010p/bin/molpro.exe -d /data/scratch $3
+
+echo 'ok2'
+
+
+

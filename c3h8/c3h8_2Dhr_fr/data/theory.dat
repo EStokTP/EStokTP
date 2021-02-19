@@ -1,0 +1,22 @@
+ level0 g09
+ b3lyp/6-31+g(d,p)  opt=internal 
+ int=ultrafine nosym
+
+ level1 g09
+ m062x/6-311+g(d,p) opt=internal
+ int=ultrafine nosym freq 
+
+ hind_rotor g09
+ b3lyp/6-31+g(d,p) opt=internal 
+ int=ultrafine nosym
+ mhr_freqs
+
+
+ symmetry g09
+ b3lyp/6-31+g(d,p) opt=internal 
+ int=ultrafine nosym
+
+ hlevel molpro
+
+End
+

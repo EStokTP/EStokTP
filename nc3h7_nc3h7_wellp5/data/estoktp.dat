@@ -1,0 +1,37 @@
+ Stoichiometry   C3H7
+ ReactionType  isomerization 1TS
+ wellp 
+
+ Debug  2
+
+ Opt_Reac1
+ Opt_wellp
+
+ Grid_Opt_TS 
+ Opt_TS_0 
+ Tauo_Ts
+
+ Opt_Reac1_1
+ Opt_TS_1 
+ Opt_wellp_1
+
+ 1dTau_Reac1 
+ 1dTau_wellp
+ 1dTau_ts
+
+ HL_Reac1
+ HL_wellp
+ HL_Ts
+
+ Symm_reac1
+ Symm_wellp
+ Symm_ts
+
+  kTP
+
+End
+ 12,4 
+ numprocll,numprochl
+ 200MW  300MW
+ gmemll gmemhl
+

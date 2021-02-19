@@ -1,0 +1,40 @@
+ level0 g09
+ b3lyp/6-31+g(d,p)  opt=internal 
+ int=ultrafine nosym
+
+ level0_ts g09
+ b3lyp/6-31+g(d,p)  opt=(ts,calcfc,noeig,intern,maxcyc=50)  
+ int=ultrafine nosym
+
+ level1 g09
+ m062x/6-311+g(d,p) opt=internal
+ int=ultrafine nosym freq 
+
+ level1_51 g09
+ m062x/6-311+g(d,p) opt(internal,calcall) 
+ int=ultrafine nosym freq scf=qc
+
+ level1_ts g09
+ m062x/6-311+g(d,p)  opt=(ts,calcfc,noeig,intern,maxcyc=50)
+ int=ultrafine nosym freq 
+
+
+ irc g09 
+ m062x/6-311+g(d,p) irc(forward,calcall,stepsize=3,maxpoints=10)
+ int=ultrafine  nosym  iop(7/33=1)
+ m062x/6-311+g(d,p) irc(reverse,calcall,stepsize=3,maxpoints=10)
+ int=ultrafine  nosym  iop(7/33=1)
+
+ symmetry g09
+ b3lyp/6-31+g(d,p) opt=internal 
+ int=ultrafine nosym
+
+ symmetry_ts g09
+ b3lyp/6-31+g(d,p) opt=(ts,calcfc,noeig,intern,maxcyc=50) 
+ int=ultrafine nosym
+
+ hlevel molpro
+ hlevel_2 molpro
+
+End
+

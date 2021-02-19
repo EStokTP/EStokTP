@@ -1,7 +1,4 @@
-### Hi there 👋
-
-<!--
-**EStokTP/EStokTP** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+### Installation notice
 
 At present the compilation of EStokTP requires to download and install nlopt.
 It can be found at https://nlopt.readthedocs.io/en/latest/

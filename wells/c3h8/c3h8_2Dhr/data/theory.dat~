@@ -1,0 +1,89 @@
+reac1 reac2 prod1 prod2 reacs prods grid
+
+ level0 of theory for geomfreq
+ m062x/6-311+g(d,p)  opt=internal 
+ int=ultrafine nosym
+ E(RWB97XD) 3
+ E(UWB97XD) 3
+
+ level1 of theory for geomfreq
+ m062x/aug-cc-pvtz opt=internal
+ int=ultrafine nosym freq 
+ E(RM062X) 3
+ E(UM062X) 3
+  -->level of theory for FC (must be equal to level1!!)
+ m062x/aug-cc-pvtz opt(calcfc) iop(7/33=1)
+ guess=read geom=check
+ E(RM062X) 3
+ E(UM062x) 3
+
+ hind_rotor level_of_theory
+ m062x/6-311+g(d,p) opt=internal 
+ int=ultrafine nosym
+ E(RM062x) 3
+ E(UM062x) 3
+
+!transition state level of theory
+
+ level0_ts
+ m062x/6-311+g(d,p) opt=(ts,calcall,noeig,intern,maxcyc=50) 
+ int=ultrafine  nosym
+ E(RM062X) 3
+ E(UM062X) 3
+
+ level1_ts of theory for geom and freq
+ m062x/aug-cc-pvtz opt=(ts,calcfc,noeig,intern,maxcyc=50) 
+ int=ultrafine nosym freq iop(7/33=1)
+ E(RM062X) 3
+ E(UM062X) 3
+ -->level of theory for FC (must be equal to level1!!)
+ m062x/aug-cc-pvtz opt(ts,calcfc) iop(7/33=1)
+ guess=read geom=check
+ E(RM062X) 3
+ E(UM062X) 3
+
+ hind_rotor_ts level of theory
+ m062x/6-311+g(d,p) opt=(ts,calcfc,noeig,intern,maxcyc=50)
+ int=ultrafine nosym iop(1/8=10)
+ E(RM062X) 3
+ E(UM062X) 3
+ m062x/6-311+g(d,p) opt=(calcfc,noeig,intern,maxcyc=50)
+ int=ultrafine nosym
+
+
+! if the word after irc is skip, the IRC ES calculations are skipped
+! but the energy is upgraded using the HL data.
+! the last word tells how to rescale the HR potentials
+ irc nskip !level of theory and energy gkeyword. 
+ m062x/aug-cc-pvtz irc(forward,calcall,stepsize=3,maxpoints=10)
+ int=ultrafine  nosym  iop(7/33=1)
+ m062x/aug-cc-pvtz irc(reverse,calcall,stepsize=3,maxpoints=10)
+ int=ultrafine  nosym  iop(7/33=1)
+ E(UM062X) 3
+ noHRcc 3
+
+
+! choice of code is between molpro or g09
+! il molpro is used, it is possible to specify a specific input 
+! for reac1, reac2, prod1 or prod2i or ts. this is for example useful for H
+! in some cases, the keyword reac1 reac2 prod1 prod2 must be added after
+! the molpro request
+ hl_code used for the simulations
+ molpro  
+
+gaussian high level of theory
+
+ HL_G09_closed
+ #ccsd(t)/cc-pvtz
+ #nosym
+ -->gkeyword
+ CCSD(T)=
+
+ HL_G09_open
+ #uccsd(t)/cc-pvtz
+ #nosym
+ -->gkeyword
+ CCSD(T)=
+
+End
+

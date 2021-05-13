@@ -1,0 +1,10 @@
+      integer ntaumx, nhindmx,  nmdmx, natommx, ndim
+      integer nmethmx, nelecmx
+      integer ntempmx, noptmx, noptmdmx
+      integer nircmx
+
+      parameter (ntaumx=10, nhindmx=10,  nmdmx=300, natommx=100, ndim=3)
+      parameter (nmethmx=10, nelecmx=10)
+      parameter (ntempmx=100, noptmx=200, noptmdmx=36)
+      parameter (nircmx=1000)
+      parameter (npespointsmx=100, npivmax=20)

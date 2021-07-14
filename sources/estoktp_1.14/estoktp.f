@@ -16597,6 +16597,14 @@ c         endif
             open (unit=107, file='./me_files/prod1_zpe.me',status='old')
             read (107,*) prod1_zpe
             close (107)
+            prod1_zpe_vr=0.
+            if(ibarr.eq.2)then
+               open(unit=107,file='./me_files/pr1_vrc_zpe.me',
+     +  status='old')
+               read (107,*) prod1_zpe_vr
+               close (107)
+            endif
+
             prod1_en=prod1_en+prod1_zpe
             if(iwellpen.eq.1.or.iwellren.eq.1)then
                prod1wellen=prod1wellen+prod1_zpe
@@ -16622,6 +16630,13 @@ c         endif
             open (unit=107, file='./me_files/prod2_zpe.me',status='old')
             read (107,*) prod2_zpe
             close (107)
+            prod2_zpe_vr=0.
+            if(ibarr.eq.2)then
+               open(unit=107,file='./me_files/pr2_vrc_zpe.me',
+     +  status='old')
+               read (107,*) prod2_zpe_vr
+               close (107)
+            endif
             prod2_en=prod2_en+prod2_zpe
             if(iwellpen.eq.1.or.iwellren.eq.1)then
                prod2wellen=prod2wellen+prod2_zpe
@@ -16800,6 +16815,9 @@ cc      write (6,*) 'ipw 3 test',ipw,w2_en
       close (107)
       ts_el_en=ts_en
       ts_en=ts_en+ts_zpe
+      if(ibarr.eq.2)then
+         ts_en=ts_en+prod1_zpe-prod1_zpe_vr+prod2_zpe-prod2_zpe_vr
+      endif
       ts_en_au=ts_en
       if(iwellren.eq.1.or.iwellpen.eq.1)then
          tswell_en=tswell_en+ts_zpe
@@ -19971,9 +19989,11 @@ c      endif
          numorb=(neltot-1)/2
       else if (ispin.eq.3) then
          numorb=(neltot-2)/2+2
+      else if (ispin.eq.4) then
+         numorb=(neltot-3)/2+3
       else
          write(7,*)'active space subr. called '
-         write(7,*)'with spin number gt 2 ',ispin
+         write(7,*)'with spin number gt 4 ',ispin
          write(7,*)'not expected by code'
          write(7,*)'please check, the execution will be stopped'
          close(7)
@@ -19986,13 +20006,15 @@ c      endif
       if(ispin.eq.3)numopentot=numopentot+2
       open(unit=101,file='activespace.dat',status='unknown')
       if(numclosedtot.eq.0.and.ispin.eq.3)then
-         write(101,*)2
+c        write(101,*)2
+        write(101,*)1
       else
-         write(101,*)numclosedtot+1
+c         write(101,*)numclosedtot+1
+         write(101,*)numclosedtot
       endif
-      if(ispin.eq.1)write(101,900)neltot,2
-      if(ispin.eq.2)write(101,900)neltot,1
-      if(ispin.eq.3)write(101,900)neltot,2
+c      if(ispin.eq.1)write(101,900)neltot,2
+c      if(ispin.eq.2)write(101,900)neltot,1
+c      if(ispin.eq.3)write(101,900)neltot,2
       mspin=ispin-1
       do j=1,numclosedtot
          nstatew=1
@@ -22783,7 +22805,7 @@ cc write third vrc-tst file, structure.inp (of bimol prods/reacs)
                stop
             endif
          enddo
-         read (13,*) natom,natomt,ilin
+         read (13,*) natom1,natomt1,ilin
          close(13)
 
 
@@ -22829,7 +22851,7 @@ c         stop
                stop
             endif
          enddo
-         read (13,*) natom,natomt,ilin
+         read (13,*) natom2,natomt2,ilin
          close(13)
 
          read(12,*)natom2
@@ -22931,7 +22953,7 @@ c      stop
 
 cc get fourth input file, tst.inp, from data directory
 
-      command1='cp -f ./data/vrc_tst.inp ./vrc_tst/tst.inp'
+      command1='cp -f ./data/vrc_tst.inp ./vrc_tst/tst_sr.inp'
       call commrun(command1)
 
       isymm_fr1=1
@@ -22955,8 +22977,14 @@ cc get fourth input file, tst.inp, from data directory
       read (99,'(A80)') command1
       call commrun(command1)
  1000 format(" sed -ie 's/FSYMM/",1X,I2,1X,
-     +    "/' ./vrc_tst/tst.inp")
+     +    "/' ./vrc_tst/tst_sr.inp")
       close(99)
+
+      command1='cp -f ./data/vrc_tst.inp ./vrc_tst/tst_lr.inp'
+      call commrun(command1)
+
+      command1="sed -ie 's/FSYMM/ 1 /' ./vrc_tst/tst_lr.inp"
+      call commrun(command1)
 
 cc get fifth input file, molpro.inp, from data directory
 
@@ -23163,13 +23191,13 @@ cc now determine coordinates of reacting atom of prod1/reac1 in reference frame
       call commrun(command1)
       command1="cp -f ./vrc_tst/structure.inp ."
       call commrun(command1)
-      command1="cp -f ./vrc_tst/tst.inp ."
+      command1="cp -f ./vrc_tst/tst_sr.inp ."
       call commrun(command1)
       command1="cp -f ./vrc_tst/molpro.inp ."
       call commrun(command1)
       command1="cp -f ./vrc_tst/vrc_molpro.tml ."
       call commrun(command1)
-      command1="tst_test tst.inp > structure.out"
+      command1="tst_test tst_sr.inp > structure.out"
       call commrun(command1)
 
 
@@ -23309,22 +23337,41 @@ c            stop
 
 cc read other coordinates if natoms gt 1 
       if(natom2.ge.2)then
-         do while (WORD.NE.'AABS2')
-            call LineRead (25)
-            if(word.eq.'END')then
-               write (7,*) 'reached end of file without finding AABS2'  
+         if(natom2.eq.2.and.natomt2.eq.3)then
+            do while (WORD.NE.'BABS3')
+               call LineRead (25)
+               if(word.eq.'END')then
+               write (7,*) 'reached end of file without finding BABS3'  
                write (7,*) 'in ../pivrefgeom/me_files/potcorr_geom.me'
                write (7,*) 'stop requested from vrc_tsts module'
                close(7)
                stop
-            endif
-         enddo
-         rewind(99)
-         write(99,*)word2
-         rewind(99)
-         read(99,*)AABS2
+               endif
+            enddo
+            rewind(99)
+            write(99,*)word2
+            rewind(99)
+            read(99,*)BABS3
+            rewind(25)
+         else
+            do while (WORD.NE.'AABS2')
+               call LineRead (25)
+               if(word.eq.'END')then
+               write (7,*) 'reached end of file without finding AABS2'  
+               write (7,*) 'in ../pivrefgeom/me_files/potcorr_geom.me'
+               write (7,*) 'stop requested from vrc_tsts module'
+                  close(7)
+                  stop
+               endif
+            enddo
+            rewind(99)
+            write(99,*)word2
+            rewind(99)
+            read(99,*)AABS2
+            rewind(25)
+         endif
 
-        do while (WORD.NE.'BABS2')
+         do while (WORD.NE.'BABS2')
             call LineRead (25)
             if(word.eq.'END')then
                write (7,*) 'reached end of file without finding BABS2'  
@@ -23338,6 +23385,9 @@ cc read other coordinates if natoms gt 1
          write(99,*)word2
          rewind(99)
          read(99,*)BABS2
+         if(natom2.eq.2.and.natomt2.eq.3)then
+            AABS2=BABS2+BABS3       
+         endif
       endif
 
 cc read other coordinates if natoms gt 2
@@ -23444,10 +23494,15 @@ cc now we determine the total number of pivot points
       endif
       ipivtot1=ipivtot1+iaddpiv1*2
 
+c      write(*,*)'npiv1 is',npiv1
+c      stop
+
       if(npiv2.eq.1)then
          ipivtot2=ipivtot2+1
       else if(npiv2.eq.0.and.natom2.eq.2)then
          ipivtot2=ipivtot2+1
+      else if(npiv2.eq.2.and.natom2.eq.2)then
+         ipivtot2=ipivtot2+2
       else if (npiv2.eq.2)then
          ipivtot2=ipivtot2+2
       else
@@ -23879,6 +23934,14 @@ cc to be continued
          else if(ipivtot1.eq.1.and.ipivtot2.eq.2)then
             write(11,*)'r11 = r-d1'
             write(11,*)'r12 = r-d1'
+         else if(ipivtot1.gt.2.and.ipivtot2.eq.1)then
+            do i=1,ipivtot1
+               if(i.lt.10)then
+                  write(11,405)i
+               else
+                  write(11,505)i
+               endif
+            enddo
          else
             do i=1,ipivtot1
                do j=1,ipivtot2
@@ -23892,6 +23955,7 @@ cc to be continued
          endif
 
          write(11,*)
+
          if(ipivtot1.ge.2.and.ipivtot2.ge.2)then
             write(11,*)'Conditions 2'
             write(11,*)'d1-d2 < 0.1'
@@ -23919,6 +23983,9 @@ c     determine number of cycles
             if(natom2.gt.2)ncycles=ncycles+2
             if(natom1.eq.2)ncycles=ncycles+1
             if(natom1.gt.2)ncycles=ncycles+2
+         else if(ipivtot1.ge.2.and.ipivtot2.eq.1)then
+            ncycles=1
+            ncycles=ncycles+ipivtot1+ipivtot2
          else if(ipivtot1.ge.2.and.ipivtot2.ge.2)then
             ncycles=3
             ncycles=ncycles+ipivtot1+ipivtot2
@@ -23973,6 +24040,13 @@ c               write(11,110)theta2
 c               write(11,107)phi1
 c               write(11,108)theta1
             endif
+         else if(ipivtot1.ge.2.and.ipivtot2.eq.1)then
+            write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
+            write(11,*)'d1 = (0.01, 0.3, 0.5)'
+            do j=1,ipivtot1/2
+               write(11,402)j,phi(j)
+               write(11,403)j,theta(j)
+            enddo
          else if(ipivtot1.ge.2.and.ipivtot2.ge.2)then
             write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
             write(11,*)'d1 = (0.01, 0.3, 0.5)'
@@ -24063,12 +24137,16 @@ cc now produce the debug structure files for short range and long range dividing
 
       command1="cp -f ./vrc_tst/divsur_lr.inp ./divsurf.inp "
       call commrun(command1)
+      command1="cp -f ./vrc_tst/tst_lr.inp ./tst.inp "
+      call commrun(command1)
       command1="tst_test tst.inp > vrc_tst/tst_test_lr.out"
       call commrun(command1)
       command1="cp -f ./divsur.out ./vrc_tst/divsurf_lr.out"
       call commrun(command1)
 
       command1="cp -f ./vrc_tst/divsur_sr.inp ./divsurf.inp "
+      call commrun(command1)
+      command1="cp -f ./vrc_tst/tst_sr.inp ./tst.inp "
       call commrun(command1)
       command1="tst_test tst.inp > vrc_tst/tst_test_sr.out"
       call commrun(command1)
@@ -24121,10 +24199,10 @@ c 141  format('x1  = ',F5.2,' y1 = ',F5.2,' z1 = ',F5.2,1X)
 c 142  format('x2  = ',F5.2,' y2 = ',F5.2,' z2 = ',F5.2,1X)
 c 143  format('x3  = ',F5.2,' y3 = ',F5.2,' z3 = ',F5.2,1X)
  301  format('x',I1,' = ',F5.2,' y',I1,' = ',F5.2,' z',I1,' = ',F5.2,1X)
- 302  format('x',I1,' = ',F5.2,' +d',I1,'*cos(aabs',I1,') y',I1,' = '
-     + ,F5.2,'+d',I1,'*sin(aabs',I1,') z',I1,' = ',F5.2,1X)
- 303  format('x',I1,' = ',F5.2,' -d',I1,'*cos(aabs',I1,') y',I1,' = '
-     + ,F5.2,'-d',I1,'*sin(aabs',I1,') z',I1,' = ',F5.2,1X)
+ 302  format('x',I1,' = ',F5.2,' +d',I1,'*cos(a',I1,') y',I1,' = '
+     + ,F5.2,'+d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
+ 303  format('x',I1,' = ',F5.2,' -d',I1,'*cos(a',I1,') y',I1,' = '
+     + ,F5.2,'-d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
 
  304  format('x',I1,' = ',F5.2,' +d',I1,'*sin(p',I1,')*cos(a',I1,') y'
      + ,I1,' = ',F5.2,'+d',I1,'*sin(p',I1,')*sin(a',I1,') z',I1,' = ',
@@ -24140,6 +24218,8 @@ c 143  format('x3  = ',F5.2,' y3 = ',F5.2,' z3 = ',F5.2,1X)
  403  format('a',I1,' = (',F7.2,')')
  404  format('r',I1,I1,' = r-d1/2-d2/2')
  504  format('r',I2,I1,' = r-d1/2-d2/2')
+ 405  format('r',I1,'1 = r-d1/2')
+ 505  format('r',I2,'1 = r-d1/2')
 c 406  format('d',I1,' = (0.01, 0.3, 0.5)')
 
       return
@@ -25883,7 +25963,7 @@ cc initialize active space determination
          call activespace(nbonds_vrc,nlps_vrc,nstates_vrc,neltot,ispin)
             command1="cp -f activespace.dat ./activespace_vrc.dat"
             call activespace(nbonds,nlps,nstates,neltot,ispin)
-      endif
+         endif
 
 cc assume calculations will be done only for molpro
 c
@@ -25906,17 +25986,24 @@ cc
             command1="sed -ie 's/inactive,/active,aabs1,babs1/' 
      $ level0_molpro1.dat"
             call commrun(command1)
-         else if (natom1.gt.2.and.natom2.eq.2)then
-         command1="sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2/' 
+         else if (natom1.gt.2.and.natom2.eq.2.and.natomt2.eq.2)then
+            command1=
+     $ "sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2/' 
+     $ level0_molpro1.dat"
+            call commrun(command1)
+         else if (natom1.gt.2.and.natom2.eq.2.and.natomt2.eq.3)then
+            command1=
+     $ "sed -ie 's/inactive,/active,aabs1,babs1,babs2,babs3/' 
      $ level0_molpro1.dat"
             call commrun(command1)
          else if (natom1.eq.2.and.natom2.eq.2)then
-         command1="sed -ie 's/inactive,/active,aabs1,aabs2,babs2/' 
+            command1="sed -ie 's/inactive,/active,aabs1,aabs2,babs2/' 
      $ level0_molpro1.dat"
             call commrun(command1)
          else
-         command1="sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2,b
-     $abs3/' level0_molpro1.dat"
+            command1=
+     $ "sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2,babs3/' 
+     $  level0_molpro1.dat"
             call commrun(command1)
          endif
          if (ipotguess.eq.1) then
@@ -25924,13 +26011,14 @@ cc
      $level0_molpro1.dat"
             call commrun(command1)
          endif
+c         stop
 
          if(ipottype.eq.5)goto 3000
 
          open(unit=11,file='level0_molpro.dat',status='unknown')
          open(unit=12,file='./level0_molpro1.dat',status='unknown')
          open(unit=99,status='unknown')
-
+      
          iread=0
          if (ipotguess.eq.1) iread=1
 
@@ -26277,8 +26365,8 @@ cc with full relaxation
       close(13)
       write(12,*)vtotr
       write(12,*)vtotref
-      write(12,*)natom,nint
-      do j=1,natom
+      write(12,*)natomt,nint
+      do j=1,natomt
          write(12,*)atomlabel(j)
       enddo
       do j=1,nint
@@ -26743,8 +26831,8 @@ c         endif
          read(15,*)cjunk
          read(15,*)cjunk
          read(15,*)cjunk
-c         do iatom = 1 , natomt
-         do iatom = 1 , natom
+         do iatom = 1 , natomt
+c         do iatom = 1 , natom
             read(15,'(A60)')atomlabel(iatom)
          enddo
 c         write(*,*)'natomt is ',natomt
@@ -26766,9 +26854,6 @@ cc read coordinate names
          iaspace=0
          ispecies=0
          ires=0
-
-cc assume calculations will be done only for molpro
-cc         ilev0code=2
 
          if(ilev0code.eq.1) then
             if (idebug.ge.2) write (26,*) 'entering g09fopt'
@@ -27247,7 +27332,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          open (unit=17,file='./output/pr2_vrc_opt.out',status='unknown')
       endif
 
-
       do while (WORD.NE.'NTAU')
          call LineRead (15)
          if (WORD.EQ.'END') then
@@ -27343,30 +27427,56 @@ cc we can now determine the xyz geometry
 
       if(natom.gt.1)then
          do j=1,nint
-            if(intcoor(j).eq.bname(2))then
+            if(intcoor(j).eq.bname(2).and.idummy(2).ne.1)then
+               coox(2)=xint(j)
+            else if(idummy(2).eq.1.and.idummy(3).ne.1.and.
+     $ intcoor(j).eq.bname(3))then
                coox(2)=xint(j)
             endif
          enddo
       endif
 
       if(natom.gt.2)then
+cc determine position of atom 3
+         if(ilin.eq.1)then
+            ithird=0
+            icount=0
+            do j=1,natomt
+               if(idummy(j).eq.1)icount=icount+1
+               if((j-icount).eq.3)ithird=j
+            enddo
+         endif
+c         write(*,*)'ithird is ',ithird
+c         write(*,*)'bname(ithird) is ',bname(ithird)
          do j=1,nint
-            if(intcoor(j).eq.bname(3))then
+            if(intcoor(j).eq.bname(3).and.ilin.ne.1)then
                bdist3=xint(j)
             endif
-            if(intcoor(j).eq.anname(3))then
+            if(intcoor(j).eq.anname(3).and.ilin.ne.1)then
                adist3=xint(j)
 c               if(adist3.gt.90)adist3=180.-adist3
                adist3=adist3*pigr/180.
             endif
+            if(ilin.eq.1.and.icount.ne.0)then
+               if(intcoor(j).eq.bname(ithird))then
+                  bdist3=xint(j)               
+               endif
+            endif
          enddo
-         if(ibconn(3).eq.2)then
+c         write(*,*)'bdist3 is ',bdist3
+
+         if(ibconn(3).eq.2.and.ilin.ne.1)then
             coox(3)=coox(2)+bdist3*cos(pigr-adist3)
             cooy(3)=bdist3*sin(adist3)
-         else if (ibconn(3).eq.1)then
+         else if (ibconn(3).eq.1.and.ilin.ne.1)then
             coox(3)=bdist3*cos(adist3)
-            cooy(3)=bdist3*sin(adist3) 
+            cooy(3)=bdist3*sin(adist3)
+         else if (ilin.eq.1.and.ibconn(ithird).ne.1)then
+            coox(3)=coox(2)+bdist3
+         else if (ilin.eq.1.and.ibconn(ithird).eq.1)then
+            coox(3)=-bdist3
          endif
+
       endif
       if(natom.gt.3)then
          do j=4,natom

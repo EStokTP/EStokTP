@@ -670,8 +670,10 @@ c            write(*,*)'check ',ijunk,iatype,ijunk
                   coord(j,1)=coox(j)
                   coord(j,2)=cooy(j)
                   coord(j,3)=cooz(j)
+                  if(index.eq.natom) goto 1222
                endif
             enddo
+ 1222       continue
             write(64,*)
             close(64)
             goto 264
@@ -726,6 +728,9 @@ c              ifreq=0
                CALL LineRead (11)
 c                 write (6,990) word,word2,word3,word4,word5,'tw'
 c 990           format (5a20)
+               if (WORD.eq.'JOB') then
+                  go to 9000
+               endif
                if (WORD.eq.'FREQUENCIES') then
                   OPEN (unit=65,status='unknown')
                   REWIND (65)

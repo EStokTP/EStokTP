@@ -14983,6 +14983,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 cc initialize parameters
       irescale=0
+      ires=0
       prod_en_100cas=0
       iaspace=0
       iaspacel1=0
@@ -15966,6 +15967,8 @@ c     write (6,*) 'intcoor, xint ',intcoori(iint),xinti(iint)
       ixyz=0
       ired=0
       ntau=0
+      ires=0
+
       if(iabs.eq.1) ireact=natom1+1
       if(iadd.eq.1) ireact=natom1
       if((ispecies.eq.100).or.(ispecies.eq.101))ixyz=1

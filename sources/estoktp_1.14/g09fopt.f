@@ -382,7 +382,7 @@ cc first check if the framework group is linear
       call commrun(command1)         
       command1='tail -n 1 temp.dat > temp1.dat'
       call commrun(command1)         
-      write(command1,920)
+      write(command1,921)
       call commrun(command1)         
 
       open(unit=920,file='temp1.dat',status='unknown')
@@ -395,8 +395,19 @@ cc first check if the framework group is linear
       write(*,*)'cgroup ',cgroup
       write(*,*)'ilin_fr ',ilin_fr
 c      stop
- 920  format(" sed -ie 's/\[/ /g' temp1.dat")
-        
+ 921  format(" sed -ie 's/\[/ /g' temp1.dat")
+
+cc now check if frequencies were calculated        
+
+      command1='egrep Freq geom.log > temp.dat'
+      call commrun(command1) 
+      command1='wc temp.dat > temp1.dat'
+      call commrun(command1)
+      nlines=0
+      open(unit=920,file='temp1.dat',status='unknown')
+      read(920,*)nlines
+      close(920)
+      if(nlines.eq.0)ifreq=0
 
 ccc now read output file
 c
@@ -728,9 +739,9 @@ c              ifreq=0
                CALL LineRead (11)
 c                 write (6,990) word,word2,word3,word4,word5,'tw'
 c 990           format (5a20)
-               if (WORD.eq.'JOB') then
-                  go to 9000
-               endif
+c               if (WORD.eq.'JOB') then
+c                  go to 9000
+c               endif
                if (WORD.eq.'FREQUENCIES') then
                   OPEN (unit=65,status='unknown')
                   REWIND (65)

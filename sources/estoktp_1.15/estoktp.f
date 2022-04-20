@@ -2952,6 +2952,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       character*40 filename
       character*4  cjunk
       character*100 commandcopy
+      character*30 disb,angb,dihb
 
       LOGICAL leof,lsec,ltit
 
@@ -3078,6 +3079,7 @@ c            exit
 c build z-mat input
 
       natom = natom1
+      natomt = natom1
       ntau = ntau1
       ismp=0
       iopt=0
@@ -3109,10 +3111,95 @@ c      write(26,*)'nr1 is',nr1
 c      write(26,*)'nr2 is',nr2
 c      write(26,*)'nr is',nr
 
+      call LineRead3(0)
+      open(unit=99,status='unknown')
+      do iatom = 1 , natomt
+         rewind (99)
+         write(99,*)atomlabel(iatom)
+c         write(*,*)atomlabel(iatom)
+         rewind (99)
+         call LineRead3(99)
+         if(iatom.eq.ireact.and.ireact.gt.3)then
+            disb=word3
+            angb=word5
+            dihb=word7
+         else if(iatom.eq.ireact.and.ireact.eq.2)then
+            disb=word3
+         else if(iatom.eq.ireact+1.and.ireact.eq.2)then
+            angb=word5
+         else if(iatom.eq.ireact+2.and.ireact.eq.2)then
+            dihb=word7
+         else if(iatom.eq.ireact.and.ireact.eq.3)then
+            disb=word3
+            angb=word5
+         else if(iatom.eq.ireact+1.and.ireact.eq.3)then
+            dihb=word7
+         endif
+      enddo
+      close(99)
+c      write(*,*)'disb is ', disb
+c      write(*,*)'angb is ', angb
+c      write(*,*)'dihb is ', dihb
+
+c      stop
+
       nint = 3*natom-6
       do iint = 1 , nint
          xint(iint) = xinti(iint)
+         write(*,*)'xint ',iint,xint(iint),intcoor(iint)
       enddo
+
+cc move angle and dih angle to last three positions
+
+      iang=1
+      idih=1
+
+      do iint = 1 , nint
+         if(intcoor(iint).eq.angb)iang=iint
+         if(intcoor(iint).eq.dihb)idih=iint
+      enddo
+
+      temp_ang=xint(iang)
+      temp_dih=xint(idih)
+
+c      write(*,*)'disb is ', disb
+c      write(*,*)'angb is ', angb
+c      write(*,*)'dihb is ', dihb
+c      write(*,*)'tempang is ', iang,temp_ang
+c      write(*,*)'tempdihis ', idih,temp_dih
+c      stop
+
+      ipos=0
+
+      do iint = 1 , nint
+         if(intcoor(iint).ne.angb)then
+            ipos=ipos+1
+            intcoor(ipos)=intcoor(iint)
+            xint(ipos)=xint(iint)
+         endif
+      enddo
+
+      ipos=0
+      do iint = 1 , nint
+         if(intcoor(iint).ne.dihb)then
+            ipos=ipos+1
+            intcoor(ipos)=intcoor(iint)
+            xint(ipos)=xint(iint)
+         endif
+      enddo
+
+
+c      intcoor(iang)=intcoor(nint-1)
+c      intcoor(idih)=intcoor(nint-2)
+
+c      xint(idih)=xint(nint-2)
+c      xint(iang)=xint(nint-1)
+
+      intcoor(nint-1)=angb
+      intcoor(nint-2)=dihb
+
+      xint(nint-1)=temp_ang
+      xint(nint-2)=temp_dih
 
       rts=rdist
 
@@ -3606,7 +3693,6 @@ c save key data
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-
       subroutine grid_opt_2d
 
       implicit double precision (a-h,o-z)
@@ -3615,7 +3701,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       include 'data_estoktp.fi'
       include 'param_estoktp.fi'
 
-
       dimension tau(ntaumx),taumn(ntaumx),taumx(ntaumx),freq(nmdmx)
       dimension coord(natommx,ndim),xint(3*natommx),xinti(3*natommx),
      $ abcrot(ndim)
@@ -3623,6 +3708,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       dimension tauopt(ntaumx)
       dimension xint2ds(3*natommx)
       dimension drea(noptmx)
+      dimension idummy(natommx)
+      character*4 atomname(natommx)
+      character*1 atfirstlet
 
       character*70 comline1,comline2
       character*60 atomlabel(natommx)
@@ -3631,7 +3719,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       character*30 intcoori(3*natommx)
       character*30 intcoors(3*natommx)
       character*20 bislab(ntaumx)
-      character*20 intlabel
+      character*30 intlabel
       character*30 gmem
       character*70 command1
       character*40 filename
@@ -3723,6 +3811,13 @@ cc
          endif
       enddo
       read (25,*) rmin1_2,rstp1_2,rmin2_2,rstp2_2,intlabel
+      open (unit=99,status='unknown')
+      write (99,*) intlabel
+      rewind (99)
+      call lineread (99) 
+      intlabel=word
+      close (unit=99,status='keep')
+
       rewind 25
 
       do while (WORD.NE.'CHARGE')
@@ -3767,6 +3862,79 @@ cc
          read (21,'(A70)') comline2
       endif
       close(21)
+cc
+
+      rts = 0.d0
+      ismp=0
+
+      if (idebug.ge.2) write (26,*) 'entering ts_zmat'
+
+      call ts_zmat_iso(atomlabel,atomlabel1,xinti,
+     $ intcoor,natom1,natomt1,ntau1,iopt,dstart)
+
+      if (idebug.ge.2) write (26,*) 'finished ts_zmat'
+
+      do iatom = 1 , natomt1
+         atomlabel(iatom) = atomlabel1(iatom)
+         write(*,*)atomlabel(iatom)
+      enddo
+
+      nint = 3*natom1-6
+      do iint = 1 , nint
+         xint(iint) = xinti(iint)
+         write(*,*)'coord and value bef',xint(iint),intcoor(iint)
+      enddo
+
+cc
+cc now inizialize the index for dummy atoms
+cc
+
+      do iatom = 1, natomt1
+         OPEN (unit=99,status='unknown')
+         REWIND (99)
+         write (99,*) atomlabel(iatom)
+         REWIND (99)
+         read (99,*) atomname(iatom)
+         close (99)
+      enddo
+      do iatom = 1 , natomt1
+         idummy(iatom)=0
+      enddo
+      do iatom = 1 , natomt1
+         OPEN (unit=99,status='unknown')
+         REWIND (99)
+         write (99,1100) atomname(iatom)
+         REWIND (99)
+         read (99,1100) atfirstlet
+         if (atfirstlet.eq.'X'.or.atfirstlet.eq.'x') idummy(iatom)=1
+         close (99)
+      enddo
+
+ 1100 FORMAT (A1)
+
+      do iatom = 1 , natomt1
+         write(*,*)'dummy atom',iatom,idummy(iatom)
+      enddo
+
+cc now count dummy atoms before ireact
+
+      ndummybef=0
+      do iatom = 1 , ireact
+         if(idummy(iatom).eq.1)then
+            ndummybef=ndummybef+1
+         endif
+      enddo
+      ireact_xyz=ireact-ndummybef
+
+      ndummybefs=0
+      do iatom = 1 , isite
+         if(idummy(iatom).eq.1)then
+            ndummybefs=ndummybefs+1
+         endif
+      enddo
+      isite_xyz=isite-ndummybefs
+
+c      stop
 
 cc now determine the structure to use in the calculations
 
@@ -3786,6 +3954,10 @@ cc between the reacting atoms
       write(7,*)'Optimized structure chosen for isomerization reaction'
       write(7,*)'NUMSTR IS', numstruct
       write(7,*)
+      write(26,*)
+      write(26,*)'Optimized structure chosen for isomerization reaction'
+      write(26,*)'NUMSTR IS', numstruct
+      write(26,*)
       do j=1,numstruct
          open (unit=99,status='unknown')
          write(99,1201)j
@@ -3798,12 +3970,12 @@ c         write(*,*) 'filename is ',filename
          read (23,*)
          do k=1,natom1
             read (23,*)cjunk,coox,cooy,cooz
-            if(k.eq.ireact)then
+            if(k.eq.ireact_xyz)then
                coox1=coox
                cooy1=cooy
                cooz1=cooz
             endif
-            if(k.eq.isite)then
+            if(k.eq.isite_xyz)then
                coox2=coox
                cooy2=cooy
                cooz2=cooz
@@ -3815,43 +3987,11 @@ c         write(*,*) 'filename is ',filename
          write(26,*)'irea-isite dist for str ',j,' is ',drea(j)
       enddo
 
-cc now determine the structure with the minimum distance
-      iopt=1
-      do j=1,numstruct
-         if(drea(j).lt.drea(iopt))then
-            iopt=j
-         endif
-      enddo
-      write(26,*) 'the structure with the min dist is',iopt
-
-c      stop
-
       natom = natom1
       ntau = ntau1
 
 c build z-mat input
 
-      rts = 0.d0
-      ismp=0
-c      iopt=0
-
-      if (idebug.ge.2) write (26,*) 'entering ts_zmat'
-
-      call ts_zmat_iso(atomlabel,atomlabel1,xinti,
-     $ intcoor,natom1,natomt1,ntau1,iopt,dstart)
-
-      if (idebug.ge.2) write (26,*) 'finished ts_zmat'
-
-      do iatom = 1 , natomt1
-         atomlabel(iatom) = atomlabel1(iatom)
-c         write(*,*)'atom label is',atomlabel(iatom)
-      enddo
-
-      nint = 3*natom-6
-      do iint = 1 , nint
-         xint(iint) = xinti(iint)
-c         write(*,*)'coord and value bef',xint(iint),intcoor(iint)
-      enddo
 c      write(*,*)
 c
 c     now move the second coordinate to the end of the z-matrix
@@ -3859,6 +3999,23 @@ c
 
 c      write(*,*)'int lab is ',intlabel
 c      stop
+
+cc now determine the structure with the minimum distance
+      iopt=1
+      do j=1,numstruct
+         if(drea(j).lt.drea(iopt))then
+            iopt=j
+         endif
+      enddo
+      write(26,*)
+      write(26,*) 'The structure with the min dist is',iopt
+      write(26,*)
+      write(7,*)
+      write(7,*) 'The structure with the min dist is',iopt
+      write(7,*)
+
+c      stop
+
 
       ncoord = 3*natom-6
       do iatom = 1 , ncoord
@@ -5317,6 +5474,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       character*30 gmem
       character*30 distname
       character*30 filename,stoichname
+      character*30 disb,angb,dihb,intcoosave
 
       dimension freq(nmdmx),freqp(nmdmx)
       dimension coord(natommx,ndim),xint(3*natommx),xinti(3*natommx),
@@ -5333,8 +5491,25 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       include 'filcomm.f'
 
+      write(7,*)'*****'
+      write(7,*)'performing level1 optimization and frequency for:'
+      if(ispecies.eq.1)then
+         write(7,*)'reactant 1'
+      else if(ispecies.eq.2)then
+         write(7,*)'reactant 2'
+      else if(ispecies.eq.3)then
+         write(7,*)'product 1'
+      else if(ispecies.eq.4)then
+         write(7,*)'product 2'
+      else if(ispecies.eq.0)then
+         write(7,*)'transition state'
+      else if(ispecies.eq.5.or.ispecies.eq.51)then
+         write(7,*)'reactant well'
+      else if(ispecies.eq.6.or.ispecies.eq.61)then
+         write(7,*)'product well'
+      endif
+      write(7,*)'*****'
 
-      write(7,*)'entering sub level1'
 c      write(7,*)'step is ',ibstep
 c      close(7)
 c      stop
@@ -6259,6 +6434,7 @@ cc if linear molecule reacting with linear radical in abs assume TS is linear
          endif
 c        natomt = natomt1+natomt2+1
          
+         ibarrfr=0
          if(ibarr.gt.1)then
             rewind(15)
             do while (WORD.NE.'IBOND')
@@ -6268,10 +6444,18 @@ c        natomt = natomt1+natomt2+1
                   stop
                endif
             enddo
+            if(word2.eq.'ANG')ib_froz=2
+            if(word2.eq.'ANG'.and.word3.eq.'DIH')ib_froz=3
+            if(word3.eq.'ANG'.and.word2.eq.'DIH')ib_froz=3
             read (15,*) ireact,rdist
             frozcoo=rdist
+
          endif
          close (unit=15,status='keep')
+
+c            write(*,*)'ibindex is',ib_froz
+c            stop
+
 
 c natomt is to account for dummy atoms
          if (natomt.gt.natommx) then
@@ -6290,6 +6474,36 @@ c gaussian com file data
          do iatom = 1 , natomt
             read (17,'(A60)') atomlabel(iatom)
          enddo
+
+cc identify frozen coordinates in barrierless reactions
+
+         if(ibarr.gt.1)then            
+            call LineRead3(0)
+            open(unit=99,status='unknown')
+            do iatom = 1 , natomt
+               rewind (99)
+               write(99,*)atomlabel(iatom)
+               rewind (99)
+               call LineRead3(99)
+               if(iatom.eq.ireact.and.ireact.gt.3)then
+                  disb=word3
+                  angb=word5
+                  dihb=word7
+               else if(iatom.eq.ireact.and.ireact.eq.2)then
+                  disb=word3
+               else if(iatom.eq.ireact+1.and.ireact.eq.2)then
+                  angb=word5
+               else if(iatom.eq.ireact+2.and.ireact.eq.2)then
+                  dihb=word7
+               else if(iatom.eq.ireact.and.ireact.eq.3)then
+                  disb=word3
+                  angb=word5
+               else if(iatom.eq.ireact+1.and.ireact.eq.3)then
+                  dihb=word7
+               endif
+            enddo
+            close(99)
+         endif
 
 cc determine distance to check for the findgeom option for wellp and wellr
 
@@ -6339,12 +6553,16 @@ c and isomerization reactions
                      stop
                   endif
                enddo
+               if(word2.eq.'ANG')ib_froz=2
+               if(word2.eq.'ANG'.and.word3.eq.'DIH')ib_froz=3
+               if(word3.eq.'ANG'.and.word2.eq.'DIH')ib_froz=3
                read (99,*) ireact,rdist
             endif
             close(99)
             
+c            write(*,*)'ibindex is',ibfroz
+c            stop
 
-c            write(*,*)'isite is',isite
             open (unit=99,file='geoms/tsgta_l1.xyz',status='old')
             read(99,*)
             read(99,*)
@@ -6427,6 +6645,51 @@ cc read coordinate names
          ircons=1
          xint(ncoord)=frozcoo
       endif
+      if(ib_froz.eq.2) then
+         ircons=2
+cc move to end frozen coordinates for barrierless reactions 
+         isub=0
+         xintsave=0.
+         do iint = 1 , ncoord
+            if(intcoor(iint).eq.angb.and.isub.eq.0) then
+               xintsave=xint(ncoord-1)
+               intcoosave=intcoor(ncoord-1)
+               xint(ncoord-1)=xint(iint)
+               intcoor(ncoord-1)=intcoor(iint)
+               xint(iint)=xintsave
+               intcoor(iint)=intcoosave
+               isub=1
+            endif
+         enddo
+      else if (ib_froz.eq.3) then
+         ircons=3
+         isub=0
+         xintsave=0.
+         do iint = 1 , ncoord
+            if(intcoor(iint).eq.angb.and.isub.eq.0) then
+               xintsave=xint(ncoord-1)
+               intcoosave=intcoor(ncoord-1)
+               xint(ncoord-1)=xint(iint)
+               intcoor(ncoord-1)=intcoor(iint)
+               xint(iint)=xintsave
+               intcoor(iint)=intcoosave
+               isub=1
+            endif
+         enddo
+         isub=0
+         do iint = 1 , ncoord
+            if(intcoor(iint).eq.dihb.and.isub.eq.0) then
+               xintsave=xint(ncoord-2)
+               intcoosave=intcoor(ncoord-2)
+               xint(ncoord-2)=xint(iint)
+               intcoor(ncoord-2)=intcoor(iint)
+               xint(iint)=xintsave
+               intcoor(iint)=intcoosave
+               isub=1
+            endif
+         enddo
+      endif
+
       ixyz=0
       ired=0
       if(iabs.eq.1) ireact=natom1+1
@@ -6453,7 +6716,8 @@ cc read coordinate names
             ispin=3
          endif
       endif
-c      write(*,*)'ilin is',ilin
+c      write(*,*)'ircons is',ircons
+c      stop
 
       if(ilev1code.eq.1) then
          call g09fopt(ilev1code,tau,ntau,natom,natomt,numproc,gmem,
@@ -6828,7 +7092,7 @@ c     compute fc matrix for HR analysis
             atomlabel(2)=' '
 
             if(ilev1code.eq.1.or.ilev1code.eq.3) then
-               ired=1
+c              ired=1
                call elstructopt(ilev1code,tau,ntau,natom,natomt,numproc,
      $           gmem,
      $           coord,vtot_0,vtotr,freq,ifreq,ilin,ismp,
@@ -7168,7 +7432,9 @@ c     compute fc matrix for HR analysis
             atomlabel(1)=' '
             atomlabel(2)=' '
             if(ilev1code.eq.1.or.ilev1code.eq.3) then
-               ired=1
+c               ired=1
+c               write(*,*)'ok up to here'
+c               stop
                call elstructopt(ilev1code,tau,ntau,natom,natomt,numproc,
      $           gmem,
      $           coord,vtot_0,vtotr,freq,ifreq,ilin,ismp,
@@ -7282,10 +7548,10 @@ cc save me_files of frequencies so that they are not overwritten by 1Dhscan
       call commrun(command1)
 
 
-      write(7,*) 'ispecies',ispecies
-      write(7,*) 'iaspace',iaspace
-      write(7,*) 'ispecies',ilev1code
-      write(7,*) 'ispecies',ibstep
+c      write(7,*) 'ispecies',ispecies
+c      write(7,*) 'iaspace',iaspace
+c      write(7,*) 'ispecies',ilev1code
+c      write(7,*) 'ispecies',ibstep
 
 
       if(ispecies.eq.0.and.iaspace.eq.1.and.ilev1code.eq.2.and.
@@ -7957,6 +8223,26 @@ c        natomt = natomt1+natomt2+1
          enddo
          read (15,*) icharge,ispin
 c         rewind(15)
+
+         if(ibarr.gt.1)then
+            ib_froz=0
+            rewind(15)
+            do while (WORD.NE.'IBOND')
+               call LineRead (15)
+               if (WORD.EQ.'END') then
+                  write (66,*) 'grid coords must be defined for TS'
+                  stop
+               endif
+            enddo
+            if(word2.eq.'ANG')ib_froz=2
+            if(word2.eq.'ANG'.and.word3.eq.'DIH')ib_froz=3
+            if(word3.eq.'ANG'.and.word2.eq.'DIH')ib_froz=3
+c            read (15,*) ireact,rdist
+c            frozcoo=rdist
+         endif
+
+
+
          close (unit=15,status='keep')
          
          if(ispecies.eq.0) then
@@ -8115,7 +8401,7 @@ cc read coordinate names
 
 cc now read abstraction site from grid input file
 
-         if(iabs.eq.1.or.iad.eq.1)then
+         if(iabs.eq.1.or.iadd.eq.1)then
             open (unit=18,file='./data/ts.dat',status='old')
 
             do while (WORD.NE.'ISITE')
@@ -8227,6 +8513,10 @@ cc no dummy atom in this case
                if (hindlab(ihind).eq.'BABS1') then 
                   pivotA(ihind)=atomname(isite)
                   pivotB(ihind)=atomname(jsite)
+               endif
+               if (hindlab(ihind).eq.'BABS2') then 
+c                  pivotA(ihind)=atomname(jsite)
+                  pivotB(ihind)=atomname(isite)
                endif
             enddo
             atomconn(natomt1+1)=atomname(isite)
@@ -8579,6 +8869,13 @@ c         stop
          ihalf=nhindsteps(ihind)/2
          iprog=0
          if(ifrozrts.eq.1.and.ispecies.eq.0) ircons=2
+         if(ib_froz.eq.2) then
+            ircons=ircons+1
+         endif
+         if(ib_froz.eq.3) then
+            ircons=ircons+2
+         endif
+
 
  111     continue
 
@@ -14979,8 +15276,32 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
       call lineread(0)
 
+cc output to EStokTP file
+
+      write(7,*)'****'
+      write(7,*)'entering subroutine HL'
+      write(7,*)'performing high level calculations for species'
+      if(ispecies.eq.1)then
+         write(7,*)'reactant 1'
+      else if(ispecies.eq.2)then
+         write(7,*)'reactant 2'
+      else if(ispecies.eq.3)then
+         write(7,*)'product 1'
+      else if(ispecies.eq.4)then
+         write(7,*)'product 2'
+      else if(ispecies.eq.0)then
+         write(7,*)'transition state'
+      else if(ispecies.eq.5)then
+         write(7,*)'reactant vdW well'
+      else if(ispecies.eq.6)then
+         write(7,*)'product vdW well'
+      endif
+      write(7,*)'number of processors for HL run:',numprochl
+      write(7,*)'****'
+
 cc initialize parameters
       irescale=0
+      ires=0
       prod_en_100cas=0
       iaspace=0
       iaspacel1=0
@@ -15008,6 +15329,8 @@ c      call LineRead (21)
          ilev1code=2
          commandcopy='cp -f ./data/hl_molpro.dat ./hl_molpro.dat'       
       else if (code_name.eq.'G09')then
+         ilev1code=1
+      else if (code_name.eq.'G16')then
          ilev1code=1
       else if (code_name.eq.'LEVEL1')then
          ilev1code=0
@@ -15178,7 +15501,7 @@ cc      else if (word3.eq.'RESCALE3'.and.ispecies.eq.0)then
          open (unit=99,file='./me_files/prod2_en.me',status='old')
          read(99,*)hl_prod2_en
          close(99)
-         if(ibarr.gt.1)then
+         if(ibarr.gt.1.and.ilevcode.eq.2)then
             command1='egrep CBSEN  hl_logs/ts_molpro.out > en.dat'
             call commrun(command1)
             open (unit=99,file='./en.dat',status='old')
@@ -15190,6 +15513,18 @@ cc      else if (word3.eq.'RESCALE3'.and.ispecies.eq.0)then
             open (unit=99,file='./en.dat',status='old')
             read(99,*)cjunk,cjunk,cjunk,prod_en_l1
             close(99)
+         else if (ibarr.gt.1.and.ilevcode.eq.1)then
+            command1='egrep SCF  hl_logs/ts_g09.out > en.dat'
+            call commrun(command1)
+            open (unit=99,file='./en.me',status='old')
+            read(99,*)cjunk,cjunk,cjunk,cjunk,ts_en_l1
+            close(99)
+            command1='egrep SCF  ../100/hl_logs/ts_g09.out > 
+     $ en.dat'
+            call commrun(command1)
+            open (unit=99,file='./en.me',status='old')
+            read(99,*)cjunk,cjunk,cjunk,cjunk,prod_en_l1
+            close(99)
          else
             open (unit=99,file='./geoms/tsgta_l1.xyz',status='old')
             read(99,*)
@@ -15200,7 +15535,6 @@ cc      else if (word3.eq.'RESCALE3'.and.ispecies.eq.0)then
             read(99,*)prod_en_l1
             close(99)
          endif
-
 
          dhreaction=hl_prod2_en+hl_prod1_en-hl_react_en
          ets_prod=ts_en_l1-prod_en_l1
@@ -15441,12 +15775,16 @@ cc now check for code specific/species specific input commands
          endif
       endif
       if(ispecies.eq.0)then
+         ihl_asguess=0
          open (unit=15,file='./data/ts.dat',status='old')
          do while (WORD.NE.'MULTIREFERENCE')
             call LineRead(15)
             if (WORD.EQ.'END') then
                rewind(15)
                go to  902
+            endif
+            if (WORD2.EQ.'HLGUESS'.or.WORD3.EQ.'HLGUESS') then
+               ihl_asguess=1
             endif
          enddo
          call LineRead(15)
@@ -15843,14 +16181,28 @@ c            stop
                   call stoichiometry(filename,stoichname,neltot2)
                   neltot=neltot1+neltot2
                   call activespace(nbonds,nlps,nstates,neltot,ispin)
+               else if(iabs.eq.1)then
+                  filename='./me_files/reac1_ge.me'
+                  neltot1=0
+                  call stoichiometry(filename,stoichname,neltot1)
+                  filename='./me_files/reac2_ge.me'
+                  neltot2=0
+                  call stoichiometry(filename,stoichname,neltot2)
+                  neltot=neltot1+neltot2
+                  call activespace(nbonds,nlps,nstates,neltot,ispin)
 c            write(7,*)'nel tot ',neltot
 c            stop
                endif
                if(iaspacel1.eq.1.and.ibstep.ge.1)then
                   open (unit=21,file='./data/hl_ts_molpro.dat',
      $                 status='unknown')
-                  open (unit=22,file='./output/ts_asl1_step2.inp',
+                  if(ihl_asguess.eq.0)then
+                     open (unit=22,file='./output/ts_asl1_step2.inp',
      $                 status='unknown')
+                  else if (ihl_asguess.eq.1)then
+                     open (unit=22,file='./output/ts_ashl_step2.inp',
+     $                 status='unknown')
+                  endif
                   open (unit=23,file='hl_molpro.dat',
      $                 status='unknown')
                   open (unit=24,file='./data/theory.dat',
@@ -15895,8 +16247,8 @@ c                 write (23,*)'End2'
                else if(iaspacel1.eq.0.and.ibstep.eq.1)then
                   call commrun(commandcopy)
                else if(iaspacel1.eq.0.and.ibstep.gt.1)then
-                  commandcopy='cp -f ./output/ts_ashl_step2.inp 
-     $ hl_molpro.dat'            
+c                  commandcopy='cp -f ./output/ts_ashl_step2.inp 
+c     $ hl_molpro.dat'            
                   call commrun(commandcopy)
                endif
             endif
@@ -15964,6 +16316,8 @@ c     write (6,*) 'intcoor, xint ',intcoori(iint),xinti(iint)
       ixyz=0
       ired=0
       ntau=0
+      ires=0
+
       if(iabs.eq.1) ireact=natom1+1
       if(iadd.eq.1) ireact=natom1
       if((ispecies.eq.100).or.(ispecies.eq.101))ixyz=1
@@ -16230,6 +16584,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       character*300 command1
       character*80 cread
+      character*120 creadl
       character*20 cread1,cread2
       CHARACTER*1000 line,string
       CHARACTER*160 sename,word,word2,word3,title,title1,
@@ -16302,7 +16657,7 @@ cc check on single product
          read(99,*)numend
          close(99)
          if(numend.eq.1)then
-cc add a line at the end fo the file
+cc add a line at the end of the file
             open(unit=99,file='tmp.log',status='unknown')
             write(99,*)'End'
             close(99)
@@ -16595,6 +16950,14 @@ c         endif
             open (unit=107, file='./me_files/prod1_zpe.me',status='old')
             read (107,*) prod1_zpe
             close (107)
+            prod1_zpe_vr=0.
+            if(ibarr.eq.2)then
+               open(unit=107,file='./me_files/pr1_vrc_zpe.me',
+     +  status='old')
+               read (107,*) prod1_zpe_vr
+               close (107)
+            endif
+
             prod1_en=prod1_en+prod1_zpe
             if(iwellpen.eq.1.or.iwellren.eq.1)then
                prod1wellen=prod1wellen+prod1_zpe
@@ -16620,6 +16983,13 @@ c         endif
             open (unit=107, file='./me_files/prod2_zpe.me',status='old')
             read (107,*) prod2_zpe
             close (107)
+            prod2_zpe_vr=0.
+            if(ibarr.eq.2)then
+               open(unit=107,file='./me_files/pr2_vrc_zpe.me',
+     +  status='old')
+               read (107,*) prod2_zpe_vr
+               close (107)
+            endif
             prod2_en=prod2_en+prod2_zpe
             if(iwellpen.eq.1.or.iwellren.eq.1)then
                prod2wellen=prod2wellen+prod2_zpe
@@ -16798,6 +17168,9 @@ cc      write (6,*) 'ipw 3 test',ipw,w2_en
       close (107)
       ts_el_en=ts_en
       ts_en=ts_en+ts_zpe
+      if(ibarr.eq.2)then
+         ts_en=ts_en+prod1_zpe-prod1_zpe_vr+prod2_zpe-prod2_zpe_vr
+      endif
       ts_en_au=ts_en
       if(iwellren.eq.1.or.iwellpen.eq.1)then
          tswell_en=tswell_en+ts_zpe
@@ -17199,10 +17572,10 @@ cc now write hindered rotor section
                   read(19,*)cread,start,arr,nptot
                   read(20,*)(rotpot(ij),ij=1,nptot)
                   write(125,8010)(rotpot(ij),ij=1,nptot)
-                  read(20,'(A80)')cread
-                  write(125,'(A80)')cread
+                  read(20,'(A120)')creadl
+                  write(125,'(A120)')creadl
                enddo
-               write(126,*)'Endrot'
+               write(125,*)'Endrot'
                close(125)
                close(20)
             endif
@@ -17262,8 +17635,8 @@ c                  read(21,*)
                   read(19,*)cread,start,arr,nptot
                   read(20,*)(rotpot(ij),ij=1,nptot)
                   write(126,8010)(rotpot(ij),ij=1,nptot)
-                  read(20,'(A80)')cread
-                  write(126,'(A80)')cread
+                  read(20,'(A120)')creadl
+                  write(126,'(A120)')creadl
                enddo
                write(126,*)'Endrot'
                close(126)
@@ -17280,23 +17653,23 @@ c                  read(21,*)
             write(15,*)'    End'
 
             if(nhind1.ne.0)then
-               cread=''
+               creadl=''
                open(unit=126,file='rot1_rot.dat',status='unknown')
-               do while (cread.ne.' Endrot')
-                  read(126,'(A80)')cread
-                  if(cread.ne.' Endrot')then
-                     write(15,'(A80)')cread
+               do while (creadl.ne.' Endrot')
+                  read(126,'(A120)')creadl
+                  if(creadl.ne.' Endrot')then
+                     write(15,'(A120)')creadl
                   endif
                enddo
                close(126)
             endif
             if(nhind2.ne.0)then
-               cread=''
+               creadl=''
                open(unit=126,file='rot2_rot.dat',status='unknown')
-               do while (cread.ne.' Endrot')
-                  read(126,'(A80)')cread
-                  if(cread.ne.' Endrot')then
-                     write(15,'(A80)')cread
+               do while (creadl.ne.' Endrot')
+                  read(126,'(A120)')creadl
+                  if(creadl.ne.' Endrot')then
+                     write(15,'(A120)')creadl
                   endif
                enddo
                close(126)
@@ -17341,23 +17714,23 @@ c                  read(21,*)
             write(15,*)'    End'
 
             if(nhind1.ne.0)then
-               cread=''
+               creadl=''
                open(unit=126,file='rot1_rot.dat',status='unknown')
-               do while (cread.ne.' Endrot')
-                  read(126,'(A80)')cread
-                  if(cread.ne.' Endrot')then
-                     write(15,'(A80)')cread
+               do while (creadl.ne.' Endrot')
+                  read(126,'(A120)')creadl
+                  if(creadl.ne.' Endrot')then
+                     write(15,'(A120)')creadl
                   endif
                enddo
                close(126)
             endif
             if(nhind2.ne.0)then
-               cread=''
+               creadl=''
                open(unit=126,file='rot2_rot.dat',status='unknown')
-               do while (cread.ne.' Endrot')
-                  read(126,'(A80)')cread
-                  if(cread.ne.' Endrot')then
-                     write(15,'(A80)')cread
+               do while (creadl.ne.' Endrot')
+                  read(126,'(A120)')creadl
+                  if(creadl.ne.' Endrot')then
+                     write(15,'(A120)')creadl
                   endif
                enddo
                close(126)
@@ -19180,7 +19553,7 @@ c      write (116,*) 'WORD',WORD
       ndummy=0
       do iatom = 1 , natomt1
          read (21,*) xread
-         if(xread.eq.'X')then
+         if(xread.eq.'X'.or.xread.eq.'x')then
             ndummy=ndummy+1
          endif
          if(iatom.eq.ireact)ireact_xyz=ireact-ndummy
@@ -19310,7 +19683,7 @@ cc now determine new parameters for reacting atoms
             read (99,'(A40)') filename
             close (99)
          else
-            filename='reac1_l1.xyz'
+            filename='./geoms/reac1_l1.xyz'
          endif
       endif
 
@@ -19693,8 +20066,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       include 'filcomm.f'
 
 c      write(*,*)'filename is ',filename
+c      stop
       open (unit=116,file=filename,status='old')
-      read(116,*)cjunk
+      if(iabs.ne.1)then
+         read(116,*)cjunk
+      endif
+      if(iabs.eq.1.and.filename.ne.'./me_files/reac2_ge.me')then
+         write(*,*)'filename is ', filename
+         if(filename.ne.'./me_files/reac2_ge.me')then
+            read(116,*)cjunk
+         endif
+      endif
       read(116,*)cjunk
       read(116,*)cjunk
       read(116,*)cjunk,natom
@@ -19969,9 +20351,11 @@ c      endif
          numorb=(neltot-1)/2
       else if (ispin.eq.3) then
          numorb=(neltot-2)/2+2
+      else if (ispin.eq.4) then
+         numorb=(neltot-3)/2+3
       else
          write(7,*)'active space subr. called '
-         write(7,*)'with spin number gt 2 ',ispin
+         write(7,*)'with spin number gt 4 ',ispin
          write(7,*)'not expected by code'
          write(7,*)'please check, the execution will be stopped'
          close(7)
@@ -19984,13 +20368,15 @@ c      endif
       if(ispin.eq.3)numopentot=numopentot+2
       open(unit=101,file='activespace.dat',status='unknown')
       if(numclosedtot.eq.0.and.ispin.eq.3)then
-         write(101,*)2
+c        write(101,*)2
+        write(101,*)1
       else
-         write(101,*)numclosedtot+1
+c         write(101,*)numclosedtot+1
+         write(101,*)numclosedtot
       endif
-      if(ispin.eq.1)write(101,900)neltot,2
-      if(ispin.eq.2)write(101,900)neltot,1
-      if(ispin.eq.3)write(101,900)neltot,2
+c      if(ispin.eq.1)write(101,900)neltot,2
+c      if(ispin.eq.2)write(101,900)neltot,1
+c      if(ispin.eq.3)write(101,900)neltot,2
       mspin=ispin-1
       do j=1,numclosedtot
          nstatew=1
@@ -22781,7 +23167,7 @@ cc write third vrc-tst file, structure.inp (of bimol prods/reacs)
                stop
             endif
          enddo
-         read (13,*) natom,natomt,ilin
+         read (13,*) natom1,natomt1,ilin
          close(13)
 
 
@@ -22827,7 +23213,7 @@ c         stop
                stop
             endif
          enddo
-         read (13,*) natom,natomt,ilin
+         read (13,*) natom2,natomt2,ilin
          close(13)
 
          read(12,*)natom2
@@ -22929,7 +23315,7 @@ c      stop
 
 cc get fourth input file, tst.inp, from data directory
 
-      command1='cp -f ./data/vrc_tst.inp ./vrc_tst/tst.inp'
+      command1='cp -f ./data/vrc_tst.inp ./vrc_tst/tst_sr.inp'
       call commrun(command1)
 
       isymm_fr1=1
@@ -22953,8 +23339,14 @@ cc get fourth input file, tst.inp, from data directory
       read (99,'(A80)') command1
       call commrun(command1)
  1000 format(" sed -ie 's/FSYMM/",1X,I2,1X,
-     +    "/' ./vrc_tst/tst.inp")
+     +    "/' ./vrc_tst/tst_sr.inp")
       close(99)
+
+      command1='cp -f ./data/vrc_tst.inp ./vrc_tst/tst_lr.inp'
+      call commrun(command1)
+
+      command1="sed -ie 's/FSYMM/ 1 /' ./vrc_tst/tst_lr.inp"
+      call commrun(command1)
 
 cc get fifth input file, molpro.inp, from data directory
 
@@ -23161,13 +23553,13 @@ cc now determine coordinates of reacting atom of prod1/reac1 in reference frame
       call commrun(command1)
       command1="cp -f ./vrc_tst/structure.inp ."
       call commrun(command1)
-      command1="cp -f ./vrc_tst/tst.inp ."
+      command1="cp -f ./vrc_tst/tst_sr.inp ."
       call commrun(command1)
       command1="cp -f ./vrc_tst/molpro.inp ."
       call commrun(command1)
       command1="cp -f ./vrc_tst/vrc_molpro.tml ."
       call commrun(command1)
-      command1="tst_test tst.inp > structure.out"
+      command1="tst_test tst_sr.inp > structure.out"
       call commrun(command1)
 
 
@@ -23307,22 +23699,41 @@ c            stop
 
 cc read other coordinates if natoms gt 1 
       if(natom2.ge.2)then
-         do while (WORD.NE.'AABS2')
-            call LineRead (25)
-            if(word.eq.'END')then
-               write (7,*) 'reached end of file without finding AABS2'  
+         if(natom2.eq.2.and.natomt2.eq.3)then
+            do while (WORD.NE.'BABS3')
+               call LineRead (25)
+               if(word.eq.'END')then
+               write (7,*) 'reached end of file without finding BABS3'  
                write (7,*) 'in ../pivrefgeom/me_files/potcorr_geom.me'
                write (7,*) 'stop requested from vrc_tsts module'
                close(7)
                stop
-            endif
-         enddo
-         rewind(99)
-         write(99,*)word2
-         rewind(99)
-         read(99,*)AABS2
+               endif
+            enddo
+            rewind(99)
+            write(99,*)word2
+            rewind(99)
+            read(99,*)BABS3
+            rewind(25)
+         else
+            do while (WORD.NE.'AABS2')
+               call LineRead (25)
+               if(word.eq.'END')then
+               write (7,*) 'reached end of file without finding AABS2'  
+               write (7,*) 'in ../pivrefgeom/me_files/potcorr_geom.me'
+               write (7,*) 'stop requested from vrc_tsts module'
+                  close(7)
+                  stop
+               endif
+            enddo
+            rewind(99)
+            write(99,*)word2
+            rewind(99)
+            read(99,*)AABS2
+            rewind(25)
+         endif
 
-        do while (WORD.NE.'BABS2')
+         do while (WORD.NE.'BABS2')
             call LineRead (25)
             if(word.eq.'END')then
                write (7,*) 'reached end of file without finding BABS2'  
@@ -23336,6 +23747,9 @@ cc read other coordinates if natoms gt 1
          write(99,*)word2
          rewind(99)
          read(99,*)BABS2
+         if(natom2.eq.2.and.natomt2.eq.3)then
+            AABS2=BABS2+BABS3       
+         endif
       endif
 
 cc read other coordinates if natoms gt 2
@@ -23442,10 +23856,15 @@ cc now we determine the total number of pivot points
       endif
       ipivtot1=ipivtot1+iaddpiv1*2
 
+c      write(*,*)'npiv1 is',npiv1
+c      stop
+
       if(npiv2.eq.1)then
          ipivtot2=ipivtot2+1
       else if(npiv2.eq.0.and.natom2.eq.2)then
          ipivtot2=ipivtot2+1
+      else if(npiv2.eq.2.and.natom2.eq.2)then
+         ipivtot2=ipivtot2+2
       else if (npiv2.eq.2)then
          ipivtot2=ipivtot2+2
       else
@@ -23877,6 +24296,14 @@ cc to be continued
          else if(ipivtot1.eq.1.and.ipivtot2.eq.2)then
             write(11,*)'r11 = r-d1'
             write(11,*)'r12 = r-d1'
+         else if(ipivtot1.gt.2.and.ipivtot2.eq.1)then
+            do i=1,ipivtot1
+               if(i.lt.10)then
+                  write(11,405)i
+               else
+                  write(11,505)i
+               endif
+            enddo
          else
             do i=1,ipivtot1
                do j=1,ipivtot2
@@ -23890,6 +24317,7 @@ cc to be continued
          endif
 
          write(11,*)
+
          if(ipivtot1.ge.2.and.ipivtot2.ge.2)then
             write(11,*)'Conditions 2'
             write(11,*)'d1-d2 < 0.1'
@@ -23917,6 +24345,9 @@ c     determine number of cycles
             if(natom2.gt.2)ncycles=ncycles+2
             if(natom1.eq.2)ncycles=ncycles+1
             if(natom1.gt.2)ncycles=ncycles+2
+         else if(ipivtot1.ge.2.and.ipivtot2.eq.1)then
+            ncycles=1
+            ncycles=ncycles+ipivtot1+ipivtot2
          else if(ipivtot1.ge.2.and.ipivtot2.ge.2)then
             ncycles=3
             ncycles=ncycles+ipivtot1+ipivtot2
@@ -23971,6 +24402,13 @@ c               write(11,110)theta2
 c               write(11,107)phi1
 c               write(11,108)theta1
             endif
+         else if(ipivtot1.ge.2.and.ipivtot2.eq.1)then
+            write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
+            write(11,*)'d1 = (0.01, 0.3, 0.5)'
+            do j=1,ipivtot1/2
+               write(11,402)j,phi(j)
+               write(11,403)j,theta(j)
+            enddo
          else if(ipivtot1.ge.2.and.ipivtot2.ge.2)then
             write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
             write(11,*)'d1 = (0.01, 0.3, 0.5)'
@@ -24061,12 +24499,16 @@ cc now produce the debug structure files for short range and long range dividing
 
       command1="cp -f ./vrc_tst/divsur_lr.inp ./divsurf.inp "
       call commrun(command1)
+      command1="cp -f ./vrc_tst/tst_lr.inp ./tst.inp "
+      call commrun(command1)
       command1="tst_test tst.inp > vrc_tst/tst_test_lr.out"
       call commrun(command1)
       command1="cp -f ./divsur.out ./vrc_tst/divsurf_lr.out"
       call commrun(command1)
 
       command1="cp -f ./vrc_tst/divsur_sr.inp ./divsurf.inp "
+      call commrun(command1)
+      command1="cp -f ./vrc_tst/tst_sr.inp ./tst.inp "
       call commrun(command1)
       command1="tst_test tst.inp > vrc_tst/tst_test_sr.out"
       call commrun(command1)
@@ -24119,10 +24561,10 @@ c 141  format('x1  = ',F5.2,' y1 = ',F5.2,' z1 = ',F5.2,1X)
 c 142  format('x2  = ',F5.2,' y2 = ',F5.2,' z2 = ',F5.2,1X)
 c 143  format('x3  = ',F5.2,' y3 = ',F5.2,' z3 = ',F5.2,1X)
  301  format('x',I1,' = ',F5.2,' y',I1,' = ',F5.2,' z',I1,' = ',F5.2,1X)
- 302  format('x',I1,' = ',F5.2,' +d',I1,'*cos(aabs',I1,') y',I1,' = '
-     + ,F5.2,'+d',I1,'*sin(aabs',I1,') z',I1,' = ',F5.2,1X)
- 303  format('x',I1,' = ',F5.2,' -d',I1,'*cos(aabs',I1,') y',I1,' = '
-     + ,F5.2,'-d',I1,'*sin(aabs',I1,') z',I1,' = ',F5.2,1X)
+ 302  format('x',I1,' = ',F5.2,' +d',I1,'*cos(a',I1,') y',I1,' = '
+     + ,F5.2,'+d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
+ 303  format('x',I1,' = ',F5.2,' -d',I1,'*cos(a',I1,') y',I1,' = '
+     + ,F5.2,'-d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
 
  304  format('x',I1,' = ',F5.2,' +d',I1,'*sin(p',I1,')*cos(a',I1,') y'
      + ,I1,' = ',F5.2,'+d',I1,'*sin(p',I1,')*sin(a',I1,') z',I1,' = ',
@@ -24138,6 +24580,8 @@ c 143  format('x3  = ',F5.2,' y3 = ',F5.2,' z3 = ',F5.2,1X)
  403  format('a',I1,' = (',F7.2,')')
  404  format('r',I1,I1,' = r-d1/2-d2/2')
  504  format('r',I2,I1,' = r-d1/2-d2/2')
+ 405  format('r',I1,'1 = r-d1/2')
+ 505  format('r',I2,'1 = r-d1/2')
 c 406  format('d',I1,' = (0.01, 0.3, 0.5)')
 
       return
@@ -24169,6 +24613,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       dimension ibond(natommx),ibondi(natommx)
       dimension ianum(3*natommx)
       dimension ianum_at(natommx)
+      dimension idummy(natommx)
       dimension amass(3*natommx)
       dimension coox(natommx)
       dimension cooy(natommx)
@@ -24389,7 +24834,11 @@ c     natomt is to account for dummy atoms
             stop
          endif
          rewind(15)
-
+c         initialize idummy
+         do j=1,natomt
+            idummy(j)=0
+         enddo
+c
          do while (WORD.NE.'CHARGE')
             call LineRead (15)
             if (WORD.EQ.'END') then
@@ -24573,6 +25022,11 @@ c natomt is to account for dummy atoms
             stop
          endif
 
+c         initialize idummy
+         do j=1,natomt
+            idummy(j)=0
+         enddo
+c
 c gaussian com file data
          read (17,*)
 cc condition for reading guess from grid
@@ -24733,7 +25187,7 @@ cc check if intcoor coordinate is a bond
          ibond(j)=0
       enddo
       open(unit=21,file='temp.dat',status='unknown')
-      do j=i,natom
+      do j=i,natomt
          word3=''
          rewind(21)
          write(21,*)atomlabel(j)
@@ -24980,17 +25434,19 @@ cc get xyz geometry
          call readxyzgrad_g09(natom,ianum,grad_xyz1)
          do j=1,3*natom
             call atom_num_mass(ianum(j),amass(j))
+calb            write(7,*)grad_xyz1(j),amass(j)
             grad_xyz1(j)=grad_xyz1(j)/sqrt(amass(j))
          enddo
          commandcopy='cp -f na_tst/natst_V2.log geom.log'
          call commrun(commandcopy)
-         call readxyzgeom_g09(natom,coox,cooy,cooz)
+         call readxyzgeom_g09(natomt,idummy,coox,cooy,cooz)
          call readxyzgrad_g09(natom,ianum,grad_xyz2)
          do j=1,3*natom
             call atom_num_mass(ianum(j),amass(j))
+calb            write(7,*)grad_xyz2(j)
             grad_xyz2(j)=grad_xyz2(j)/sqrt(amass(j))
          enddo
-      else if (ilevcode.eq.2)then
+      else if (ilevcode.eq.2.and.ilev_na.lt.4)then
          write(*,*)'ok up to here'
          inapes=1
          call calcxyzgrad_molpro(inapes,natom,ianum,grad_xyz1)
@@ -25007,18 +25463,44 @@ c         call commrun(commandcopy)
          inapes=2
          call calcxyzgrad_molpro(inapes,natom,ianum,grad_xyz2)
 
-c         call readxyzgeom_g09(natom,coox,cooy,cooz)
 c         call readxyzgrad_g09(natom,ianum,grad_xyz2)
          do j=1,3*natom
             call atom_num_mass(ianum(j),amass(j))
             grad_xyz2(j)=grad_xyz2(j)/sqrt(amass(j))
          enddo
+      else if (ilevcode.eq.2.and.ilev_na.eq.4)then
+         commandcopy='cp -f ./geoms/natst_mecp.molden molpro.molden'
+         call commrun(commandcopy)
+         call readianum_molpro(natom,ianum)
+c         call readxyzgeom_g09(natom,coox,cooy,cooz)
+         call readxyzgeom_molpro(natom,coox,cooy,cooz)
+
+         commandcopy='cp -f ./na_tst/natst_V1_xyz.log geom.log'
+         call commrun(commandcopy)
+         call readxyzgrad_molpro(natom,grad_xyz1)
+         do j=1,3*natom
+            call atom_num_mass(ianum(j),amass(j))
+            grad_xyz1(j)=grad_xyz1(j)/sqrt(amass(j))
+c            write(*,*)'mass grad',j,amass(j),grad_xyz1(j)
+         enddo
+
+         commandcopy='cp -f ./na_tst/natst_V2_xyz.log geom.log'
+         call commrun(commandcopy)
+         call readxyzgrad_molpro(natom,grad_xyz2)
+         do j=1,3*natom
+            call atom_num_mass(ianum(j),amass(j))
+            grad_xyz2(j)=grad_xyz2(j)/sqrt(amass(j))
+c            write(*,*)'mass',j,amass(j),grad_xyz2(j)
+         enddo
+
       endif
+c      stop
 
 cc grad is g1-g2
 
       do j=1,3*natom
          grad_xyz(j)=grad_xyz1(j)-grad_xyz2(j)
+c         write(*,*)'grad_xyz',j,grad_xyz1(j),grad_xyz2(j),grad_xyz(j)
       enddo
 
       grad_diff_norm=0.
@@ -25169,7 +25651,7 @@ c         ilev=2
 
          ispin=ispin1
 
-         call g09fopt(ilevcode,tau,ntau,natom,natom,numproc,gmem,
+         call g09fopt(ilevcode,tau,ntau,natom,natomt,numproc,gmem,
      $ coord,vtot_0,vtotr,freq,ifreq,ilin,ismp,comline1,
      $ comline2,icharge,ispin,ircons,
      $ atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires,ixyz,ired)
@@ -25181,7 +25663,7 @@ c         ilev=2
          comline1=comline3
          comline2=comline4
 
-         call g09fopt(ilevcode,tau,ntau,natom,natom,numproc,gmem,
+         call g09fopt(ilevcode,tau,ntau,natom,natomt,numproc,gmem,
      $ coord,vtot_0,vtotr,freq,ifreq,ilin,ismp,comline1,
      $ comline2,icharge,ispin,ircons,
      $ atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires,ixyz,ired)
@@ -25239,8 +25721,8 @@ c
 cc bordered Hessian average
 
 c            vlag=0.
-            hess_xyz(i,j)=hess_xyz1(i,j)+vlag*(hess_xyz1(i,j)
-     + -hess_xyz2(i,j))
+            hess_xyz(i,j)=(hess_xyz1(i,j)+vlag*(hess_xyz1(i,j)
+     + -hess_xyz2(i,j)))
 c            hess_xyz(i,j)=hess_xyz2(i,j)
 
 
@@ -25257,7 +25739,7 @@ c            hess_xyz(i,j)=(-gr2norm*hess_xyz1(i,j)+gr1norm*
 c     +  hess_xyz2(i,j))/grdiffnorm
 
 cc corrected formulation
-c            hess_xyz(i,j)=(-gr21norm*hess_xyz1(i,j)+gr11norm*
+c           hess_xyz(i,j)=(-gr21norm*hess_xyz1(i,j)+gr11norm*
 c     +  hess_xyz2(i,j))/(-gr21norm+gr11norm)
 
 
@@ -25332,8 +25814,13 @@ cc we are now ready to write the input for projection
       endif
       write(13,*)'Step 1'
       write(13,*)'geometry'
-      do j=1,natom
-         write(13,500)j,ianum_at(j),0,coox(j),cooy(j),cooz(j)
+      ind=0
+      do j=1,natomt
+         if(idummy(j).ne.1)then
+            ind=ind+1
+            write(13,500)ind,ianum_at(ind),0,coox(j),cooy(j)
+     +                  ,cooz(j)
+         endif
       enddo
 
 cc now write the gradient
@@ -25486,6 +25973,72 @@ c      close(108)
 c      close(109)
       write(12,*)
       write(12,*)'Finished writing me natst files'
+      write(7,*)'Finished writing me natst files'
+
+calb some printing tests
+c      write(12,*)'prints in na_tst/na_tst.out'
+c      write(7,*)'prints in output/estoktp.out'
+c      write(6,*)'prints in output/messages.out'
+c      write(*,*)'prints in output/messages.out for some reaon'
+
+calb print down P(LZ) using cfact by cc
+c      write(7,'(A12,A20)')'E(cm^-1)','P(LZ)'
+c      write(7,'(I12,F20.12)')0,1.-exp(-cfact/sqrt(1.d-6))
+c      do i=1,10
+c         write(7,'(I12,F20.12)')i,1.-exp(-cfact/sqrt(real(i)))
+c      enddo
+
+calb some tests on the airy subroutine
+c      x=100.
+c      call airy(x,ai,bi,aip,bip)
+c      write(7,*)ai
+
+calb compute P(LZ) and P(WC) using ZN coefficients
+c a2_zn taken from 10.1021/jp063643v eq.A.1
+c b2_zn taken from 10.1021/jp063643v eq.A.2
+c f_zn taken from 10.1021/jp063643v just below eq.A.2
+c epsilon in 10.1021/jp512942w eq.7 is taken as b2_zn 
+c beta in 10.1021/jp512942w eq.6 is taken as a2_zn**(1./2.)
+c Plz is defined in J.KoreanPhys.Soc.32.3.332-337(1998) below eq.2.2
+c Pwc taken from 10.1021/jp512942w eq.5
+
+      cden=cautokcal*4184./cautocm/0.01/DNAV/sqrt(1.0e-3/DNAV)
+      g1=0.
+      g2=0.
+      ccmtoj=clight_cms*cplanck
+      do j=1,3*natom
+         g1=g1+grad_xyz1(j)*grad_xyz1(j)
+         g2=g2+grad_xyz2(j)*grad_xyz2(j)
+      enddo
+
+      open(unit=107,file='probISC_LZ.dat',status='unknown')
+      open(unit=108,file='probISC_WC.dat',status='unknown')
+
+      grad=grad_diff_norm*cden
+      g1=sqrt(g1)*cden
+      g2=sqrt(g2)*cden
+      f_zn=sqrt(g1*g2)
+      so_coup=so_coup*ccmtoj
+      hbar=cplanck/2./pigr
+      a2_zn=hbar**2.*grad*f_zn/16./so_coup**3
+      write(107,*)20000
+      write(108,*)20000
+      write(107,'(I6,E24.16)')0,1.
+      write(108,'(I6,E24.16)')0,0.
+      do j=1,20000
+         en=j*ccmtoj
+         b2_zn=en*grad/2./so_coup/f_zn
+         x_airy=-b2_zn*a2_zn**(-1./3.)
+         call airy(x_airy,ai,bi,aip,bip)
+         Plz=1.-exp(-pigr/4./sqrt(a2_zn*b2_zn))
+         Plz=Plz+(1-Plz)*Plz
+         Pwc=pigr**2.*a2_zn**(-2./3.)*ai**2.
+         write(107,'(I6,E24.16)')j,Plz
+         write(108,'(I6,E24.16)')j,Pwc
+      enddo
+
+      close(107)
+      close(108)
 
 c      stop
 c      do j=1,natom
@@ -25554,6 +26107,7 @@ c     $ ,atname(natommx),bconnt(natommx),aconnt(natommx),dconnt(natommx)
       ibond=0
       jbond=0
       kbond=0
+      write(7,*)'entering subroutine level1'
 
 cc get data from react1 file
 
@@ -25599,7 +26153,6 @@ cc get data from react2 file
          write(7,*)'barrierless reaction type not defined'
          stop
       endif
-
       do while (WORD.NE.'NTAU')
          call LineRead (15)
          if (WORD.EQ.'END') then
@@ -25621,6 +26174,29 @@ c     natomt is to account for dummy atoms
       read (15,*) natom2,natomt2,ilin2
       close (15)
 
+
+cc get data for dummy atoms
+      call LineRead (0)
+      if(ibarr.eq.2)then
+         open (unit=16,file='./data/reac1.dat',status='old')
+      else if (ibarr.eq.3) then
+         open (unit=16,file='./data/prod1.dat',status='old')
+      else
+         write(7,*)'in pot_corr subroutine'
+         write(7,*)'barrierless reaction type not defined'
+         stop
+      endif
+      do while (WORD.NE.'NATOM')
+         call LineRead (16)
+         if (WORD.EQ.'END') then
+            write (7,*) 'natom must be defined'
+            stop
+         endif
+      enddo
+      read (16,*) natom_compl,natomt_compl,ilin
+      close (16)
+
+c
       natom = natom1+natom2
       natomt = natomt1+natomt2
       ntau = ntau1+ntau2
@@ -25638,7 +26214,7 @@ c     natomt is to account for dummy atoms
       rewind 25
 
 cc isite here refers to prod1/reac1 
-
+      naddres=0
       do while (WORD.NE.'IBOND')
          call LineRead (25)
          if (WORD.EQ.'END') then
@@ -25646,6 +26222,14 @@ cc isite here refers to prod1/reac1
             stop
          endif
       enddo
+      if(word2.eq.'ANG')naddres=1
+      if(word2.eq.'ANG'.and.word3.eq.'DIH')naddres=2
+      if(word2.eq.'DIH'.and.word3.eq.'ANG')naddres=2
+      if(naddres.ne.0)then
+         jbond=jsite
+         kbond=ksite
+      endif
+
       if(ipottype.eq.4)then
          read (25,*) ibond
       else
@@ -25654,7 +26238,6 @@ cc isite here refers to prod1/reac1
       read (25,*)
       read (25,*) aabs1,babs1,aabs2,babs2,babs3
       rewind 25
-
 
       do while (WORD.NE.'JKBOND')
          call LineRead (25)
@@ -25667,8 +26250,8 @@ cc isite here refers to prod1/reac1
       rewind 25
 
       if (jbond.ne.0)then
-         call calc_transitional(ibond,jbond,kbond,natom,aabs1v,babs1v
-     +   ,aabs2v,babs2v,babs3v)
+         call calc_transitional(ibond,jbond,kbond,natom,natomt_compl
+     +      ,aabs1v,babs1v,aabs2v,babs2v,babs3v)
 
          aabs1=aabs1v
          babs1=babs1v
@@ -25705,16 +26288,20 @@ cc determine active space for lev1
       do while (WORD.NE.'AS_LEVEL1')
          call LineRead (13)
          if (WORD.EQ.'END') then
-            write(7,*) 'active space and orbitals for VRC'
-            write(7,*) 'must be described in theory.dat'
-            stop
-         endif
+            write(7,*) 'level1 active space not defined'
+            write(7,*) 'using level1 defined in theory.dat'
+            goto 1919
+         endif         
       enddo
 
       read (13,*) cjunk,nbonds
       read (13,*) cjunk,nlps
       read (13,*) cjunk,nstates
+
+ 1919 continue
+
       rewind(13)
+
 
 cc determine active space for vrc
       word=''
@@ -25787,7 +26374,7 @@ cc initialize active space determination
          call activespace(nbonds_vrc,nlps_vrc,nstates_vrc,neltot,ispin)
             command1="cp -f activespace.dat ./activespace_vrc.dat"
             call activespace(nbonds,nlps,nstates,neltot,ispin)
-      endif
+         endif
 
 cc assume calculations will be done only for molpro
 c
@@ -25810,31 +26397,81 @@ cc
             command1="sed -ie 's/inactive,/active,aabs1,babs1/' 
      $ level0_molpro1.dat"
             call commrun(command1)
-         else if (natom1.gt.2.and.natom2.eq.2)then
-         command1="sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2/' 
-     $ level0_molpro1.dat"
+         else if (natom1.gt.2.and.natom2.eq.2.and.natomt2.eq.2)then
+            if(naddres.eq.0)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.1)then
+               command1=
+     $ "sed -ie 's/inactive,/active,babs1,aabs2,babs2/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.2)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs2,babs2/' 
+     $  level0_molpro1.dat"
+            endif
+            call commrun(command1)
+         else if (natom1.gt.2.and.natom2.eq.2.and.natomt2.eq.3)then
+            if(naddres.eq.0)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2,babs3/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.1)then
+               command1=
+     $ "sed -ie 's/inactive,/active,babs1,aabs2,babs2,babs3/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.2)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs2,babs2,babs3/' 
+     $  level0_molpro1.dat"
+            endif
             call commrun(command1)
          else if (natom1.eq.2.and.natom2.eq.2)then
-         command1="sed -ie 's/inactive,/active,aabs1,aabs2,babs2/' 
-     $ level0_molpro1.dat"
+            if(naddres.eq.0)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.1)then
+               command1=
+     $ "sed -ie 's/inactive,/active,babs1,aabs2,babs2/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.2)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs2,babs2/' 
+     $  level0_molpro1.dat"
+            endif
             call commrun(command1)
          else
-         command1="sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2,b
-     $abs3/' level0_molpro1.dat"
+            if(naddres.eq.0)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs1,babs1,aabs2,babs2,babs3/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.1)then
+               command1=
+     $ "sed -ie 's/inactive,/active,babs1,aabs2,babs2,babs3/' 
+     $  level0_molpro1.dat"
+            else if (naddres.eq.2)then
+               command1=
+     $ "sed -ie 's/inactive,/active,aabs2,babs2,babs3/' 
+     $  level0_molpro1.dat"
+            endif
             call commrun(command1)
          endif
+
          if (ipotguess.eq.1) then
             command1="sed -ie 's/active_space1/active_space2/'
      $level0_molpro1.dat"
             call commrun(command1)
          endif
+c         stop
 
          if(ipottype.eq.5)goto 3000
 
          open(unit=11,file='level0_molpro.dat',status='unknown')
          open(unit=12,file='./level0_molpro1.dat',status='unknown')
          open(unit=99,status='unknown')
-
+      
          iread=0
          if (ipotguess.eq.1) iread=1
 
@@ -25914,7 +26551,16 @@ c         endif
         read(99,'(A70)')comline2
         close(99)
         write(*,*)'comline2 is ',comline2 
+
+        filename='./me_files/reac1_ge.me'
+        neltot=0
+        call stoichiometry(filename,stoichname,neltot)
+        call activespace(nbonds_vrc,nlps_vrc,nstates_vrc,neltot,ispin)
+        command1="cp -f activespace.dat ./activespace_vrc.dat"
+        call commrun(command1)
+
 c        stop
+         if(ipottype.eq.5)goto 3000
       endif
 
 c      stop
@@ -26131,6 +26777,8 @@ cc
          else
             ircons=nint-5
          endif
+         ircons=ircons+naddres
+         if(ircons.gt.nint)ircons=nint
          if (idebug.ge.2) write (26,*) 'entering g09fopt'
          numproc=numprocll
          call g09fopt(ilev0code,tau,ntau,natom,natomt,numproc,gmem,
@@ -26181,8 +26829,8 @@ cc with full relaxation
       close(13)
       write(12,*)vtotr
       write(12,*)vtotref
-      write(12,*)natom,nint
-      do j=1,natom
+      write(12,*)natomt,nint
+      do j=1,natomt
          write(12,*)atomlabel(j)
       enddo
       do j=1,nint
@@ -26313,9 +26961,16 @@ cc update AS file
          endif
       enddo
       close(13)
+      ilevhlcode=0
       if(word2.eq.'G09')then
          ilev0code=1
+         ilevhlcode=1
       else if (word2.eq.'MOLPRO')then
+         ilev0code=2
+      endif
+      if(word3.eq.'G09')then
+         ilev0code=1
+      else if (word3.eq.'MOLPRO')then
          ilev0code=2
       endif
 
@@ -26471,6 +27126,7 @@ cc      read(15,*)cjunk
 
 cc read coordinate names                                                                                 
 
+      ntau=0
       ncoord = 3*natom-6
       do iint = 1 , ncoord
          read (15,*) intcoor(iint),xint(iint)
@@ -26509,11 +27165,25 @@ c      ilev0code=2
 
       open(unit=12,file='./me_files/potcorr_hl.me',status='unknown')
 
-      command1='egrep CBSEN  hl_logs/ts_molpro.out > en.dat'
-      call commrun(command1)
-      open (unit=99,file='./en.dat',status='old')
-      read(99,*)cjunk,cjunk,cjunk,vtotref
-      close(99)
+      if(ilev0code.eq.2.and.ilevhlcode.eq.0) then
+         command1='egrep CBSEN  hl_logs/ts_molpro.out > en.dat'
+         call commrun(command1)
+         open (unit=99,file='./en.dat',status='old')
+         read(99,*)cjunk,cjunk,cjunk,vtotref
+         close(99)
+      else if (ilev0code.eq.1.or.ilev0code.eq.3) then
+         command1='egrep SCF  hl_logs/ts_g09.out > en.dat'
+         call commrun(command1)
+         open (unit=99,file='./en.dat',status='old')
+         read(99,*)cjunk,cjunk,cjunk,cjunk,vtotref
+         close(99)
+      else if (ilev0code.eq.2.and.ilevhlcode.eq.1) then
+         command1='egrep SCF  hl_logs/ts_g09.out > en.dat'
+         call commrun(command1)
+         open (unit=99,file='./en.dat',status='old')
+         read(99,*)cjunk,cjunk,cjunk,cjunk,vtotref
+         close(99)
+      endif 
 
 c      open(unit=13,file='./me_files/ts_en.me',status='unknown')
 c      read(13,*)vtotref
@@ -26527,7 +27197,6 @@ c      close(13)
 
       if(ipottype.eq.3.or.ipottype.eq.5)then
 
-
 cc check requested level of theory for high level energy 
 
          open(unit=13,file='./data/theory.dat',status='unknown')
@@ -26536,17 +27205,30 @@ cc check requested level of theory for high level energy
          do while (WORD.NE.'HLEVEL_TS')
             call LineRead (13)
             if (WORD.EQ.'END') then
-               write(7,*) 'level1 of theory '
+               write(7,*) 'high level of theory '
                write(7,*) 'must be described in theory.dat'
                stop
             endif
          enddo
          close(13)
+         ilevhlcode=0
          if(word2.eq.'G09')then
             ilev0code=1
+            ilevhlcode=1
          else if (word2.eq.'MOLPRO')then
             ilev0code=2
          endif
+         if(word3.eq.'G09')then
+            ilev0code=1
+         else if (word3.eq.'MOLPRO')then
+            ilev0code=2
+         endif
+
+c         if(word2.eq.'G09')then
+c            ilev0code=1
+c         else if (word2.eq.'MOLPRO')then
+c            ilev0code=2
+c         endif
 
          open(unit=11,file='level0_molpro.dat',status='unknown')
          open(unit=12,file='./data/vrc_as.inp',status='unknown')
@@ -26647,8 +27329,8 @@ c         endif
          read(15,*)cjunk
          read(15,*)cjunk
          read(15,*)cjunk
-c         do iatom = 1 , natomt
-         do iatom = 1 , natom
+         do iatom = 1 , natomt
+c         do iatom = 1 , natom
             read(15,'(A60)')atomlabel(iatom)
          enddo
 c         write(*,*)'natomt is ',natomt
@@ -26657,11 +27339,14 @@ c        stop
 cc read coordinate names                                                                                 
 
          ncoord = 3*natom-6
+         ntau=0
          do iint = 1 , ncoord
             read (15,*) intcoor(iint),xint(iint)
+c            write (*,*) intcoor(iint),xint(iint)
          enddo
          close(15)
-         
+c         stop
+
          ircons=0
          ifreq=0
          ixyz=0
@@ -26670,9 +27355,6 @@ cc read coordinate names
          iaspace=0
          ispecies=0
          ires=0
-
-cc assume calculations will be done only for molpro
-cc         ilev0code=2
 
          if(ilev0code.eq.1) then
             if (idebug.ge.2) write (26,*) 'entering g09fopt'
@@ -27151,7 +27833,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          open (unit=17,file='./output/pr2_vrc_opt.out',status='unknown')
       endif
 
-
       do while (WORD.NE.'NTAU')
          call LineRead (15)
          if (WORD.EQ.'END') then
@@ -27167,7 +27848,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       if (ntau.ne.0) then
          read (15,*)
          do itau = 1 , ntau
-            read (15,*) bislab(itau),taumn(itau),taumx(itau)
+            call LineRead (15)
+             bislab(itau)=word
+c            read (15,*) bislab(itau),taumn(itau),taumx(itau)
          enddo
       endif
       rewind(15)
@@ -27209,9 +27892,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                stop
             endif
          enddo
-         do j = 1 , nint
+         do j = 1 , nint-ntau
             call LineRead(15)
             intcoor(j)=word
+         enddo
+c         itau=0
+         do j = 1, ntau
+            intcoor(nint-ntau+1)=bislab(j)
          enddo
          rewind(15)
       endif
@@ -27219,11 +27906,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       read(17,*)cjunk
       do iint = 1 , nint
          read (17,*)xint(iint)
+         write(*,*)intcoor(iint),xint(iint)
       enddo
+
 
       close(17)
       close(15)
 c      write(7,*)'nint is',nint
+      ntau=0
 
       call read_zmat(atomlabel,natom,natomt,intcoor,bislab,ibconn,
      $ iaconn,idconn,bname,anname,dname,atname,idummy,isited,jsited,
@@ -27247,42 +27937,84 @@ cc we can now determine the xyz geometry
 
       if(natom.gt.1)then
          do j=1,nint
-            if(intcoor(j).eq.bname(2))then
+            if(intcoor(j).eq.bname(2).and.idummy(2).ne.1)then
+               coox(2)=xint(j)
+            else if(idummy(2).eq.1.and.idummy(3).ne.1.and.
+     $ intcoor(j).eq.bname(3))then
                coox(2)=xint(j)
             endif
          enddo
       endif
 
       if(natom.gt.2)then
+cc determine position of atom 3
+         if(ilin.eq.1)then
+            ithird=0
+            icount=0
+            do j=1,natomt
+               if(idummy(j).eq.1)icount=icount+1
+               if((j-icount).eq.3)ithird=j
+            enddo
+         endif
+c         write(*,*)'ithird is ',ithird
+c         write(*,*)'bname(ithird) is ',bname(ithird)
          do j=1,nint
-            if(intcoor(j).eq.bname(3))then
+            if(intcoor(j).eq.bname(3).and.ilin.ne.1)then
                bdist3=xint(j)
             endif
-            if(intcoor(j).eq.anname(3))then
+            if(intcoor(j).eq.anname(3).and.ilin.ne.1)then
                adist3=xint(j)
 c               if(adist3.gt.90)adist3=180.-adist3
                adist3=adist3*pigr/180.
             endif
+            if(ilin.eq.1.and.icount.ne.0)then
+               if(intcoor(j).eq.bname(ithird))then
+                  bdist3=xint(j)               
+               endif
+            endif
          enddo
-         if(ibconn(3).eq.2)then
+c         write(*,*)'bdist3 is ',bdist3
+
+         if(ibconn(3).eq.2.and.ilin.ne.1)then
             coox(3)=coox(2)+bdist3*cos(pigr-adist3)
             cooy(3)=bdist3*sin(adist3)
-         else if (ibconn(3).eq.1)then
+         else if (ibconn(3).eq.1.and.ilin.ne.1)then
             coox(3)=bdist3*cos(adist3)
-            cooy(3)=bdist3*sin(adist3) 
+            cooy(3)=bdist3*sin(adist3)
+         else if (ilin.eq.1.and.ibconn(ithird).ne.1)then
+            coox(3)=coox(2)+bdist3
+         else if (ilin.eq.1.and.ibconn(ithird).eq.1)then
+            coox(3)=-bdist3
          endif
+
       endif
       if(natom.gt.3)then
-         do j=4,natom
+         do j=4,natomt
             do k=1,nint
-               if(intcoor(k).eq.bname(j))then
-                  bd=xint(k)
-               endif
-               if(intcoor(k).eq.anname(j))then
-                  ang=xint(k)
-               endif
-               if(intcoor(k).eq.dname(j))then
-                  dihed=xint(k)
+               if(idummy(j).eq.0)then
+                  if(intcoor(k).eq.bname(j))then
+                     bd=xint(k)
+                  endif
+                  if(intcoor(k).eq.anname(j))then
+                     ang=xint(k)
+                  endif
+                  if(intcoor(k).eq.dname(j))then
+                     dihed=xint(k)
+                  endif
+               else if(idummy(j).eq.1)then
+c                  write(*,*)'found dummy atom in sub zmat to xyz'
+c                  write(*,*)'idummy is ',j
+c                  write(*,*)'bd is ',bname(j)
+c                  write(*,*)'ang is ',anname(j)
+c                  write(*,*)'dihed is ',dname(j)
+                  read(bname(j),111)bd
+                  read(anname(j),111)ang
+                  read(dname(j),111)dihed
+c                  write(*,*)' bd now is ',bd
+c                  write(*,*)' ang now is ',ang
+c                  write(*,*)' dihed now is ',dihed
+ 111              format(f7.4)
+c                  stop
                endif
             enddo
             call zmat_to_xyz(xa,ya,za,coox(ibconn(j)),cooy(ibconn(j)),
@@ -27315,9 +28047,12 @@ c            stop
       open(unit=15,file='geomconv.xyz',status='unknown')
       write(15,*)natom
       write(15,*)'xyz geom of ispecies ',ispecies
-      do j=1,natom
-         write(15,100)atname(j),coox(j),cooy(j),cooz(j)
+      do j=1,natomt
+         if(idummy(j).ne.1)then
+            write(15,100)atname(j),coox(j),cooy(j),cooz(j)
+         endif
       enddo
+c      stop
 c      write(15,*),coox(ibconn(4)),cooy(ibconn(4)),cooz(ibconn(4))
 c      write(15,*),coox(iaconn(4)),cooy(iaconn(4)),cooz(iaconn(4))
 c      write(15,*),coox(idconn(4)),cooy(idconn(4)),cooz(idconn(4))
@@ -27329,8 +28064,8 @@ c      write(15,*),coox(idconn(4)),cooy(idconn(4)),cooz(idconn(4))
       end
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
 
-      subroutine calc_transitional(ibond,jbond,kbond,natom,aabs1v,babs1v
-     +   ,aabs2v,babs2v,babs3v)
+      subroutine calc_transitional(ibond,jbond,kbond,natom,natomt,aabs1v
+     +   ,babs1v,aabs2v,babs2v,babs3v)
 
       implicit double precision (a-h,o-z)
       implicit integer (i-n)
@@ -27354,20 +28089,31 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       open (unit=15,file='./output/ts_opt.out',status='old')
 
-      if(ibond.lt.3)then
-         write(7,*)'automatic determination of aabs1 not supported'
-         write(7,*)'for broken bond smaller than 3'
-         goto 1000
+      if(ibond.lt.4)then
+         write(7,*)'automatic det of transitional'
+         write(7,*)'is not possible with ibond smaller than 4'
+         write(7,*)'disable jk bond line and restart'
+         stop
       endif
 
       call LineRead3 (15)
 
-      do j=1,natom
+c      write(*,*)'natom is',natom
+c      write(*,*)'natomt is',natomt
+
+      do j=1,natomt
          call LineRead3 (15)
          if(j.eq.ibond)then
             aabs1_name=word5
             babs1_name=word7
          endif
+      enddo
+
+      rewind(15)
+      call LineRead3 (15)
+
+      do j=1,natomt
+         call LineRead3 (15)
          if(j.eq.jbond)then
             aabs2_name=word5
             babs2_name=word7
@@ -27440,5 +28186,417 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       return
       end
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
+
+calb  code was adapted to double precision as suggested in comments
+c     goto/continue line numbers were made unique as follows
+c       bessik subroutine uses 771,772
+c       bessjy subroutine uses 781,782,783
+c     pause statements were replaced by stop ones
+c       with erroer messages printed in output/estoktp.out
+c     PI was swapped for double precision pigr when needed
+c     double precision ai(0.) and aip(0.) were obtained using
+c       scipy.special.airy function on python
+c     double precision ONOVRT was obtained as ai(0.)/bi(0.)
+c       as produced by scipy.special.airy function on python
+
+calb  from Numerical Recipes in FORTRAN77 page 244
+
+      SUBROUTINE airy(x,ai,bi,aip,bip)
+      DOUBLE PRECISION ai,aip,bi,bip,x
+c     USES bessik,bessjy
+      DOUBLE PRECISION absx,ri,rip,rj,rjp,rk,rkp,rootx,ry,ryp,z,
+     * PI,THIRD,TWOTHR,ONOVRT
+      PARAMETER (PI=3.141592653589793,THIRD=1./3.,TWOTHR=2.*THIRD,
+     * ONOVRT=.57735026918962573)
+      absx=abs(x)
+      rootx=sqrt(absx)
+      z=TWOTHR*absx*rootx
+      if(x.gt.0.)then
+         call bessik(z,THIRD,ri,rk,rip,rkp)
+         ai=rootx*ONOVRT*rk/PI
+         bi=rootx*(rk/PI+2.*ONOVRT*ri)
+         call bessik(z,TWOTHR,ri,rk,rip,rkp)
+         aip=-x*ONOVRT*rk/PI
+         bip=x*(rk/PI+2.*ONOVRT*ri)
+      else if(x.lt.0.)then
+         call bessjy(z,THIRD,rj,ry,rjp,ryp)
+         ai=.5*rootx*(rj-ONOVRT*ry)
+         bi=-.5*rootx*(ry+ONOVRT*rj)
+         call bessjy(z,TWOTHR,rj,ry,rjp,ryp)
+         aip=.5*absx*(ONOVRT*ry+rj)
+         bip=.5*absx*(ONOVRT*rj-ry)
+      else
+         ai=.35502805388781722
+         bi=ai/ONOVRT
+         aip=-.25881940379280682
+         bip=-aip/ONOVRT
+      endif
+      return
+      END 
+
+calb  from Numerical Recipes in FORTRAN77 page 241
+
+      SUBROUTINE bessik(x,xnu,ri,rk,rip,rkp)
+      INTEGER MAXIT
+      DOUBLE PRECISION ri,rip,rk,rkp,x,xnu,XMIN
+      DOUBLE PRECISION EPS,FPMIN,PI
+      PARAMETER (EPS=1.e-16,FPMIN=1.e-30,MAXIT=10000,XMIN=2.,
+     * PI=3.141592653589793d0)
+c     USES beschb
+      INTEGER i,l,nl
+      DOUBLE PRECISION a,a1,b,c,d,del,del1,delh,dels,e,f,fact,
+     * fact2,ff,gam1,gam2,gammi,gampl,h,p,pimu,q,q1,q2,
+     * qnew,ril,ril1,rimu,rip1,ripl,ritemp,rk1,rkmu,rkmup,
+     * rktemp,s,sum,sum1,x2,xi,xi2,xmu,xmu2
+      if(x.le.0..or.xnu.lt.0.)then !pause 'bad arguments in bessik'
+         write(7,*)'bad arguments in bessik'
+         stop
+      endif
+      nl=int(xnu+.5d0)
+      xmu=xnu-nl
+      xmu2=xmu*xmu
+      xi=1.d0/x
+      xi2=2.d0*xi
+      h=xnu*xi
+      if(h.lt.FPMIN)h=FPMIN
+      b=xi2*xnu
+      d=0.d0
+      c=h
+      do i=1,MAXIT
+         b=b+xi2
+         d=1.d0/(b+d)
+         c=b+1.d0/c
+         del=c*d
+         h=del*h
+         if(abs(del-1.d0).lt.EPS)goto 771
+      enddo
+      !pause 'x too large in bessik; try asymptotic expansion'
+      write(7,*)'x too large in bessik; try asymptotic expansion'
+      stop
+  771 continue
+      ril=FPMIN 
+      ripl=h*ril
+      ril1=ril
+      rip1=ripl
+      fact=xnu*xi
+      do l=nl,1,-1
+         ritemp=fact*ril+ripl
+         fact=fact-xi
+         ripl=fact*ritemp+ril
+         ril=ritemp
+      enddo
+      f=ripl/ril
+      if(x.lt.XMIN) then
+         x2=.5d0*x
+         pimu=PI*xmu
+         if(abs(pimu).lt.EPS)then
+            fact=1.d0
+         else
+            fact=pimu/sin(pimu)
+         endif
+         d=-log(x2)
+         e=xmu*d
+         if(abs(e).lt.EPS)then
+            fact2=1.d0
+         else
+            fact2=sinh(e)/e
+         endif
+         call beschb(xmu,gam1,gam2,gampl,gammi)
+         ff=fact*(gam1*cosh(e)+gam2*fact2*d)
+         sum=ff
+         e=exp(e)
+         p=0.5d0*e/gampl
+         q=0.5d0/(e*gammi)
+         c=1.d0
+         d=x2*x2
+         sum1=p
+         do i=1,MAXIT
+            ff=(i*ff+p+q)/(i*i-xmu2)
+            c=c*d/i
+            p=p/(i-xmu)
+            q=q/(i+xmu)
+            del=c*ff
+            sum=sum+del
+            del1=c*(p-i*ff)
+            sum1=sum1+del1
+            if(abs(del).lt.abs(sum)*EPS)goto 772
+         enddo
+         !pause 'bessk series failed to converge'
+         write(7,*)'bessk series failed to converge'
+         stop
+  772    continue
+         rkmu=sum
+         rk1=sum1*xi2
+      else
+         b=2.d0*(1.d0+x)
+         d=1.d0/b
+         delh=d
+         h=delh
+         q1=0.d0
+         q2=1.d0
+         a1=.25d0-xmu2
+         c=a1
+         q=c
+         a=-a1
+         s=1.d0+q*delh
+         do i=2,MAXIT
+            a=a-2*(i-1)
+            c=-a*c/i
+            qnew=(q1-b*q2)/a
+            q1=q2
+            q2=qnew
+            q=q+c*qnew
+            b=b+2.d0
+            d=1.d0/(b+a*d)
+            delh=(b*d-1.d0)*delh
+            h=h+delh
+            dels=q*delh
+            s=s+dels
+            if(abs(dels/s).lt.EPS)goto 773
+         enddo
+         !pause 'bessik: failure to converge in cf2'
+         write(7,*)'bessik: failure to converge in cf2'
+         stop
+  773    continue
+         h=a1*h
+         rkmu=sqrt(PI/(2.d0*x))*exp(-x)/s
+         rk1=rkmu*(xmu+x+.5d0-h)*xi
+      endif
+      rkmup=xmu*xi*rkmu-rk1
+      rimu=xi/(f*rkmu-rkmup)
+      ri=(rimu*ril1)/ril
+      rip=(rimu*rip1)/ril
+      do i=1,nl
+         rktemp=(xmu+i)*xi2*rk1+rkmu
+         rkmu=rk1
+         rk1=rktemp
+      enddo
+      rk=rkmu
+      rkp=xnu*xi*rkmu-rk1
+      return
+      END
+
+calb  from Numerical Recipes in FORTRAN77 page 236
+
+      SUBROUTINE bessjy(x,xnu,rj,ry,rjp,ryp)
+      INTEGER MAXIT
+      DOUBLE PRECISION rj,rjp,ry,ryp,x,xnu,XMIN
+      DOUBLE PRECISION EPS,FPMIN,PI
+      PARAMETER (EPS=1.e-16,FPMIN=1.e-30,MAXIT=10000,XMIN=2.,
+     * PI=3.141592653589793d0)
+c     USES beschb
+      INTEGER i,isign,l,nl
+      DOUBLE PRECISION a,b,br,bi,c,cr,ci,d,del,del1,den,di,dlr,dli,
+     * dr,e,f,fact,fact2,fact3,ff,gam,gam1,gam2,gammi,gampl,h,
+     * p,pimu,pimu2,q,r,rjl,rjl1,rjmu,rjp1,rjpl,rjtemp,ry1,
+     * rymu,rymup,rytemp,sum,sum1,temp,w,x2,xi,xi2,xmu,xmu2
+      if(x.le.0..or.xnu.lt.0.)then !pause 'bad arguments in bessjy'
+         write(7,*)'bad arguments in bessjy'
+         stop
+      endif
+      if(x.lt.XMIN)then
+         nl=int(xnu+.5d0)
+      else
+         nl=max(0,int(xnu-x+1.5d0))
+      endif
+      xmu=xnu-nl
+      xmu2=xmu*xmu
+      xi=1.d0/x
+      xi2=2.d0*xi
+      w=xi2/PI
+      isign=1
+      h=xnu*xi
+      if(h.lt.FPMIN)h=FPMIN
+      b=xi2*xnu
+      d=0.d0
+      c=h
+      do i=1,MAXIT
+         b=b+xi2
+         d=b-d
+         if(abs(d).lt.FPMIN)d=FPMIN
+         c=b-1.d0/c
+         if(abs(c).lt.FPMIN)c=FPMIN
+         d=1.d0/d
+         del=c*d
+         h=del*h
+         if(d.lt.0.d0)isign=-isign
+         if(abs(del-1.d0).lt.EPS)goto 781
+      enddo
+      !pause 'x too large in bessjy; try asymptotic expansion'
+      write(7,*)'x too large in bessjy; try asymptotic expansion'
+      stop
+  781 continue
+      rjl=isign*FPMIN
+      rjpl=h*rjl
+      rjl1=rjl
+      rjp1=rjpl
+      fact=xnu*xi
+      do l=nl,1,-1
+         rjtemp=fact*rjl+rjpl
+         fact=fact-xi
+         rjpl=fact*rjtemp-rjl
+         rjl=rjtemp
+      enddo
+      if(rjl.eq.0.d0)rjl=EPS
+      f=rjpl/rjl
+      if(x.lt.XMIN) then
+         x2=.5d0*x
+         pimu=PI*xmu
+         if(abs(pimu).lt.EPS)then
+            fact=1.d0
+         else
+            fact=pimu/sin(pimu)
+         endif
+         d=-log(x2)
+         e=xmu*d
+         if(abs(e).lt.EPS)then
+            fact2=1.d0
+         else
+            fact2=sinh(e)/e
+         endif
+         call beschb(xmu,gam1,gam2,gampl,gammi)
+         ff=2.d0/PI*fact*(gam1*cosh(e)+gam2*fact2*d)
+         e=exp(e)
+         p=e/(gampl*PI)
+         q=1.d0/(e*PI*gammi)
+         pimu2=0.5d0*pimu
+         if(abs(pimu2).lt.EPS)then
+            fact3=1.d0
+         else
+            fact3=sin(pimu2)/pimu2
+         endif
+         r=PI*pimu2*fact3*fact3
+         c=1.d0
+         d=-x2*x2
+         sum=ff+r*q
+         sum1=p
+         do i=1,MAXIT
+            ff=(i*ff+p+q)/(i*i-xmu2)
+            c=c*d/i
+            p=p/(i-xmu)
+            q=q/(i+xmu)
+            del=c*(ff+r*q)
+            sum=sum+del
+            del1=c*p-i*del
+            sum1=sum1+del1
+            if(abs(del).lt.(1.d0+abs(sum))*EPS)goto 782
+         enddo
+         !pause 'bessy series failed to converge'
+         write(7,*)'bessy series failed to converge'
+         stop
+  782    continue
+         rymu=-sum
+         ry1=-sum1*xi2
+         rymup=xmu*xi*rymu-ry1
+         rjmu=w/(rymup-f*rymu)
+      else
+         a=.25d0-xmu2
+         p=-.5d0*xi
+         q=1.d0
+         br=2.d0*x
+         bi=2.d0
+         fact=a*xi/(p*p+q*q)
+         cr=br+q*fact
+         ci=bi+p*fact
+         den=br*br+bi*bi
+         dr=br/den
+         di=-bi/den
+         dlr=cr*dr-ci*di
+         dli=cr*di+ci*dr
+         temp=p*dlr-q*dli
+         q=p*dli+q*dlr
+         p=temp
+         do i=2,MAXIT
+            a=a+2*(i-1)
+            bi=bi+2.d0
+            dr=a*dr+br
+            di=a*di+bi
+            if(abs(dr)+abs(di).lt.FPMIN)dr=FPMIN
+            fact=a/(cr*cr+ci*ci)
+            cr=br+cr*fact
+            ci=bi-ci*fact
+            if(abs(cr)+abs(ci).lt.FPMIN)cr=FPMIN
+            den=dr*dr+di*di
+            dr=dr/den
+            di=-di/den
+            dlr=cr*dr-ci*di
+            dli=cr*di+ci*dr
+            temp=p*dlr-q*dli
+            q=p*dli+q*dlr
+            p=temp
+            if(abs(dlr-1.d0)+abs(dli).lt.EPS)goto 783
+         enddo
+         !pause 'cf2 failed in bessjy'
+         write(7,*)'cf2 failed in bessjy'
+         stop
+  783    continue
+         gam=(p-f)/q
+         rjmu=sqrt(w/((p-f)*gam+q))
+         rjmu=sign(rjmu,rjl)
+         rymu=rjmu*gam
+         rymup=rymu*(p+q/gam)
+         ry1=xmu*xi*rymu-rymup
+         endif
+      fact=rjmu/rjl
+      rj=rjl1*fact
+      rjp=rjp1*fact
+      do i=1,nl
+         rytemp=(xmu+i)*xi2*ry1-rymu
+         rymu=ry1
+         ry1=rytemp
+      enddo
+      ry=rymu
+      ryp=xnu*xi*rymu-ry1
+      return
+      END
+
+calb  from Numerical Recipes in FORTRAN77 page 239
+
+      SUBROUTINE beschb(x,gam1,gam2,gampl,gammi)
+      INTEGER NUSE1,NUSE2
+      DOUBLE PRECISION gam1,gam2,gammi,gampl,x
+      PARAMETER (NUSE1=7,NUSE2=8)
+c     USES chebev
+      REAL xx,c1(7),c2(8),chebev
+      SAVE c1,c2
+      DATA c1/-1.142022680371168d0,6.5165112670737d-3,
+     * 3.087090173086d-4,-3.4706269649d-6,6.9437664d-9,
+     * 3.67795d-11,-1.356d-13/
+      DATA c2/1.843740587300905d0,-7.68528408447867d-2,
+     * 1.2719271366546d-3,-4.9717367042d-6,-3.31261198d-8,
+     * 2.423096d-10,-1.702d-13,-1.49d-15/
+      xx=8.d0*x*x-1.d0
+      gam1=chebev(-1.,1.,c1,NUSE1,xx)
+      gam2=chebev(-1.,1.,c2,NUSE2,xx)
+      gampl=gam2-x*gam1
+      gammi=gam2+x*gam1
+      return
+      END
+
+calb  from Numerical Recipes in FORTRAN77 page 187
+
+      FUNCTION chebev(a,b,c,m,x)
+      INTEGER m
+      REAL chebev,a,b,x,c(m)
+      INTEGER j
+      REAL d,dd,sv,y,y2
+      if ((x-a)*(x-b).gt.0.)then !pause 'x not in range in chebev'
+         write(7,*)'x not in range in chebev'
+         stop
+      endif
+      d=0.
+      dd=0.
+      y=(2.*x-a-b)/(b-a)
+      y2=2.*y
+      do j=m,2,-1
+         sv=d
+         d=y2*d-dd+c(j)
+         dd=sv
+      enddo
+      chebev=y*d-dd+0.5*c(1)
+      return
+      END
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 

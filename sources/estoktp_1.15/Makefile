@@ -9,7 +9,6 @@ CFLAGS=-O3 -std=c99
 LIBS_CDF = -lnlopt -lm
 LIBS1 = -lm 
 GLIBS   =
-# this include must specify where libraries and headers of nlopt are installed
 LDFLAGS=-L/software/cinetica/local/lib -I/software/cinetica/local/include
 #FLIBS = -lblas
 

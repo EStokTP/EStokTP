@@ -76,7 +76,9 @@ c initialize word, word2, word3, word4, word5
 c      ncoord = natom*3-6-ntau-ircons
       ncoord = natom*3-6-ntau
       if (natom.eq.2) ncoord = 1
-c      write(*,*)'natomt is',natomt
+      if (natom.eq.1) ncoord = 0
+c      write(*,*)'ncoord is',ncoord
+c      write(*,*)'ntau is',ntau
 c      stop
 c      write(*,*)'ircons is ',ircons
 
@@ -117,37 +119,51 @@ cc it is assumed the memory in the input is given as MW
       read(99,*)igmem
       close(99)
       write(10,*)'memory,',igmem,',m'
+      iskgeo=0
 
  100  continue
       read (11,'(A100)') comline1
-      if (comline1.EQ.'End1'.or.comline1.eq.' End1') go to 200
-      write (10,*) comline1
-      if(iaspace.eq.1)write(98,*) comline1
+      if (comline1.eq.'Skip'.or.comline1.eq.' Skip')iskgeo=1
+      if (comline1.eq.'Skipgeom'.or.comline1.eq.' Skipgeom')iskgeo=1
+      if (comline1.eq.'  Skipgeom'.or.comline1.eq.'  Skip')iskgeo=1
+c      write(*,*)'comline1 is',comline1
+c      write(*,*)'isk is',iskgeo
+c      if(iskgeo.eq.1)stop
+      if (comline1.eq.'End1'.or.comline1.eq.' End1') then
+         if(ilev.eq.2) write(98,*) comline1
+         go to 200
+      endif
+      if(iskgeo.ne.1)then
+         write (10,*) comline1
+         if(iaspace.eq.1)write(98,*) comline1
+      endif
       goto 100
  200  continue
-      write (10,*)'geometry={angstrom'
-      if(iaspace.eq.1)write(98,*)'geometry={angstrom'
-      if(ixyz.ne.1)then
-         do iatom = 1 , natomt
-            write (10,*)atomlabel(iatom)
-            if(iaspace.eq.1)write (98,*)atomlabel(iatom)
-         enddo
-      else
-         do iatom = 1 , natom
-            open(unit=99,status='unknown')
-            write(99,*)atomlabel(iatom)
-            rewind(99)
-            read(99,*)aname,tcoox,tcooy,tcooz
-            write(10,*)aname,', ',tcoox,', ',tcooy,', ',tcooz
-            if(iaspace.eq.1)then
-               write(98,*)aname,', ',tcoox,', ',tcooy,', ',tcooz
-            endif
-            close(99)
-         enddo
+      if(iskgeo.ne.1)then
+         write (10,*)'geometry={angstrom'
+         if(iaspace.eq.1)write(98,*)'geometry={angstrom'
+         if(ixyz.ne.1)then
+            do iatom = 1 , natomt
+               write (10,*)atomlabel(iatom)
+               if(iaspace.eq.1)write (98,*)atomlabel(iatom)
+            enddo
+         else
+            do iatom = 1 , natom
+               open(unit=99,status='unknown')
+               write(99,*)atomlabel(iatom)
+               rewind(99)
+               read(99,*)aname,tcoox,tcooy,tcooz
+               write(10,*)aname,', ',tcoox,', ',tcooy,', ',tcooz
+               if(iaspace.eq.1)then
+                  write(98,*)aname,', ',tcoox,', ',tcooy,', ',tcooz
+               endif
+               close(99)
+            enddo
+         endif
+         write (10,*)'}'
+         if(iaspace.eq.1) write (98,*)'}'
       endif
-      write (10,*)'}'
-      if(iaspace.eq.1) write (98,*)'}'
-      
+
       if(ixyz.ne.1)then
          do icoord = 1 , ncoord-1
             write (10,*) intcoor(icoord),' = ',xint(icoord)
@@ -172,9 +188,13 @@ cc it is assumed the memory in the input is given as MW
             endif
             write(10,*)
          endif
-         write (10,*) intcoor(ncoord),' = ',xint(ncoord)
+         if(ncoord.ne.0)then
+            write (10,*) intcoor(ncoord),' = ',xint(ncoord)
+         endif
          if(iaspace.eq.1)then
-            write (98,*) intcoor(ncoord),' = ',xint(ncoord)
+            if(ncoord.ne.0)then
+               write (98,*) intcoor(ncoord),' = ',xint(ncoord)
+            endif
          endif
          do itau = 1 , ntau
             write (10,*) bislab(itau),' = ',tau(itau)
@@ -467,8 +487,10 @@ cc then get and write xyz coordinates
       enddo
       nread=natomt
       if (ixyz.eq.1) nread=natom
+      nxatoms=0
       do j=1,nread
          read(100,*)atomtype(j),djunk,djunk,coox(j),cooy(j),cooz(j)
+         if(atomtype(j).eq.'X')nxatoms=nxatoms+1
          if(atomtype(j).ne.'X')then
             call update_atomtype(atomtype(j),atomtype_new)
             write(101,1204)atomtype_new,coox(j),cooy(j),cooz(j)
@@ -476,6 +498,7 @@ cc then get and write xyz coordinates
             coord(j,2)=cooy(j)
             coord(j,3)=cooz(j)
          endif
+         if(j.eq.natom.and.nxatoms.eq.0)exit
       enddo
       write(101,*)
       close(100)
@@ -574,7 +597,7 @@ c         numlines=numlines-1
          write(101,*)'Number'
          write(101,*)'---'
 
-         do j=1,natom
+         do j=1,natomt
             if(atomtype(j).eq.'H')ianumb=1
             if(atomtype(j).eq.'B')ianumb=5
             if(atomtype(j).eq.'C')ianumb=6
@@ -602,7 +625,10 @@ c         numlines=numlines-1
             if(atomtype(j).eq.'Te')ianumb=52
             if(atomtype(j).eq.'I')ianumb=53
             if(atomtype(j).eq.'Xe')ianumb=54
-            write(101,1002)j,ianumb,0,coox(j),cooy(j),cooz(j)
+            if(atomtype(j).ne.'X')then
+               write(101,1002)j,ianumb,0,coox(j),cooy(j),cooz(j)
+            endif
+c            if(atomtype(j).eq.'X')j=j-1
          enddo
 
 cc now save the gradient
@@ -665,7 +691,7 @@ cc count lines
          write(101,*)'---'
          write(101,*)'Center'
 
-         do j=1,natom
+         do j=1,natomt
             if(atomtype(j).eq.'H')ianumb=1
             if(atomtype(j).eq.'B')ianumb=5
             if(atomtype(j).eq.'C')ianumb=6
@@ -693,7 +719,9 @@ cc count lines
             if(atomtype(j).eq.'Te')ianumb=52
             if(atomtype(j).eq.'I')ianumb=53
             if(atomtype(j).eq.'Xe')ianumb=54
-            write(101,1001)j,ianumb,gradx(j),grady(j),gradz(j)
+            if(atomtype(j).ne.'X')then
+               write(101,1001)j,ianumb,gradx(j),grady(j),gradz(j)
+            endif
          enddo
          write(101,*)
          write(101,*)
@@ -936,3 +964,171 @@ c      stop
       end
 
 C     *****************************
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      subroutine readxyzgrad_molpro(natom,grad_xyz)
+
+      implicit double precision (a-h,o-z)
+      implicit integer (i-n)
+
+      include 'data_estoktp.fi'
+      include 'param_estoktp.fi'
+
+      dimension grad_xyz(3*natommx)
+
+      LOGICAL leof,lsec,ltit
+      
+c      character*30 gmem
+      character*30 cjunk
+      character*100 commandcopy,comm1
+
+      CHARACTER*1000 line,string
+      CHARACTER*160 sename,word,word2,word3,title,title1,
+     $ word4,word5,word6,word7
+
+      include 'filcomm.f'
+
+      open (unit=11,status='old',file='geom.log')
+c      rewind (11)
+115   continue
+      call LineRead (0)
+      call LineRead (11)
+
+cc read gradient 
+
+      if((WORD.EQ.'OPTIMIZATION').AND.(WORD2.EQ.'POINT'))then
+         gradval=0.
+         read(11,*)cjunk
+         read(11,*)cjunk
+         nvar=natom*3
+
+         do iread = 1 , nvar
+            read(11,*)cjunk,cjunk,cjunk,cjunk,cjunk,gradval
+            grad_xyz(iread)=gradval
+c            write(*,*)'grad is ',grad_xyz(iread)
+         enddo
+      endif
+      if (WORD.eq.'ENDFILE')goto 9001
+      goto 115
+      
+ 9001 continue
+      close(11)
+
+      return
+      end
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      subroutine readianum_molpro(natom,ianum)
+
+      implicit double precision (a-h,o-z)
+      implicit integer (i-n)
+
+      include 'data_estoktp.fi'
+      include 'param_estoktp.fi'
+
+      dimension ianum(3*natommx)
+
+      LOGICAL leof,lsec,ltit
+      
+c      character*30 gmem
+      character*30 cjunk
+      character*100 commandcopy,comm1
+
+      CHARACTER*1000 line,string
+      CHARACTER*160 sename,word,word2,word3,title,title1,
+     $ word4,word5,word6,word7
+
+      include 'filcomm.f'
+
+
+      commandcopy='echo endfile >> molpro.molden'
+      call commrun(commandcopy)
+
+      open (unit=11,status='old',file='molpro.molden')
+      rewind (11)
+114   continue
+      call LineRead (0)
+      call LineRead (11)
+
+cc read atom numbers
+
+      if((WORD.EQ.'[ATOMS]').AND.(WORD2.EQ.'ANGS'))then
+c         gradval=0.
+         iprog=0
+         do ip = 1 , natom
+            read(11,*)cjunk,cjunk,ianum(iprog+1)
+            write(*,*)cjunk,cjunk,ianum(iprog+1)
+            ianum(iprog+2)=ianum(iprog+1)
+            ianum(iprog+3)=ianum(iprog+1)
+            iprog=iprog+3
+         enddo
+      endif
+c      write(*,*)'word is ',word
+      if (WORD.eq.'ENDFILE')goto 9000
+      goto 114
+      
+ 9000 continue
+      close(11)
+
+      return
+      end
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      subroutine readxyzgeom_molpro(natom,coox,cooy,cooz)
+
+      implicit double precision (a-h,o-z)
+      implicit integer (i-n)
+
+      include 'data_estoktp.fi'
+      include 'param_estoktp.fi'
+
+      dimension coox(natommx)
+      dimension cooy(natommx)
+      dimension cooz(natommx)
+
+      character*30 gkeyword,igkey
+      character*70 cjunk
+      character*70 comline1
+      character*70 comline2
+      character*70 comline3
+      character*70 comline4
+      character*120 command1
+      LOGICAL leof,lsec,ltit
+
+      CHARACTER*1000 line,string
+      CHARACTER*160 sename,word,word2,word3
+     $ ,title,title1,word4,word5,word6,word7
+
+      include 'filcomm.f'
+
+      iread=0
+      OPEN (unit=11,status='old',file='molpro.molden')
+      rewind (11)
+114   CONTINUE
+      CALL LineRead (0)
+      CALL LineRead (11)
+
+      do while (WORD.ne.'[ATOMS]')
+         CALL LineRead (11)
+      enddo
+c      if (ixyz.eq.1) nread=natom
+      do j=1,natom
+         read(11,*)cjunk,cjunk,cjunk,coox(j),cooy(j),cooz(j)
+c         if(atomtype(j).ne.'X')then
+c            call update_atomtype(atomtype(j),atomtype_new)
+c            write(101,1204)atomtype_new,coox(j),cooy(j),cooz(j)
+c            coord(j,1)=coox(j)
+c            coord(j,2)=cooy(j)
+c            coord(j,3)=cooz(j)
+c         endif
+      enddo
+
+      close(11)
+
+      return
+      end
+
+C     *****************************
+
+
+

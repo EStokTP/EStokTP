@@ -382,7 +382,7 @@ cc first check if the framework group is linear
       call commrun(command1)         
       command1='tail -n 1 temp.dat > temp1.dat'
       call commrun(command1)         
-      write(command1,920)
+      write(command1,921)
       call commrun(command1)         
 
       open(unit=920,file='temp1.dat',status='unknown')
@@ -395,8 +395,19 @@ cc first check if the framework group is linear
       write(*,*)'cgroup ',cgroup
       write(*,*)'ilin_fr ',ilin_fr
 c      stop
- 920  format(" sed -ie 's/\[/ /g' temp1.dat")
-        
+ 921  format(" sed -ie 's/\[/ /g' temp1.dat")
+
+cc now check if frequencies were calculated        
+
+      command1='egrep Freq geom.log > temp.dat'
+      call commrun(command1) 
+      command1='wc temp.dat > temp1.dat'
+      call commrun(command1)
+      nlines=0
+      open(unit=920,file='temp1.dat',status='unknown')
+      read(920,*)nlines
+      close(920)
+      if(nlines.eq.0)ifreq=0
 
 ccc now read output file
 c
@@ -670,8 +681,10 @@ c            write(*,*)'check ',ijunk,iatype,ijunk
                   coord(j,1)=coox(j)
                   coord(j,2)=cooy(j)
                   coord(j,3)=cooz(j)
+                  if(index.eq.natom) goto 1222
                endif
             enddo
+ 1222       continue
             write(64,*)
             close(64)
             goto 264
@@ -726,6 +739,9 @@ c              ifreq=0
                CALL LineRead (11)
 c                 write (6,990) word,word2,word3,word4,word5,'tw'
 c 990           format (5a20)
+c               if (WORD.eq.'JOB') then
+c                  go to 9000
+c               endif
                if (WORD.eq.'FREQUENCIES') then
                   OPEN (unit=65,status='unknown')
                   REWIND (65)
@@ -1851,7 +1867,7 @@ c      stop
       end
 
 C     *****************************
-      subroutine readxyzgeom_g09(natom,coox,cooy,cooz)
+      subroutine readxyzgeom_g09(natom,idummy,coox,cooy,cooz)
 
       implicit double precision (a-h,o-z)
       implicit integer (i-n)
@@ -1862,6 +1878,7 @@ C     *****************************
       dimension coox(natommx)
       dimension cooy(natommx)
       dimension cooz(natommx)
+      dimension idummy(natommx)
 
       character*30 gkeyword,igkey
       character*70 cjunk
@@ -1879,6 +1896,7 @@ C     *****************************
       include 'filcomm.f'
 
       iread=0
+      atype=0.
       OPEN (unit=11,status='old',file='geom.log')
       rewind (11)
 114   CONTINUE
@@ -1892,7 +1910,10 @@ cc read and write gradient
          CALL LineRead2 (11)
          CALL LineRead2 (11)
          do i = 1 , natom
-            read(11,*)cjunk,cjunk,cjunk,coox(i),cooy(i),cooz(i)
+            read(11,*)cjunk,atype,cjunk,coox(i),cooy(i),cooz(i)
+c            write(*,*)'atype is',atype
+            if(atype.eq.-1.)idummy(i)=1
+c            write(*,*)'idummy is is',idummy(i)
          enddo
 c         stop
       ENDIF

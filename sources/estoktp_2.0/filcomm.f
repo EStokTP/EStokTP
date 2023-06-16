@@ -17,4 +17,6 @@ c
       common /irtype/ irw,ipw,nts,ip1,ip2,ipr1
 c      common /strucword/ stoich
       common /igeom/ frozcoo,igeom_wellp,igeom_wellr
+      common /GlbGau/ iGOpMod
+c      common /CustomRPHT/ RPHT_custom_flag
 

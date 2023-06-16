@@ -12,12 +12,13 @@ GLIBS   =
 LDFLAGS=-L/software/cinetica/local/lib -I/software/cinetica/local/include
 #FLIBS = -lblas
 
+# decomment/comment the following two lines to activate/deactivate compilation with NATST
 
 #estoktp.x: estoktp.o g09fopt.o LineRead.o  mt.o croutines.o molprofopt.o zmat_routines.o 
 #	$(F77)  -o ../../exe/estoktp.x  estoktp.o g09fopt.o LineRead.o croutines.o mt.o molprofopt.o zmat_routines.o  
 
-estoktp.x: estoktp.o g09fopt.o LineRead.o  mt.o croutines.o molprofopt.o zmat_routines.o constrained_minimization_nlopt.o  target_01.o
-	$(F77) $(LDFLAGS)  -o ../../exe/estoktp.x  estoktp.o g09fopt.o LineRead.o croutines.o mt.o molprofopt.o zmat_routines.o constrained_minimization_nlopt.o  target_01.o  $(LIBS_CDF)
+estoktpd.x: estoktp.o g09fopt.o LineRead.o  mt.o croutines.o molprofopt.o zmat_routines.o constrained_minimization_nlopt.o  target_01.o
+	$(F77) $(LDFLAGS)  -o ../../exe/estoktpd.x  estoktp.o g09fopt.o LineRead.o croutines.o mt.o molprofopt.o zmat_routines.o constrained_minimization_nlopt.o  target_01.o  $(LIBS_CDF)
 estoktp.o: estoktp.f
 	$(F77) -c   estoktp.f -o estoktp.o 
 g09fopt.o: g09fopt.f
@@ -33,6 +34,7 @@ mt.o: mt.c
 croutines.o: croutines.c
 	$(CC) -c -fno-leading-underscore  croutines.c -o croutines.o  
 
+# decomment/comment to activate/deactivate compilation with NATST
 constrained_minimization_nlopt.o: constrained_minimization_nlopt.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -c constrained_minimization_nlopt.c -o constrained_minimization_nlopt.o  $(LIBS_CDF)
 target_01.o: target_01.f

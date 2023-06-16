@@ -1,0 +1,523 @@
+gfortran -g  -ffpe-trap=invalid,zero,overflow -Wall -Wextra -Werror  -c   estoktp.f -o estoktp.o 
+estoktp.f:608:72:
+
+       gmemlow=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:609:72:
+
+       gmemhigh=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:1191:72:
+
+          nameout='wellr_l0'
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (5/8) at (1) [-Werror=character-truncation]
+estoktp.f:1231:72:
+
+          nameout='wellp_l0'
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (5/8) at (1) [-Werror=character-truncation]
+estoktp.f:1459:72:
+
+             intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:1576:72:
+
+                      distname=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:1605:72:
+
+                      distname=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:18590:72:
+
+             intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:18606:72:
+
+             intcoor(natom1p+itau-ntau1) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:18830:72:
+
+             intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:18846:72:
+
+             intcoor(natomtp+itau-ntau2) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:2094:72:
+
+          revcoo=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19149:72:
+
+             intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19165:72:
+
+             intcoor(natom1p+itau-ntau1) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19194:72:
+
+       adislab=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19201:72:
+
+       aanglab=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19208:72:
+
+       adihlab=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19324:72:
+
+             cname1=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19327:72:
+
+             cname2=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19330:72:
+
+             cname3=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19333:72:
+
+             cname4=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:2472:10:
+
+       nr2=abs(dstart-rmin1)/rstp1+0.5
+          1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:2473:10:
+
+       nr1=abs(rmin1-rmin2)/rstp2+0.5
+          1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:2523:72:
+
+          dih_rot=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19489:72:
+
+             intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19504:72:
+
+             intcoor(natom1p+itau-ntau1) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:19535:72:
+
+       adislab=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:2827:10:
+
+       nr1=(rmax1-dstart)/rstp1+0.5
+          1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:2828:10:
+
+       nr2=(rmax2-rmax1)/rstp2+0.5
+          1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:3218:5:
+
+  1201 format ("./geoms/reac1_"I0.2".xyz")
+     1
+Error: Label 1201 at (1) defined but not used [-Werror=unused-label]
+estoktp.f:3903:12:
+
+       nr2_1=(dstart-rmin1_1)/rstp1_1+0.5
+            1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:3904:12:
+
+       nr1_1=(rmin1_1-rmin2_1)/rstp2_1+0.5
+            1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:3913:12:
+
+       nr2_2=abs((xint(ncoord-1)-rmin1_2)/rstp1_2)+0.5
+            1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:3914:12:
+
+       nr1_2=abs((rmin1_2-rmin2_2)/rstp2_2)+0.5
+            1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:3963:72:
+
+          dih_rot=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:4659:72:
+
+             bislab(itau)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:4732:72:
+
+                bbcheck=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:4750:72:
+
+                distcheck=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:6002:72:
+
+                intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:6030:72:
+
+                intcoor(icoord)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:6380:72:
+
+                      distname=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:20210:72:
+
+                intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:20241:72:
+
+                intcoor(icoord)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:20297:72:
+
+                      angsub1=WORD2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:20298:72:
+
+                      angsub2=WORD3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:20563:72:
+
+          aname1(j)=atname(j)
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (1/20) at (1) [-Werror=character-truncation]
+estoktp.f:7712:72:
+
+          hindlab(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:7822:72:
+
+                intcoori(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:7849:72:
+
+                intcoori(icoord)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:8245:72:
+
+          atomname(iatom)=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:8246:72:
+
+          atomconn(iatom)=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:8247:72:
+
+          atomcoo(iatom)=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:8257:72:
+
+          pivotA(ihind)=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:8258:72:
+
+          pivotB(ihind)=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:8266:72:
+
+          dicheck1(ihind)=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:8267:72:
+
+          dicheck2(ihind)=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:8573:22:
+
+          ihind_step = (dhindmx(ihind)-dhindmn(ihind))/nhindsteps(ihind)
+                      1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:9674:72:
+
+          hindlab(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:9709:72:
+
+          hindlab1Da(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:9740:72:
+
+          hindlab2Da(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:9750:72:
+
+          hindlab2Db(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:9788:72:
+
+          hindlab3Da(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:9799:72:
+
+          hindlab3Db(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:9809:72:
+
+          hindlab3Dc(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:10053:72:
+
+                intcoori(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:10080:72:
+
+                intcoori(icoord)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:10335:72:
+
+          atomname(iatom)=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:10336:72:
+
+          atomconn(iatom)=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:10337:72:
+
+          atomcoo(iatom)=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (4/160) at (1) [-Werror=character-truncation]
+estoktp.f:10399:23:
+
+          ihind_stepa = (dhindmx1Da(ihind)-dhindmn1Da(ihind))
+                       1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:10858:23:
+
+          ihind_stepa = (dhindmx2Da(ihind)-dhindmn2Da(ihind))
+                       1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:10882:26:
+
+             ihind_stepb = (dhindmx2Db(ihind)-dhindmn2Db(ihind))
+                          1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:11377:23:
+
+          ihind_stepa = (dhindmx3Da(ihind)-dhindmn3Da(ihind))
+                       1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:11397:26:
+
+             ihind_stepb = (dhindmx3Db(ihind)-dhindmn3Db(ihind))
+                          1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:11417:29:
+
+                ihind_stepc = (dhindmx3Dc(ihind)-dhindmn3Dc(ihind))
+                             1
+Error: Possible change of value in conversion from REAL(8) to INTEGER(4) at (1) [-Werror=conversion]
+estoktp.f:12604:72:
+
+          hindlab(ihind)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:14946:72:
+
+       code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15236:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15252:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15268:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15284:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15300:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15316:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15332:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15348:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15364:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15380:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15416:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15432:72:
+
+             code_name=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15596:72:
+
+                intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:15625:72:
+
+                intcoor(icoord)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:13189:72:
+
+       hr_rescale=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:13190:72:
+
+       hr_rescale2f=word2
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:13191:72:
+
+       hr_rescale2b=word3
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:13192:72:
+
+       hr_rescale3=word4
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:14636:18:
+
+                if(freqproj(j,inumpoints).ne.0)then
+                  1
+Error: Inequality comparison for REAL(8) at (1) [-Werror=compare-reals]
+estoktp.f:27298:72:
+
+             aabs1_name=word5
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:27299:72:
+
+             babs1_name=word7
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:27302:72:
+
+             aabs2_name=word5
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:27303:72:
+
+             babs2_name=word7
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:27306:72:
+
+             babs3_name=word7
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (20/160) at (1) [-Werror=character-truncation]
+estoktp.f:27144:72:
+
+             intcoor(j)=word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:24371:72:
+
+                intcoor(icoord) = word
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+estoktp.f:24399:72:
+
+                intcoor(icoord)=WORD
+                                                                        1
+Error: CHARACTER expression will be truncated in assignment (30/160) at (1) [-Werror=character-truncation]
+f951: all warnings being treated as errors
+make: *** [Makefile:21: estoktp.o] Error 1

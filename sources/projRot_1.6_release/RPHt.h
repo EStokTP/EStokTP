@@ -301,7 +301,7 @@ double **transpose_double(double**A, int l_side, int h_side,double **B);
 double dot_prod(double *v1,double *v2, int dim);
 void calc_reaction_coordinate_direction_vector(int step);
 double **calc_deriv_matrix(int step,double **Matrix_back,double **Matrix_for , double **Deriv_Matrix ,int dim);
-double *calc_BkF(int dim,int step, double **L_int, double *BkF);
+double *calc_BkF(int dim,int step, double **L_int, double *L_saddle_grad, double *BkF);
 int compare(const void *v1 ,const void *v2);
 void eigen_QL(double **a, int n, double d[], double e[], double **z);
 void tred2(double **a, int n, double d[], double e[]);

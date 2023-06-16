@@ -71,6 +71,7 @@ int main(void) {
   double **L_int;
   double ***L_int_save;
   double *BkF;
+  double *L_saddle_grad;
   double *k_ome;
   double **Km,*K,*t, *a, *t_dev;
   FILE *Cart_displ; 
@@ -128,13 +129,12 @@ int main(void) {
   a= (double*) malloc( MAXSTEP*sizeof(double) );
   k_ome= (double*) malloc( MAXSTEP*sizeof(double) );
   mueff_mu= (double*) malloc( MAXSTEP*sizeof(double) );
+  L_saddle_grad= (double*) malloc( dim*sizeof(double) );
 
   for(step=0; step<MAXSTEP; step++) {
     k_ome[step]=0 ;
     K[step]=0;
   }
-
-
 
 
   //**** beginning of cycle over different input structures (steps)****
@@ -218,9 +218,14 @@ int main(void) {
       if(onlyrotors!=0){
 	double **L_mwc;
 	L_mwc=diagonalize_hessian((int)(3*ATOMS),Hessian[step]);
+
+	if(step==saddlep){
+	  for(i=0;i<dim;i++) L_saddle_grad[i]=L_mwc[i+1][dim-6];
+	} 
+
 	/*    
 	fprintf(L_orig_save,"step=%d\n\n",step);
-	for(j=1;j<(int)(dim+1);j++){
+	for(j=1;j<(int)(dim1);j++){
 	  for(i=1;i<(int)(dim+1);i++){	
 	    fprintf(L_orig_save,"%lf\t",L_mwc[j][i]);fflush(0);
 	  }  
@@ -236,7 +241,14 @@ int main(void) {
     //the 6 lowest frequencies correspond to translations and internal rotations
 
 	frequencies=calc_freq(lambda,frequencies);
-  
+	/*
+	if(step==100){
+	  for(j=0;j<dim;j++)   {
+	    printf("lambda freq %d  %lf %lf\n",j,lambda[j],frequencies[j]);
+	  }    
+	  exit(0);
+	}    
+	*/
 	free(lambda);
 
 	//	fprintf(freq_orig_results, "%d\t",step);
@@ -493,9 +505,6 @@ int main(void) {
    
     }
 
-
-
-
     //    if(onlyrotors!=0){
       //      fclose(L_orig_save);
       //      fclose(freq_results);
@@ -575,8 +584,13 @@ int main(void) {
       BkF=(double *) malloc( dim*sizeof(double ) );
       for(i=0;i<dim;i++) BkF[i]=0.;
 
-      BkF=calc_BkF(dim,step,L_int_save[step],BkF);
-    //    BkF=calc_BkF(dim-7,step,L_int_save[step],BkF);
+      if(step==saddlep){
+	//	for(i=0;i<dim;i++) printf("grad %d %lf \n",i,L_saddle_grad[i]);
+	for(i=0;i<dim;i++) printf("freq %d %lf \n",i,frequencies_save[step][i]);
+      } 
+
+      BkF=calc_BkF(dim,step,L_int_save[step],L_saddle_grad,BkF);
+      //BkF=calc_BkF(dim-7,step,L_int_save[step],BkF);
     
       //      fprintf(Km_res,"%d\t",step);
 
@@ -704,6 +718,9 @@ int main(void) {
       temp3=splint(x_spline,t ,t_spline , MAXSTEP-1, step+2, temp3);
       deltas=Rx_coord[step-2]-Rx_coord[step+2];
       t_dev[step]=(-temp3+8*temp2-8*temp1+temp0)/(3*deltas);
+      //      deltas=Rx_coord[step+1]-Rx_coord[step-1];
+      //t_dev[step]=(-temp1+temp2)/(deltas);
+
    //   t_dev[step]=(-temp3+8*temp2-8*temp1+temp0)/(3*deltas);
    //   deltas=Rx_coord[step-1]-Rx_coord[step+1];
    //   t_dev[step]=(temp2-temp1)/(deltas);
@@ -3142,12 +3159,13 @@ double **diagonalize_hessian(int dim, double**FC){
       Lint_temp[j]=(double *) malloc((int)(dim)*sizeof(double)) ;
     }
 
-    for (i=0; i<dim; i++) {lambda_ord[i]=0.;}
+    for (i=0; i<dim; i++) {lambda_ord[i]=-100000.;}
     //    lambda_ord[1]=0.;
 
     // find the largest eigenvalue and eigenvector and put it in position 1
     for (j=1; j<dim; j++) {
-      if(fabs(lambda[j]) > fabs(lambda_ord[1])) {
+      //      if(fabs(lambda[j]) > fabs(lambda_ord[1])) {
+      if((lambda[j]) > (lambda_ord[1])) {
 	lambda_ord[1]=lambda[j];
 	for (i=1; i<dim; i++) {
 	  //	  Lint_temp[1][i]=L[j][i];
@@ -3160,7 +3178,8 @@ double **diagonalize_hessian(int dim, double**FC){
     for (i=2; i<dim; i++) {
       //      lambda_ord[i]=0.;
       for (j=1; j<dim; j++) {
-	if((fabs(lambda[j]) > fabs(lambda_ord[i])) && (fabs(lambda[j])<fabs(lambda_ord[i-1])))  {
+	//	if((fabs(lambda[j]) > fabs(lambda_ord[i])) && (fabs(lambda[j])<fabs(lambda_ord[i-1])))  {
+	if(((lambda[j]) > (lambda_ord[i])) && ((lambda[j])<(lambda_ord[i-1])))  {
 	  lambda_ord[i]=lambda[j];
 	  for (k=1; k<dim; k++) {
 	    //	  Lint_temp[i][k]=L[j][k];
@@ -3179,6 +3198,39 @@ double **diagonalize_hessian(int dim, double**FC){
 	L[i][j]=Lint_temp[i][j];
       }
     }
+
+   
+    // find smallest eigenvalue and eigenvector and save it in position 1 of lambda_ord and Lint_temp
+    
+    int jmin=0;
+
+    for (j=1; j<dim; j++) {
+      if((lambda[j]) < (lambda_ord[1])) {
+	jmin=j;
+	lambda_ord[1]=lambda[j];
+	for (i=1; i<dim; i++) {
+	  //	  Lint_temp[1][i]=L[j][i];
+	  Lint_temp[i][1]=L[i][j];
+	}
+      }
+    }
+
+    // move smallest eigenvalue and eigenvector to position dim-7
+
+    lambda[jmin]=lambda[dim-7];
+    lambda[dim-7]=lambda_ord[1];
+    for(i=1; i<(int)(dim); i++) {    
+      //   printf("lambda  %d %lf\n",i,lambda[i]);
+      L[i][jmin]=L[i][dim-7];
+      L[i][dim-7]=Lint_temp[i][1];
+    }
+    
+
+    //printf("lambda min dim %d %lf\n",dim-7,lambda[dim-7]);
+    //printf("lambda max dim %d %lf\n",1,lambda[1]);
+
+    //    exit(0);
+   
 
     for(i=0;i<dim;i++){ free (Lint_temp[i]); } free(Lint_temp);
     free(lambda_ord);
@@ -3322,6 +3374,11 @@ void determine_top_atoms(int step){
   double dist_CC;
   double dist_SH,dist_NH;
   double dist_HH;
+  double dist_ClH,dist_HCl;
+  double dist_CF,dist_FC;
+  double dist_SF,dist_FS;
+  double dist_SO,dist_OS;
+  double dist_CS,dist_SC;
 
   dist_CH=1.5;
   //  dist_CH=1.5;
@@ -3343,6 +3400,21 @@ void determine_top_atoms(int step){
   //automech value
   // dist_HC=1.5;
   dist_HH=1.2;
+
+  dist_ClH=2.2;
+  dist_HCl=2.2;
+
+  dist_CF=1.6;
+  dist_FC=1.6;
+
+  dist_SF=1.8;
+  dist_FS=1.8;
+
+  dist_SO=1.6;
+  dist_OS=1.6;
+
+  dist_CS=2.1;
+  dist_SC=2.1;
 
   // check if distance file is present and open it
 
@@ -3388,6 +3460,17 @@ void determine_top_atoms(int step){
       if((strcmp(aname1,"S")==0)&&(strcmp(aname2,"H")==0)){dist_SH=atdist;}
       if((strcmp(aname1,"N")==0)&&(strcmp(aname2,"H")==0)){dist_NH=atdist;}
       if((strcmp(aname1,"H")==0)&&(strcmp(aname2,"H")==0)){dist_HH=atdist;}
+      if((strcmp(aname1,"Cl")==0)&&(strcmp(aname2,"H")==0)){dist_ClH=atdist;}
+      if((strcmp(aname1,"H")==0)&&(strcmp(aname2,"Cl")==0)){dist_HCl=atdist;}
+      if((strcmp(aname1,"C")==0)&&(strcmp(aname2,"F")==0)){dist_CF=atdist;}
+      if((strcmp(aname1,"F")==0)&&(strcmp(aname2,"C")==0)){dist_FC=atdist;}
+      if((strcmp(aname1,"S")==0)&&(strcmp(aname2,"F")==0)){dist_SF=atdist;}
+      if((strcmp(aname1,"F")==0)&&(strcmp(aname2,"S")==0)){dist_FS=atdist;}
+      if((strcmp(aname1,"S")==0)&&(strcmp(aname2,"O")==0)){dist_SO=atdist;}
+      if((strcmp(aname1,"O")==0)&&(strcmp(aname2,"S")==0)){dist_OS=atdist;}
+      if((strcmp(aname1,"C")==0)&&(strcmp(aname2,"S")==0)){dist_CS=atdist;}
+      if((strcmp(aname1,"S")==0)&&(strcmp(aname2,"C")==0)){dist_SC=atdist;}
+
     }
 
     //    printf("%d numdata\n",numdata);
@@ -3552,6 +3635,60 @@ void determine_top_atoms(int step){
 		igroupB[i][i2]=1;
 		nvar=nvar+1;
 	      }
+
+	      //check if ClH bond
+	      if((strcmp(atoms_data[i1].atom_name,"Cl")==0)&&(strcmp(atoms_data[i2].atom_name,"H")==0)&&(dist_matrix[i1][i2]<dist_ClH)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		  igroupB[i][i2]=1;
+		  nvar=nvar+1;
+		}
+	      //check if H-Cl bond
+	      if((strcmp(atoms_data[i1].atom_name,"H")==0)&&(strcmp(atoms_data[i2].atom_name,"Cl")==0)&&(dist_matrix[i1][i2]<dist_HCl)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		igroupB[i][i2]=1;
+		nvar=nvar+1;
+	      }
+
+	      //check if C-F bond
+	      if((strcmp(atoms_data[i1].atom_name,"C")==0)&&(strcmp(atoms_data[i2].atom_name,"F")==0)&&(dist_matrix[i1][i2]<dist_CF)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		  igroupB[i][i2]=1;
+		  nvar=nvar+1;
+		}
+	      //check if F-C bond
+	      if((strcmp(atoms_data[i1].atom_name,"F")==0)&&(strcmp(atoms_data[i2].atom_name,"C")==0)&&(dist_matrix[i1][i2]<dist_FC)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		igroupB[i][i2]=1;
+		nvar=nvar+1;
+	      }
+
+	      //check if S-F bond
+	      if((strcmp(atoms_data[i1].atom_name,"S")==0)&&(strcmp(atoms_data[i2].atom_name,"F")==0)&&(dist_matrix[i1][i2]<dist_SF)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		  igroupB[i][i2]=1;
+		  nvar=nvar+1;
+		}
+	      //check if F-S bond
+	      if((strcmp(atoms_data[i1].atom_name,"F")==0)&&(strcmp(atoms_data[i2].atom_name,"S")==0)&&(dist_matrix[i1][i2]<dist_FS)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		igroupB[i][i2]=1;
+		nvar=nvar+1;
+	      }
+	      //check if S-O bond
+	      if((strcmp(atoms_data[i1].atom_name,"S")==0)&&(strcmp(atoms_data[i2].atom_name,"O")==0)&&(dist_matrix[i1][i2]<dist_SO)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		  igroupB[i][i2]=1;
+		  nvar=nvar+1;
+		}
+	      //check if O-S bond
+	      if((strcmp(atoms_data[i1].atom_name,"O")==0)&&(strcmp(atoms_data[i2].atom_name,"S")==0)&&(dist_matrix[i1][i2]<dist_OS)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		igroupB[i][i2]=1;
+		nvar=nvar+1;
+	      }
+	      //check if C-S bond
+	      if((strcmp(atoms_data[i1].atom_name,"C")==0)&&(strcmp(atoms_data[i2].atom_name,"S")==0)&&(dist_matrix[i1][i2]<dist_CS)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		  igroupB[i][i2]=1;
+		  nvar=nvar+1;
+		}
+	      //check if S-C bond
+	      if((strcmp(atoms_data[i1].atom_name,"S")==0)&&(strcmp(atoms_data[i2].atom_name,"C")==0)&&(dist_matrix[i1][i2]<dist_SC)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
+		igroupB[i][i2]=1;
+		nvar=nvar+1;
+	      }
+
 	      //check if H-H bond
 	      if((strcmp(atoms_data[i1].atom_name,"H")==0)&&(strcmp(atoms_data[i2].atom_name,"H")==0)&&(dist_matrix[i1][i2]<dist_HH)&&(igroupB[i][i2]!=1)&&(atomsintopB[i][i2]==1)){
 		igroupB[i][i2]=1;
@@ -3674,6 +3811,60 @@ void determine_top_atoms(int step){
 		igroupA[i][i2]=1;
 		nvar=nvar+1;
 	      }
+
+	      //check if Cl-H bond
+	      if((strcmp(atoms_data[i1].atom_name,"Cl")==0)&&(strcmp(atoms_data[i2].atom_name,"H")==0)&&(dist_matrix[i1][i2]<dist_ClH)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+		}
+	      //check if H-Cl bond
+	      if((strcmp(atoms_data[i1].atom_name,"H")==0)&&(strcmp(atoms_data[i2].atom_name,"Cl")==0)&&(dist_matrix[i1][i2]<dist_HCl)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+	      }
+
+	      //check if C-F bond
+	      if((strcmp(atoms_data[i1].atom_name,"C")==0)&&(strcmp(atoms_data[i2].atom_name,"F")==0)&&(dist_matrix[i1][i2]<dist_CF)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+		}
+	      //check if F-C bond
+	      if((strcmp(atoms_data[i1].atom_name,"F")==0)&&(strcmp(atoms_data[i2].atom_name,"C")==0)&&(dist_matrix[i1][i2]<dist_FC)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+	      }
+
+	      //check if S-F bond
+	      if((strcmp(atoms_data[i1].atom_name,"S")==0)&&(strcmp(atoms_data[i2].atom_name,"F")==0)&&(dist_matrix[i1][i2]<dist_SF)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+		}
+	      //check if F-S bond
+	      if((strcmp(atoms_data[i1].atom_name,"F")==0)&&(strcmp(atoms_data[i2].atom_name,"S")==0)&&(dist_matrix[i1][i2]<dist_FS)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+	      }
+	      //check if S-0 bond
+	      if((strcmp(atoms_data[i1].atom_name,"S")==0)&&(strcmp(atoms_data[i2].atom_name,"O")==0)&&(dist_matrix[i1][i2]<dist_SO)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+		}
+	      //check if O-S bond
+	      if((strcmp(atoms_data[i1].atom_name,"O")==0)&&(strcmp(atoms_data[i2].atom_name,"S")==0)&&(dist_matrix[i1][i2]<dist_OS)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+	      }
+	      //check if C-S bond
+	      if((strcmp(atoms_data[i1].atom_name,"C")==0)&&(strcmp(atoms_data[i2].atom_name,"S")==0)&&(dist_matrix[i1][i2]<dist_CS)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+		}
+	      //check if S-C bond
+	      if((strcmp(atoms_data[i1].atom_name,"S")==0)&&(strcmp(atoms_data[i2].atom_name,"C")==0)&&(dist_matrix[i1][i2]<dist_SC)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
+		igroupA[i][i2]=1;
+		nvar=nvar+1;
+	      }
+
 	      //check if H-H bond
 	      if((strcmp(atoms_data[i1].atom_name,"H")==0)&&(strcmp(atoms_data[i2].atom_name,"H")==0)&&(dist_matrix[i1][i2]<dist_HH)&&(igroupA[i][i2]!=1)&&(atomsintopA[i][i2]==1)){
 		igroupA[i][i2]=1;
@@ -3820,7 +4011,7 @@ void determine_top_atoms(int step){
     if(natomsB[i] < ATOMS-1-numatomsintopA[i]){indred=2;}
     indred=0;
     for (j=0;j<ATOMS;j++){
-      //      printf("igroup B value for rot %d natom %d is %d  \n",i,j,igroupB[i][j]); 
+      printf("igroup B value for rot %d natom %d is %d  \n",i,j,igroupB[i][j]); 
       if(ItopB[i]==0 ){
 	igroupB[i][j]=0;
       } 
@@ -3838,6 +4029,10 @@ void determine_top_atoms(int step){
       }
     }
   }
+
+  printf("indred is %d  \n",indred); 
+  printf("ItopA is %f  \n",ItopA[0]); 
+  printf("ItopB is %f  \n",ItopB[0]); 
 
   /*          
   for (i=0;i<numrotors;i++) {
@@ -3883,7 +4078,7 @@ void determine_top_atoms(int step){
   free(natomsB);
   free(massA);
   free(massB);
-  //    exit(0);
+  //  exit(0);
   
 
 }
@@ -5366,7 +5561,7 @@ double **calc_deriv_matrix(int step,double **Matrix_back,double **Matrix_for, do
 
 
 
-double *calc_BkF(int dim,int step, double **L_int, double *BkF){
+double *calc_BkF(int dim,int step, double **L_int, double *L_saddle_grad, double *BkF){
 
   //calcolo BkF secondo Page, McIver J. Chem. Phys. vol 88, pp 922-935 (1988) 
   // Bkf=Li_t*H*v/c
@@ -5443,11 +5638,9 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
 
   for(k=0;k<dim;k++){
     for(j=0;j<dim;j++){
-	bkfcorr[k]=bkfcorr[k]+ffc*L_int[j][k]*(gradient[step][j])/cost;
+      bkfcorr[k]=bkfcorr[k]+ffc*L_int[j][k]*(gradient[step][j])/cost;
     }
   }
-
-
 
   for(k=0;k<dim;k++){
     for(j=0;j<dim;j++){
@@ -5487,13 +5680,52 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
   int npoints_rem;
   saddlepbkf=1;
   // option disabled as long as it has been debugged
-  saddlepbkf=0;
+  //saddlepbkf=0;
   if(saddlepbkf==0) npoints_rem=0;
   if(saddlepbkf!=0) npoints_rem=saddlepbkf;
   
   if(step>((int)(MAXSTEP2TS/2-npoints_rem))&& step<((int)(MAXSTEP2TS/2+npoints_rem))){
 
+    /*
+    if(step==saddlep){
+      for(i=0;i<dim;i++) printf("Lgrad %d %lf \n",i,L_saddle_grad[i]);
+    } 
+
+    printf("npoints rem %d\n",npoints_rem);
+
+    for(j=1;j<(dim);j++){
+      printf("gradient %lf\n",gradient[step-1][j]/cost);
+    }
+
+    printf("step %d\n",step);
+    printf("cost %lf\n",cost);
+    printf("dim %d\n",dim-7);
+   
+    for(j=0;j<(dim);j++){
+      printf("gradient %lf\n",gradient[step][j]/cost);
+    }
+    
+    for(j=0;j<(dim);j++){
+      printf("cartdis %lf\n",L_int[j][18]);
+    }
+    
+    for(j=0;j<(dim);j++){
+      printf("lambda %d  %lf \n",j,lambda[j]);
+    }
+    
+    double test=0.;
+
+      for(j=0;j<dim;j++){    
+	//	test=test+L_int[j][dim-7]*L_int[j][dim-7];
+	test=test+L_saddle_grad[j]*L_saddle_grad[j];
+      }
+    test=sqrt(test);     
+    printf("test %lf\n",test);
+    */
+
+    //    exit(1);
     //calcolo fv=vt*F*v è uno scalare!
+
 
     double ffv=0;
     double *ffv_tempv;
@@ -5505,18 +5737,22 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
 
     for(j=0;j<dim;j++){
       for(i=0;i<dim;i++){
-	ffv_tempv[j]=ffv_tempv[j]+Hessian[step][j][i]*(gradient[step][i]/cost);
+	//	ffv_tempv[j]=ffv_tempv[j]+Hessian[step][j][i]*(gradient[step][i]/cost);
+	//	ffv_tempv[j]=ffv_tempv[j]+Hessian[step][j][i]*L_int[i][18];
+	ffv_tempv[j]=ffv_tempv[j]+Hessian[step][j][i]*L_saddle_grad[i];
       }
     }
 
     ffv=0.;
     for(j=0;j<dim;j++){
-      ffv=ffv+ffv_tempv[j]*gradient[step][j]/cost;
+      //      ffv=ffv+ffv_tempv[j]*gradient[step][j]/cost;
+      //      ffv=ffv+ffv_tempv[j]*L_int[j][18];
+      ffv=ffv+ffv_tempv[j]*L_saddle_grad[j];
     }
 
     free(ffv_tempv);
 
-    //    printf("step %d ffv=%lf\n",step,ffv);
+    // printf("step %d ffv=%lf\n",step,ffv);
     
 
     //calcolo Delta=(2*vt*F*v*I-F)
@@ -5536,6 +5772,7 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
 
     for(i=1;i<=dim;i++){
       for(j=1;j<=dim;j++){
+	//     	if(i==j) Delta[i][j]=2*ffv-Hessian[step][i-1][j-1];
      	if(i==j) Delta[i][j]=2*ffv-Hessian[step][i-1][j-1];
 	//	else Delta[i][j]=Hessian[step][i-1][j-1];		   
 	else Delta[i][j]=-Hessian[step][i-1][j-1];		   
@@ -5550,15 +5787,15 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
       Delta_inv[i]= (double*) malloc( (int)(dim+1)*sizeof(double) );
     }
 
-    for(j=0;j<dim;j++){
-      for(i=0;i<dim;i++){
+    for(j=0;j<dim+1;j++){
+      for(i=0;i<dim+1;i++){
 	Delta_inv[i][j]=0.;
       }
     }
 
     Delta_inv=inverse_matrix(Delta,dim,Delta_inv);
     
-    for(i=0;i<(dim);i++){ free (Delta[i]); } free(Delta);
+    for(i=0;i<(dim+1);i++){ free (Delta[i]); } free(Delta);
 
     //Calcolo il prodotto Lt*Delta_inv
 
@@ -5579,6 +5816,7 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
       for(j=0;j<dim;j++){
 	for(i=0;i<dim;i++){
 	  //cc_err	  LDelta_inv[j][k]= LDelta_inv[j][k]+ L_int[i][k]*Delta_inv[i+1][j+1];
+	  //	  LDelta_inv[k][j]= LDelta_inv[k][j]+ L_int[i][k]*Delta_inv[i+1][j+1];
 	  LDelta_inv[k][j]= LDelta_inv[k][j]+ L_int[i][k]*Delta_inv[i+1][j+1];
 	}
       }
@@ -5600,18 +5838,21 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
 
     for(j=0;j<dim;j++){
       for(i=0;i<dim;i++){
-	dffv_tempv[j]=dffv_tempv[j]+Hessian_deriv[step][j][i]*(gradient[step][i]/cost);	
+	//	dffv_tempv[j]=dffv_tempv[j]+Hessian_deriv[step][j][i]*(gradient[step][i]/cost);	
+	//	dffv_tempv[j]=dffv_tempv[j]+Hessian_deriv[step][j][i]*L_int[i][18];	
+	dffv_tempv[j]=dffv_tempv[j]+Hessian_deriv[step][j][i]*L_saddle_grad[i];	
       }
     }
 
     for(i=0;i<dim;i++){	
-      dffv=dffv+gradient[step][i]/cost*dffv_tempv[i];
+      //      dffv=dffv+gradient[step][i]/cost*dffv_tempv[i];
+      //      dffv=dffv+L_int[i][18]*dffv_tempv[i];
+      dffv=dffv+L_saddle_grad[i]*dffv_tempv[i];
     }
 
     free(dffv_tempv);
 
     printf("step %d dffv_n= %lf\n",step,dffv);
-
 
    //calcolo delta_piccolo=(dF/ds-vt*dF/ds*v*I)
 
@@ -5626,7 +5867,6 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
 	delta_piccolo[i][j]=0.;
       }
     }
-
 
     for(i=0;i<dim;i++){
       for(j=0;j<dim;j++){
@@ -5647,10 +5887,11 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
 
     for(k=0;k<dim;k++){
       for(j=0;j<dim;j++){
-	ld_temp[k]= ld_temp[k]+delta_piccolo[k][j]*(gradient[step][j]/cost);
+	//	ld_temp[k]= ld_temp[k]+delta_piccolo[k][j]*(gradient[step][j]/cost);
+	//	ld_temp[k]= ld_temp[k]+delta_piccolo[k][j]*L_int[j][18];
+	ld_temp[k]= ld_temp[k]+delta_piccolo[k][j]*L_saddle_grad[j];
       }
     }
-
 
     for(k=0;k<dim;k++){
       for(i=0;i<dim;i++){
@@ -5667,9 +5908,14 @@ double *calc_BkF(int dim,int step, double **L_int, double *BkF){
     //    if(step<MAXSTEP/2){
     for(k=0;k<dim;k++){
       BkF[k]=-BkF[k];
+      //      printf("k %d bkf= %le \n",k, BkF[k]);
     }
       //    }
+    //    exit(0);
+
   }
+
+  //exit(0);
 
   //    k=0;
   //    printf("step %d bkf= %le \n",step, BkF[k]);
@@ -6841,6 +7087,8 @@ void grad_hess(void){
   int i,j;
   int dim;
   int step;
+  double deltas1,deltas2;
+  //  double deltas3;
 
   dim=3*ATOMS;
 
@@ -6859,30 +7107,43 @@ void grad_hess(void){
 	  Hessian_deriv[step][i][j]=(Hessian[step][i][j]-Hessian[step-1][i][j])/(deltas);
 	}
       }
-    } else if(step<MAXSTEP2TS/2){
+    } else if(step<saddlep){
      deltas=Rx_coord[step+1]-Rx_coord[step-1];
      for(j=0;j<(dim);j++){
        for(i=0;i<dim;i++){	 
-	 Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(2*deltas);
+	 //	 Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(2*deltas);
+	 Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(deltas);
        }
      }
-    } else if(step>MAXSTEP2TS/2){
+     //    } else if(step>MAXSTEP2TS/2){
+    } else if(step>saddlep){
       deltas=Rx_coord[step+1]-Rx_coord[step-1];
       for(j=0;j<(dim);j++){
 	for(i=0;i<dim;i++){
-	  Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(2*deltas);	 
+	  //	  Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(2*deltas);	 
+	  Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(deltas);	 
 	}
       }
-    } else if(step==MAXSTEP2TS/2){
-      deltas=(Rx_coord[step+1]-Rx_coord[step]);
+      //    } else if(step==MAXSTEP2TS/2){
+    } else if(step==saddlep){
+      //deltas=(Rx_coord[step+1]-Rx_coord[step-1]);
+      deltas1=(Rx_coord[step]-Rx_coord[step-1]);
+      deltas2=(Rx_coord[step+1]-Rx_coord[step]);
+      //      deltas3=(Rx_coord[step+2]-Rx_coord[step-2]);
+      //      deltas=(Rx_coord[step+1]-Rx_coord[step-1]);
+      //deltas=(Rx_coord[step+2]-Rx_coord[step-2]);
      for(j=0;j<(dim);j++){
        for(i=0;i<dim;i++){	 
 	 // five points 
-	 //	 Hessian_deriv[step][i][j]=(-Hessian[step+2][i][j]+8*Hessian[step+1][i][j]-8*Hessian[step-1][i][j]+Hessian[step-2][i][j])/(12*deltas);
+	 // 	 Hessian_deriv[step][i][j]=(-Hessian[step+2][i][j]+8*Hessian[step+1][i][j]-8*Hessian[step-1][i][j]+Hessian[step-2][i][j])/(12*deltas);
 	 // four points forward
 	 //	 Hessian_deriv[step][i][j]=(-Hessian[step+2][i][j]+6*Hessian[step+1][i][j]-3*Hessian[step][i][j]-2*Hessian[step-1][i][j])/(6*deltas);
 	 // centered
-	 Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(4*deltas);
+	 // Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(4*deltas);
+	 //	 Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(2*deltas);
+	 //	 Hessian_deriv[step][i][j]=(Hessian[step+1][i][j]-Hessian[step-1][i][j])/(deltas);
+	 Hessian_deriv[step][i][j]=((Hessian[step+1][i][j]-Hessian[step][i][j])/(deltas2)+(Hessian[step][i][j]-Hessian[step-1][i][j])/(deltas1))/2.;
+	 // Hessian_deriv[step][i][j]=(Hessian[step+2][i][j]-Hessian[step-2][i][j])/(deltas3);
        }
      }
     }

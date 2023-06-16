@@ -31,7 +31,7 @@ c     parameter (ntaumx=10, nmdmx=300, natommx=100, ndim=3)
       logical leof,lsec,ltit
 
       character*160 stringr
-      character*200 comline1
+      character*500 comline1
       character*100 command1
       character*30 gmemo
       character*30 cjunk
@@ -122,7 +122,7 @@ cc it is assumed the memory in the input is given as MW
       iskgeo=0
 
  100  continue
-      read (11,'(A200)') comline1
+      read (11,'(A)') comline1
       if (comline1.eq.'Skip'.or.comline1.eq.' Skip')iskgeo=1
       if (comline1.eq.'Skipgeom'.or.comline1.eq.' Skipgeom')iskgeo=1
       if (comline1.eq.'  Skipgeom'.or.comline1.eq.'  Skip')iskgeo=1
@@ -173,14 +173,14 @@ c      if(iskgeo.eq.1)stop
          enddo
          if(ilev.eq.10.and.iaspace.eq.1)then
             open(unit=99,file='hrcondcoord.dat',status='unknown')
-            read(99,'(A200)')comline1
+            read(99,'(A)')comline1
             close(99)
             write(10,*)comline1
             if(ispin.eq.1)then
                open(unit=15,file='activespace.dat',status='unknown')
                read(15,*)nlines
                do j=1,nlines
-                  read(15,'(A200)')comline1
+                  read(15,'(A100)')comline1
                enddo
                write (10,*) comline1
                write(10,*)'gthresh,step=5.d-3'
@@ -204,13 +204,13 @@ c      if(iskgeo.eq.1)stop
          enddo
       endif
       write (10,*)
+      write (10,*) 'SET,SPIN=',ispin-1
       if(iaspace.eq.1)write (98,*)
-c      if(iaspace.eq.1)write (98,*)'SET,SPIN=',ispin-1
+      if(iaspace.eq.1)write (98,*)'SET,SPIN=',ispin-1
 
-      ispincheck=0
  101  continue
       word2=''
-      read (11,'(A200)') comline1
+      read (11,'(A)') comline1
       write(99,*)'line ',comline1
       rewind(99)
       call lineread(99)
@@ -219,12 +219,10 @@ c      write(7,*)word2
 c      write(7,*)comline1
       if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE1')then
          if(ispin.eq.1)then
-            write (10,*) 'SET,SPIN=',ispin-1
-            write (98,*) 'SET,SPIN=',ispin-1
             open(unit=15,file='activespace.dat',status='unknown')
             read(15,*)nlines
             do j=1,nlines
-               read(15,'(A200)')comline1
+               read(15,'(A100)')comline1
                write (10,*) comline1
                write (98,*) comline1
             enddo
@@ -234,67 +232,20 @@ c      write(7,*)comline1
             write (98,*) comline1
          endif
          goto 101
-      else
-         if(ispincheck.eq.0) then 
-            write (10,*) 'SET,SPIN=',ispin-1
-            ispincheck=1
-         endif
       endif
       if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE2')then
          if(ispin.eq.1)then
             open(unit=15,file='activespace.dat',status='unknown')
             read(15,*)nlines
             do j=1,nlines
-               read(15,'(A200)')comline1
+               read(15,'(A90)')comline1
             enddo
-            write (10,*) 'SET,SPIN=',ispin-1
-            write (98,*) 'SET,SPIN=',ispin-1
             write (10,*) comline1
             write (98,*) comline1
             close(15)
          endif
          goto 101
       endif
-      if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE2_T')then
-c        if(ispin.eq.1)then
-            open(unit=15,file='activespace.dat',status='unknown')
-            read(15,*)nlines
-            do j=1,nlines
-               read(15,'(A200)')comline1
-            enddo
-            read(15,'(A100)')
-            read(15,'(A200)')comline1
-            write (10,*) 'SET,SPIN=',ispin+1
-            write (10,*) comline1
-            write (98,*) 'SET,SPIN=',ispin+1
-            write (98,*) comline1
-            close(15)
-c         endif
-         goto 101
-      endif
-
-      if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE2_RHF')then
-c        if(ispin.eq.1)then
-            open(unit=15,file='activespace.dat',status='unknown')
-            read(15,*)nlines
-            do j=1,nlines
-               read(15,'(A200)')comline1
-            enddo
-            read(15,'(A100)')
-            read(15,'(A100)')
-            read(15,'(A200)')comline1
-            write (10,*) 'SET,SPIN=2'
-            write (98,*) 'SET,SPIN=2'
-            write (10,*) comline1
-            write (98,*) comline1
-            read(15,'(A200)')comline1
-            write (10,*) comline1
-            write (98,*) comline1
-            close(15)
-c         endif
-         goto 101
-      endif
-
       if (comline1.EQ.'End2'.or.comline1.eq.' End2') go to 201
       if (ispin.eq.1) write (10,*) comline1
       if (ispin.eq.1)then 
@@ -314,7 +265,7 @@ cc else read input for open shell
 
 c      read (11,'(A70)') comline1
       word2=''
-      read (11,'(A200)') comline1
+      read (11,'(A)') comline1
       write(99,*)'line ',comline1
       rewind(99)
       call lineread(99)
@@ -326,12 +277,11 @@ c         if(ispin.eq.1)then
             open(unit=15,file='activespace.dat',status='unknown')
             read(15,*)nlines
             do j=1,nlines
-               read(15,'(A200)')comline1
+               read(15,'(A100)')comline1
                write (10,*) comline1
                write (98,*) comline1
             enddo
             close(15)
-            write(98,*)'Skip'
             write(98,*)'End1'
             write(98,*)'End2'
             write(98,*)
@@ -344,7 +294,7 @@ c        if(ispin.eq.1)then
             open(unit=15,file='activespace.dat',status='unknown')
             read(15,*)nlines
             do j=1,nlines
-               read(15,'(A200)')comline1
+               read(15,'(A100)')comline1
             enddo
             write (10,*) comline1
             write (98,*) comline1
@@ -352,40 +302,6 @@ c        if(ispin.eq.1)then
 c         endif
          goto 301
       endif
-
-      if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE2_T')then
-c        if(ispin.eq.1)then
-            open(unit=15,file='activespace.dat',status='unknown')
-            read(15,*)nlines
-            do j=1,nlines
-               read(15,'(A200)')comline1
-            enddo
-            read(15,'(A100)')
-            read(15,'(A200)')comline1
-            write (10,*) comline1
-            write (98,*) comline1
-            close(15)
-c         endif
-         goto 301
-      endif
-
-      if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE2_RHF')then
-c        if(ispin.eq.1)then
-            open(unit=15,file='activespace.dat',status='unknown')
-            read(15,*)nlines
-            do j=1,nlines
-               read(15,'(A200)')comline1
-            enddo
-            read(15,'(A100)')
-            read(15,'(A100)')
-            read(15,'(A200)')comline1
-            write (10,*) comline1
-            write (98,*) comline1
-            close(15)
-c         endif
-         goto 301
-      endif
-
 
       if (ispin.gt.1)then 
          write (98,*) comline1
@@ -494,28 +410,17 @@ cc now read results
 
 cc first get energy
 
-      command1='rm -f temp1.log temp2.log temp3.log temp4.log temp.log'
-      call commrun(command1)
-      command1='egrep CBSEN molpro.out > temp1.log'
+      command1='egrep -w CBSEN molpro.out > temp1.log'
       call commrun(command1)
       command1="egrep 'CBSEN\(1' molpro.out >> temp1.log"
       call commrun(command1)
-      command1='egrep CBSENINT molpro.out > temp2.log'
-      call commrun(command1)
-      command1='head -n 1 temp2.log > temp3.log'
-      call commrun(command1)
-      command1='cat temp1.log temp3.log > temp4.log'
-      call commrun(command1)
-      command1='tail -n 1 temp4.log > temp.log'
+      command1='tail -n 1 temp1.log > temp.log'
       call commrun(command1)
 
       open (unit=99,status='unknown',file='temp.log')
       read(99,*)cjunk,cjunk,cjunk,vtot
       close(99)
       write(*,*)'vtot is',vtot
-      command1='rm -f temp1.log temp2.log temp3.log temp4.log temp.log'
-      call commrun(command1)
-c      stop
 
 cc then get coordinates if not an xyz calculations
       
@@ -692,7 +597,7 @@ c         numlines=numlines-1
          write(101,*)'Number'
          write(101,*)'---'
 
-         do j=1,natomt
+         do j=1,natom
             if(atomtype(j).eq.'H')ianumb=1
             if(atomtype(j).eq.'B')ianumb=5
             if(atomtype(j).eq.'C')ianumb=6
@@ -720,10 +625,7 @@ c         numlines=numlines-1
             if(atomtype(j).eq.'Te')ianumb=52
             if(atomtype(j).eq.'I')ianumb=53
             if(atomtype(j).eq.'Xe')ianumb=54
-            if(atomtype(j).ne.'X')then
-               write(101,1002)j,ianumb,0,coox(j),cooy(j),cooz(j)
-            endif
-c            if(atomtype(j).eq.'X')j=j-1
+            write(101,1002)j,ianumb,0,coox(j),cooy(j),cooz(j)
          enddo
 
 cc now save the gradient
@@ -786,7 +688,7 @@ cc count lines
          write(101,*)'---'
          write(101,*)'Center'
 
-         do j=1,natomt
+         do j=1,natom
             if(atomtype(j).eq.'H')ianumb=1
             if(atomtype(j).eq.'B')ianumb=5
             if(atomtype(j).eq.'C')ianumb=6
@@ -814,9 +716,7 @@ cc count lines
             if(atomtype(j).eq.'Te')ianumb=52
             if(atomtype(j).eq.'I')ianumb=53
             if(atomtype(j).eq.'Xe')ianumb=54
-            if(atomtype(j).ne.'X')then
-               write(101,1001)j,ianumb,gradx(j),grady(j),gradz(j)
-            endif
+            write(101,1001)j,ianumb,gradx(j),grady(j),gradz(j)
          enddo
          write(101,*)
          write(101,*)
@@ -944,7 +844,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       return
       end
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine readgrad_molpro(nvar,atomlabel,grad)
+      subroutine readgrad_molpro(nvar,grad)
 
       implicit double precision (a-h,o-z)
       implicit integer (i-n)
@@ -961,9 +861,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       character*70 comline3
       character*70 comline4
       character*120 command1
-      character*60 atomlabel(natommx)
-      character*60 atomlabelg(natommx)
-
       LOGICAL leof,lsec,ltit
 
       CHARACTER*1000 line,string
@@ -988,24 +885,12 @@ cc read gradient in internal coordinates
          read(11,*)cjunk
          read(11,*)cjunk
 
-         do i = 1 , nvar
-            grad(i)=0.                
-         enddo
          do iread = 1 , nvar
-            read(11,*)atomlabelg(iread),cjunk,cjunk,cjunk,cjunk,gradval
-c            grad(iread)=gradval
-            do ik=1,nvar
-               if(atomlabelg(iread).eq.atomlabel(ik))then
-                  grad(ik)=gradval                  
-               endif
-            enddo
+            read(11,*)cjunk,cjunk,cjunk,cjunk,cjunk,gradval
+            grad(iread)=gradval
 c            grad(iread)=0.1
 c            write(*,*)iread,gradval
          enddo
-c         do i = 1 , nvar
-c            write(*,*)i,atomlabel(i),atomlabelg(i),grad(i)
-c         enddo
-c         stop
       endif
 c      write(*,*)'word is ',word
       if (WORD.eq.'ENDFILE')goto 9000
@@ -1044,25 +929,20 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       include 'filcomm.f'
 
       En1=0.
-      isk=0
       OPEN (unit=11,status='old',file='geom.log')
       rewind (11)
 114   CONTINUE
       CALL LineRead (0)
       CALL LineRead (11)
 
-cc read energy
+cc read gradient in internal coordinates
 
-      if((WORD.EQ.'SETTING').AND.(WORD2.EQ.'CBSENINT').
-     + AND.(ISK.EQ.0))then
-         read(word4,100)En1
-         isk=1
-      endif
-
-      if((WORD.EQ.'SETTING').AND.(WORD2.EQ.'CBSEN').AND.(ISK.EQ.0))then
+      if((WORD.EQ.'SETTING').AND.(WORD2.EQ.'CBSEN'))then
 c         gradval=0.
 
          read(word4,100)En1
+ 100     format (F14.7)
+
          read(11,*)cjunk
          read(11,*)cjunk
 
@@ -1074,7 +954,6 @@ c      write(*,*)'word is ',word
  9000 continue
       close(11)
 c      stop
- 100     format (F14.7)
 
       return
       end

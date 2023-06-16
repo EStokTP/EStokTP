@@ -1,0 +1,1515 @@
+16d15
+< 
+18a18,29
+> c  lc: interface to case insensitive function
+>       interface
+>             function Up_to_low(vlstring)
+>                implicit none
+>             character(len=*),intent(in) :: vlstring 
+>             character(len=len_trim(vlstring)) :: Up_to_low
+>             integer ::  i             ! COUNTER 
+>             intrinsic :: achar
+>             end function Up_to_low
+>       end interface
+> c  lc END
+>       
+33c44
+<       character*70 comline1,comline2
+---
+>       character*(*) comline1,comline2
+42,43c53,56
+<       character*30 cjunk,cjunk1,iqclab
+< 
+---
+>       character*30 cjunk,cjunk1,iqclab,cjunk2,cjunk3
+>       character*250 longcommand1
+>       character*512 ExpGauexedir
+>  
+47c60,79
+< 
+---
+> c  lc mod , single point or optimization flag
+> c  lc mod, BasPath is a string containing the path to
+> c          the custom basis set 
+>       integer lc_flag,BasFlag,Pt2Flag,AnhFlag,AnhCounter
+>       character*300 BasPath
+> c  lc mod,  Pt2Model contains information about the pt2model
+> c           to use 
+>       character*50  Pt2Model, lc_word 
+>       character*1024 vlstring
+>       character*1024 hindfilecheck
+> 
+> c  lc mod,  COUNTERPOISE CORRECTION, INSERTION OF TWO FRAGMENTS
+> C           VARIABLES 
+>       integer icharge_frag1,ispin_frag1,icharge_frag2,ispin_frag2
+>       integer BSSE_flag
+>       integer EndPoi
+>       integer Frag_index
+>       logical OptFreq
+>       logical HindCheck
+> c
+54c86,91
+< 
+---
+> c  lc mod: hanlde EigenvalueFollow gaussian algorithm
+>       logical EFalgo
+>       integer NormTermCounter
+> c  lc mod: Logical flag to be activated if skip of computation of geometric potential
+> c          must be done for infinite computation
+>       logical SkInfGeomCorr
+64a102,190
+> c  lc mod, setting lc_flag locally to -1:  
+>       lc_flag=-1 
+> c  lc mod, setting Pt2Flag locally to -1
+> c          if Pt2flag is not -1 this will activate
+> c           the Pt2model search 
+>       Pt2Flag=-1
+>       AnhFlag=-1
+>       AnhCounter=1   
+>       BSSE_flag=-1
+>       FrGueF=-1
+>       NormTermCounter=0
+>       EFalgo=.FALSE.
+>       OptFreq=.FALSE.
+>       HindCheck=.FALSE.
+>       SkInfGeomCorr=.FALSE.
+> c  lc mod,  setting BasFlag to -1 at the start of the procedure
+> c           if this will be set to a different value is because
+> c           the gen keyword is read in the actual command line 
+> c           for the actual computation. A secondary file will be
+> c           searched. This file will contain the path to the custom 
+> c           basis set and it will be inserted in the .com file.
+>       BasFlag=-1 
+>       BasPath='Path_not_setted'
+>       Pt2Model='Pt2Model not set'
+> 
+> 
+> c  lc Check hindered file procedure
+>       open(unit=127,file='HindNormalCheck.log',iostat=iEoFfl,
+>      & status='old' )
+>       if (iEoFfl.eq.0) then 
+>          read(127,'(A)',iostat=IfileCheck) hindfilecheck
+>          hindfilecheck=Up_to_low(hindfilecheck)
+>          if (index(hindfilecheck,'normal') .gt. 0) then
+>             read(127,'(A)') hindfilecheck
+>             longcommand1='cp '//trim(hindfilecheck)//' geom.log'
+>             call commrun(longcommand1)
+>             hindfilecheck=
+>      &      trim(hindfilecheck(1:len_trim(hindfilecheck)-3))//'chk'
+>             longcommand1='cp '//trim(hindfilecheck)//' tmp.chk'
+>             call commrun(longcommand1)
+>             longcommand1=' '
+>             close(127,status='delete')
+>             HindCheck=.TRUE.
+>             longcommand1='echo HINDERED ROTORS READING ACTIVATED'
+>             call commrun(longcommand1)
+>          end if 
+>       endif
+> 
+> c  lc Check for skip geom corr file and chk. If one does not find 
+> c  lc potocorrgeom and also is chk file it assumes that a normal
+> c  lc procedure must be performed
+> 
+>        open(unit=127,file='skipgeominf.dat',iostat=iEoFfl,
+>      & status='old')
+>        if (iEoFfl.eq.0) then
+>          read(127,*) iSkipGeo
+>          if (iSkipGeo.eq.6) then 
+>             open(unit=128,file='geoms/potcorr_geom.log',iostat=iEoFfl,
+>      & status='old')
+>             open(unit=129,file='geoms/potcorr_geom.chk',iostat=iEoFfl2,
+>      & status='old')
+>             if ( 
+>      &         (iEoFFl.eq.0)
+>      &            .and. 
+>      &         (iEoFFl2.eq.0)
+>      &          ) then
+>                   if (
+>      &                index(Up_to_low(comline1),'opt') .gt.0 
+>      &                            .or. 
+>      &                index(Up_to_low(comline2),'opt') .gt.0 
+>      &                ) then 
+>                      SkInfGeomCorr=.TRUE.
+>                      longcommand1='cp geoms/potcorr_geom.log geom.log'
+>                      call commrun(longcommand1)
+>                      longcommand1='cp geoms/potcorr_geom.chk tmp.chk'
+>                      call commrun(longcommand1)
+>                      longcommand1=' '
+>                      write(6,*) 'optimization skipped for inf'
+>                      write(6,*) comline1
+>                      write(6,*) comline2
+>                      write(6,*) '-----------------------'
+>                   end if
+>             end if
+>             close(128,status='keep')
+>             close(129,status='keep')
+>          end if 
+>          close(127,status='delete')
+>        end if  
+> 
+75d200
+<       ifreq_save=ifreq
+79c204
+<       ifreq=ifreq_save
+---
+> 
+105,106c230,231
+<          write (99,'(A70)') comline1
+<          write (99,'(A70)') comline2
+---
+>          write (99,'(A300)') comline1
+>          write (99,'(A300)') comline2
+111c236
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+117c242
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+123c248
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+129c254
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+139,140c264,265
+<          read (99,'(A70)') comline1
+<          read (99,'(A70)') comline2
+---
+>          read (99,'(A300)') comline1
+>          read (99,'(A300)') comline2
+148,149c273,274
+<          write (99,'(A70)') comline1
+<          write (99,'(A70)') comline2
+---
+>          write (99,'(A300)') comline1
+>          write (99,'(A300)') comline2
+154c279
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+160c285
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+166c291
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+172c297
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+178c303
+<          read (108,'(A120)') command1
+---
+>          read (108,'(A300)') command1
+189,190c314,315
+<          read (99,'(A70)') comline1
+<          read (99,'(A70)') comline2
+---
+>          read (99,'(A300)') comline1
+>          read (99,'(A300)') comline2
+196a322,351
+> c  lc mod: open file to write route section 
+>       open(999,file='temp_route.dat')
+>       write(999,*) comline1,comline2 
+>       close(999)
+> c  lc : Mods, introduce a control section to handle opt+freq gaussian bug
+> c       the bug consists in the fact that in an opt+freq computation the route section
+> c       is taken without the iop. 
+> c       check if the frequency computation is required
+> c   1) Obtain one route section to scan
+>       write(vlstring,'(A,2x,A)') trim(adjustl(comline1)),
+>      & trim(adjustl(comline2))
+> c   2) Convert in lower case, case insensitive research
+>       vlstring=Up_to_low(vlstring)
+> c   3) Check if the route contains freq and opt togheter
+>       if (
+>      &    (index(vlstring,'freq') .gt. 0) 
+>      &     .and.
+>      &    (index(vlstring,'opt') .gt. 0)) then
+>          OptFreq=.True.
+>          write(10,'(A)') '--link1--'
+>       end if
+>       if (
+>      &   index(vlstring,',ef,') .gt. 0
+>      &      .or.
+>      &   index(vlstring,'eigenvaluefollow') .gt. 0   
+>      &   ) then 
+>        EFalgo=.true. 
+>        write(*,*) 'Eigenvalue algorithm checked'
+>       end if
+> 
+197a353
+> c  lc : Input gaussian 
+202a359,407
+> 
+> c  lc mod:  search in command.dat file the presence of gen keyword
+> c           to handle custom basis set 
+>       command1="grep -icw 'gen' temp_route.dat > LC_custom_basis.dat"
+>       call commrun(command1)
+> c lc  mod: from this file, read the basis flag 
+>       open(unit=903,file='LC_custom_basis.dat',status='old')
+>       read(903,*) BasFlag 
+>       close(903)
+> c lc  if the basflag is set to a value different from 0, then 
+> c     the path to the basis set file will be stored 
+>       if (BasFlag .ne. 0) then 
+>          open(unit=977,file='data/Custom_Basis_Path.dat',action='read'
+>      $    ,status='old')
+>          read(977,'(A)') BasPath
+>          close(977)
+>       end if 
+> c  lc check for anharmonic computation
+>       command1="grep -ic -P '(?<!read)anh' temp_route.dat > 
+>      & LC_ahn_flag.dat"
+>       call commrun(command1)
+>       open(unit=977,file='LC_ahn_flag.dat') 
+>       read(977,*) AnhFlag
+>       close(977)
+> c  lc check for ptmodel to use 
+>       command1="grep -ic 'readanh' temp_route.dat > 
+>      & LC_pt2model_flag.dat"
+>       call commrun(command1)
+>       open(977,file='LC_pt2model_flag.dat')
+>       read(977,*) Pt2Flag
+>       write(977,*) 'Pt2flag val=',Pt2Flag
+>       close(977) 
+>       if (Pt2Flag .ne. 0) then 
+>          command1="grep 'pt2model' data/theory.dat | awk '{print $2}' 
+>      &> LC_pt2Model_name.dat"
+>       call commrun(command1)
+>       open(977,file='LC_pt2Model_name.dat')
+>       read(977,*) Pt2Model 
+>       close(977) 
+>       end if 
+> c  lc :  CHECK FOR OPTIMIZATION FLAG START
+>       command1="grep -ic 'opt' temp_route.dat > LC_Opt_index.dat"
+>       open(unit=902,file='LC_Opt_index.dat',status='unknown')
+>       call commrun(command1)
+>       rewind(902)
+>       read(902,*) lc_flag  
+>       close(902,status='keep') 
+> c  lc :  CHECK FOR OPTIMIZATION FLAG END
+> 
+215a421
+> c  lc :  title card
+218,227c424,525
+<       WRITE (10,*) icharge,ispin
+<       if(ixyz.eq.0)then
+<          DO iatom = 1 , natomt
+<             write (10,*) atomlabel(iatom)
+<          ENDDO
+<       else
+<          DO iatom = 1 , natom
+<             write (10,*) atomlabel(iatom)
+<          ENDDO
+<       endif
+---
+> c      WRITE (10,*) icharge,ispin
+> c  lc :  case insensitive conversion of counterpoise correction
+> c        in geom.com file
+>       command1="grep -ic 'counterpoise' temp_route.dat > BSSE_flag.dat"
+>       call commrun(command1)
+>          open(977,file='BSSE_flag.dat') 
+>             read(977,*) BSSE_flag
+>          close(977)
+>       command1="grep -ic 'fragment' temp_route.dat > FragmentGuess.dat"
+>       call commrun(command1)
+>          open(977,file='FragmentGuess.dat') 
+>             read(977,*) FrGueF
+>          close(977)
+> c  lc :  search for substring counterpoise in comline1
+>       if ((BSSE_flag .gt. 0) .or. (FrGueF .gt. 0)) then
+>          open(977,file='data/counter_fragments.dat')
+>          read(977,*) icharge_frag1,ispin_frag1,
+>      &               icharge_frag2,ispin_frag2
+>          WRITE (10,*) icharge,ispin,
+>      &                icharge_frag1,ispin_frag1,
+>      &                icharge_frag2,ispin_frag2
+>       else 
+>          WRITE (10,*) icharge,ispin
+>       end if 
+> c lc  todo COUNTERPOISE : COMMENT UNTIL CLOSE(977) TO RETURN TO STANDARD VERSION
+> C     IF COUNTERPOISE FLAG IS ACTIVATED
+> C     CHECK IF THE ATOM LABEL IS NOT PRESENT
+> C     THE SUBSTRING "FRAGMENT" 
+> C     IF IT IS NOT PRESENT
+> C     OPEN FILE COUNTERPOISE .DAT
+> C     WRITE(ATOMLABEL(IATOM(1:3)),*) TRIM(ATOMLABEL(IATOM(1:3)))//"FRAGMENT",FRAGMENT INDEX_nf//"ATOMLABEL(IATOM(3:))
+> C     WRITE(10,*) AS IT IS.      
+> C     F77 Index_nf function for check of substring in a string
+> C     IS OVERWRITTEN BY INDEX_nf VARIABLE... USE A CHECK FOR ) 
+> C     AT THE END OF THE STRING (I WILL USE F90 INT FUNC)
+> C     Defining a pointer to the end of the atomlabel 
+> C     In this case Fragment= is assumed to be present
+> C     The writing will be as the standard version 
+> C
+>       if ((BSSE_flag .gt. 0) .or. (FrGueF .gt. 0)) then 
+>          if(ixyz.eq.0)then
+>             DO iatom = 1 , natomt
+>                read(atomlabel(iatom),*) lc_word 
+>                EndPoi=len_trim(lc_word)
+>                if ( lc_word(EndPoi:EndPoi) == ')' ) then 
+>                   write (10,*) atomlabel(iatom)
+>                else
+>                   atomlabel(iatom)=adjustl(trim(atomlabel(iatom)))
+>                   lc_word=adjustl(trim(lc_word))
+>                   read(977,*) Frag_index
+>                   write(10,'(A,A,I0,A,3x,A)') 
+>      &             trim(lc_word),
+>      &             '(Fragment=',Frag_index,')',
+>      &             atomlabel(iatom)(1+len_trim(lc_word):)
+>                end if
+>             ENDDO
+>          else
+>             DO iatom = 1 , natom
+>                read(atomlabel(iatom),*) lc_word 
+>                EndPoi=len_trim(lc_word)
+>                if ( lc_word(EndPoi:EndPoi) == ')' ) then 
+>                   write (10,*) atomlabel(iatom)
+>                else
+>                   atomlabel(iatom)=adjustl(trim(atomlabel(iatom)))
+>                   lc_word=adjustl(trim(lc_word))
+>                   read(977,*) Frag_index
+>                   write(10,'(A,A,I0,A,3x,A)') 
+>      &             trim(lc_word),
+>      &             '(Fragment=',Frag_index,')',
+>      &             atomlabel(iatom)(1+len_trim(lc_word):)
+>                end if
+>             ENDDO
+>          endif
+>       else 
+>          if(ixyz.eq.0)then
+>             DO iatom = 1 , natomt
+>                write (10,*) atomlabel(iatom)
+>             ENDDO
+>          else
+>             DO iatom = 1 , natom
+>                write (10,*) atomlabel(iatom)
+>             ENDDO
+>          endif
+>       end if 
+>  
+>       close(977)
+> 
+> C UNCOMMENT TO RETURN TO STANDARD VERSION
+> c      if(ixyz.eq.0)then
+> c         DO iatom = 1 , natomt
+> c            write (10,*) atomlabel(iatom)
+> c         ENDDO
+> c      else
+> c         DO iatom = 1 , natom
+> c            write (10,*) atomlabel(iatom)
+> c         ENDDO
+> c      endif
+> c  lc:   since the if algorithm does not print out the freezed coordinates
+> c        a file will be used to storage these         
+>       if (EFalgo) then 
+>          open(unit=157,file='freezecoord.dat',status='unknown')
+>       end if 
+232d529
+< 
+268,269c565,567
+<                index=ircons-j
+<                write (10,*) intcoor(icoord-index),xint(icoord-index)
+---
+>                index_nf=ircons-j
+>                write (10,*) intcoor(icoord-index_nf),
+>      &          xint(icoord-index_nf)
+272c570
+<          write (10,*)
+---
+> c         write (10,*)
+290a589
+>                   write(10,*)
+292a592
+>                   write(10,*)
+336a637
+>             write(10,*)
+340a642
+>                write(10,*)
+343a646
+>                write(10,*)
+346a650
+>                write(10,*)
+351c655,666
+<       close (unit=10,status='keep')
+---
+>       
+>       if (BasFlag .ne. 0) then
+>          if (natom.gt.1) write(10,*) 
+>          write(10,'(A)') '@'//BasPath
+>       end if 
+>       write(10,*)
+>       if (OptFreq .eqv. .false.) then 
+>          if (Pt2Flag .ne. 0) then 
+>             write(10,*) 'pt2model='//Pt2Model 
+>          endif 
+>       end if
+>       
+353a669,704
+> 
+> c  lc: mod link1 
+>       if (OptFreq .eqv. .true.) then
+>          write (10,'(A)') '--link1--'
+>          write (10,*) '%mem=',gmemo
+>          write (10,*) '%chk=tmp'
+>          write (10,*) '%NProcShared=',nshared
+>          write (10,*) '#',comline1
+>          write (10,*) '#',comline2
+>          write (10,*) '#','guess=read geom=allcheck ChkBasis'
+>          write (10,*)
+>          write (10,*)
+>          write (10,*) 
+>          if (Pt2Flag .ne. 0) write(10,*) 'pt2model='//Pt2Model  
+>          write (10,*)
+>          write (10,*)
+>          write (10,*) 
+>          command1=
+>      &    "sed -i -E ':a;N;$!ba;s/opt=?\(([^()]*)\)/ /2' geom.com"
+>          call commrun(command1)
+>          command1=
+>      &    "sed -i -E ':a;N;$!ba;s/freq(=?\(([^()]*)\))?/ /1' geom.com"
+>          call commrun(command1)
+>          command1=
+>      &    "sed -i -E ':a;N;$!ba;s/,?always/ /2I' geom.com"
+>          call commrun(command1)
+>          if (BasFlag .ne. 0) then
+>          command1=
+>      &    "sed -i -E ':a;N;$!ba;s/\bgen\b/ /2I' geom.com"
+>          call commrun(command1)
+>          end if
+>          
+>       end if
+> 
+>       close (unit=10,status='keep')
+> 
+364d714
+< c      stop
+365a716,723
+> c      stop
+> c  lc :  new feature
+> c        grep the path to gaussian directory
+> c        from data/GPaths.dat and then export
+> c        to env variable GAUSS_EXEDIR
+>       IF ((HindCheck .eqv. .FAlSE.)
+>      &             .and.
+>      &    (SkInfGeomCorr.eqv..FALSE.)) then 
+367a726,770
+>             ExpGauexedir=' '
+>             longcommand1='export GAUSS_EXEDIR='
+>             open(991,file='data/GPaths.dat',status='old',action='read',
+>      &      iostat=iOpstat)
+> c  lc First check if the file with gaussian paths exists. 
+>             if (iOpstat.eq.0) then 
+> c  lc Search for g09 keyword
+>                do 
+>                   read(991,*,iostat=istatus) cjunk
+>                   cjunk=Up_to_low(cjunk)
+>                   if (index(cjunk,'g09').gt.0) then 
+>                      rewind(991)
+>                      read(991,'(A)') ExpGauexedir
+>                      ExpGauexedir=
+>      &               ExpGauexedir(index(ExpGauexedir,'path')+5:)
+>                      exit 
+>                   end if
+>                end do 
+>                close(991,status='keep')
+>                longcommand1=trim(longcommand1)//trim(ExpGauexedir)
+> c  lc problem to fix:
+> c                    Up to now if I use the croutine to set
+> c                    The environment variable to set the new 
+> c                    Gaussian directory path the computation starts
+> c                    But does not write anything to the .log file
+> c                    And I cannot change the environment variable from
+> c                    A subprocess by fortran command or executing
+> c                    A shell script 
+> c-----------------------------------------------------------------------
+> c               open(991,file='setenv.sh')
+> c               write(991,'(A)') '#!/bin/bash'
+> c               write(991,'(A)') longcommand1
+> c               close(991)
+> c               call setgvar(ExpGauexedir)
+> c               longcommand1='chmod +x setenv.sh'
+> c               call commrun(longcommand1)
+> c               call execute_command_line(longcommand1)
+> c               longcommand1='. ./setenv.sh'
+> c               call commrun(longcommand1)
+> c               call commrun(longcommand1)
+> c              longcommand1=' '
+> c              ExpGauexedir=' '
+>             else 
+>                write(*,*) 'WARNING, NO GPATHS FILE DETECTED IN DATA' 
+>             end if
+369a773,807
+>             ExpGauexedir=' '
+>             longcommand1='export GAUSS_EXEDIR='
+>             open(991,file='data/GPaths.dat',status='old',action='read',
+>      &      iostat=iOpstat)
+> c  lc First check if the file with gaussian paths exists. 
+>             if (iOpstat.eq.0) then 
+> c  lc Search for g09 keyword
+>                do 
+>                   read(991,*,iostat=istatus) cjunk
+>                   cjunk=Up_to_low(cjunk)
+>                   if (index(cjunk,'g16').gt.0) then 
+>                      rewind(991)
+>                      read(991,'(A)') ExpGauexedir
+>                      ExpGauexedir=
+>      &               ExpGauexedir(index(ExpGauexedir,'path')+5:)
+>                      exit 
+>                   end if
+>                end do 
+>                close(991,status='keep')
+>                longcommand1=trim(longcommand1)//trim(ExpGauexedir)
+>                open(991,file='setenv.sh')
+>                write(991,'(A)') '#!/bin/bash'
+>                write(991,'(A)') longcommand1
+>                close(991)
+>                longcommand1='chmod +x setenv.sh'
+>                call commrun(longcommand1)
+>                longcommand1='./setenv.sh'
+>                call commrun(longcommand1)
+>                longcommand1='rm -f setenv.sh'
+>                call commrun(longcommand1)
+>               longcommand1=' '
+>               ExpGauexedir=' '
+>             else 
+>                write(*,*) 'WARNING, NO GPATHS FILE DETECTED IN DATA' 
+>             end if
+372a811
+>       ENDIF 
+375a815,816
+> 
+> 
+402,413c843,855
+< 
+<       command1='egrep Freq geom.log > temp.dat'
+<       call commrun(command1) 
+<       command1='wc temp.dat > temp1.dat'
+<       call commrun(command1)
+<       nlines=0
+<       open(unit=920,file='temp1.dat',status='unknown')
+<       read(920,*)nlines
+<       close(920)
+<       if(nlines.eq.0)ifreq=0
+<       write(*,*)'ifreq ',ifreq
+<       write(*,*)'nlines ',nlines
+---
+>       if (index(vlstring,'freq') .eq. 0) ifreq=0
+> c      command1='egrep Freq geom.log > temp.dat'
+> c      call commrun(command1) 
+> c      command1='wc temp.dat > temp1.dat'
+> c      call commrun(command1)
+> c      nlines=0
+> c      open(unit=920,file='temp1.dat',status='unknown')
+> c      read(920,*)nlines
+> c      close(920)
+> c      if(nlines.eq.0) then 
+> c         ifreq=0
+> c         write(*,*) 'FREQUENCIES WILL NOT BE PROCESSED'
+> c      end if 
+416a859,888
+> 
+> c  lc:   Debug for EF optimization algorithm. 
+> c        First read the geom.log file to search 
+> c        Constants internal variables and put in
+> c        a separate file 
+> 
+>       if (EFalgo) then
+>          write(*,*) 'eigenvalue are you checked?'
+>          open(unit=11,status='old',file='geom.log')
+>          do 
+>             read(11,'(A)') vlstring
+>             vlstring=Up_to_low(vlstring)
+>             if (index(vlstring,'constants:').gt.0) then
+>                do
+>                   read(11,'(A)') vlstring
+>                   if (len(trim(vlstring)).eq. 0) then 
+>                      rewind(11)
+>                      rewind(157)
+>                      close(11)
+>                      go to 777
+>                   else 
+>                      read(vlstring,*) cjunk2,cjunk3
+>                      write(157,*) cjunk3,cjunk2  
+>                   endif
+>                end do
+>             endif
+>          enddo 
+>       end if 
+> 
+> 777   continue
+419c891
+< 
+---
+>       open(unit=107,status='unknown',file='LC_output.out')
+421a894,896
+> c  lc debug: here read energy from fchk file and not from 
+> c           the .log because the igkey point to double hybrid
+> c           functionals
+423c898
+<       if (igkey.eq.'notfound')then
+---
+>       if ((igkey.eq.'notfound').or.(igkey.eq.'4'))then
+432c907
+<             command1='formchk tmp.chk'
+---
+>             command1='formchk09 tmp.chk'
+434c909,916
+<          call commrun(command1)         
+---
+>          call commrun(command1)       
+> 
+>          open(unit=778,file='tmp.fchk',iostat=iStatus,status='old')
+>             if (iStatus .ne. 0 ) then 
+>                command1='formchk09 tmp.chk'
+>                call commrun(command1)  
+>             end if 
+>             close(778,status='keep')
+461,476d942
+<       else if (igkey.eq.'4') then
+<          IF (WORD4.EQ.gkeyword) THEN
+<             OPEN (unit=65,status='unknown')
+<             REWIND (65)
+<             WRITE (65,1000) WORD5
+<             REWIND (65)
+<             READ (65,*) vtot
+<             close(unit=65,status='keep')
+<             if (ie.eq.0) vtot_0 = vtot
+<             ie = ie + 1
+<             ichecken=1
+<          ENDIF
+< c      else
+< c         write(*,*)'the gkeyword must be in position 3 or 4'
+< c         write(*,*)'other positions are not supported'
+< c         stop
+477a944,945
+> c  lc :  This is the read energy even for a single point
+> c        write(107,*) 'The read vtot is',vtot
+480a949,950
+> c  lc:   comment this for handle strange behaviour with 
+> c        combined computation
+483c953,954
+<          go to 9000
+---
+>          write(*,*) 'lc debug, line 727'
+>          goto 9000
+487c958,962
+<       IF((WORD.EQ.'VARIABLE').AND.(WORD2.EQ.'OLD'))then
+---
+>       IF(
+>      &    ((WORD.EQ.'VARIABLE').AND.(WORD2.EQ.'OLD')) .or.
+>      &    ((word3 .eq. 'GRADIENT').and.(WORD4.EQ.'DISPLACEMENT'))
+>      &    )
+>      &    then
+490c965
+<          CALL LineRead2 (11)
+---
+>          if (.not.EFalgo) CALL LineRead2 (11)
+493a969,974
+> c  lc:   EF algorithm handling, since the print is changed for 
+> c        this opt algo, now the grad reading is changed to 
+> c        the right number of coordinates displayed that are 
+> c        equal to nint-ircons that are the number of frozen
+> c        coordinates
+>          if (EFalgo) nint=nint-ircons
+496,497c977,983
+<             grad(iread)=-gradval
+<             write(64,*)cjunk,grad(iread)
+---
+>             if (.not.EFalgo) then 
+>                grad(iread)=-gradval
+>                write(64,*)cjunk,grad(iread)
+>             else 
+>                grad(iread)=gradval
+>                write(64,*)intcoor(iread),grad(iread)
+>             endif
+498a985,989
+>          if (EFalgo) then 
+>             do iwrite=0,ircons-1
+>                write(64,*) intcoor(nint+ircons-iwrite),0.00000000
+>             end do
+>          end if
+518,520c1009,1026
+< cc update geometry for restart option
+<       IF((WORD.EQ.'OPTIMIZATION').AND.(WORD2.EQ.'STOPPED.').AND.
+<      $   (IRES.NE.0).AND.(ixyz.ne.1)) THEN
+---
+> c lc : if the lc_flag is greater than 0 it means that
+> c      opt in route section of gauss.com is detected
+> c      so these check on the optimization failure are 
+> c      neeeded
+> c  lc control, write lc flag in LC_output.dat
+>       write(107,*) 'LC flag is=',lc_flag
+>       if (lc_flag.gt.0) then
+>       IF(
+>      &   (
+>      &   (WORD.EQ.'OPTIMIZATION').AND.(WORD2.EQ.'STOPPED.').AND.
+>      $   (IRES.NE.0).AND.(ixyz.ne.1)
+>      &   )
+>      &   .OR.
+>      &   (
+>      &   (WORD2.EQ.'OPTIMIZATION').AND.(WORD3.EQ.'STOPPED').AND.
+>      &   (IRES.NE.0).AND.(ixyz.ne.1)
+>      &    )
+>      &  ) THEN
+521a1028
+>          write(*,*) 'Optimization stopped?'
+523a1031
+>             write(*,*) 'lc debug, line 775'
+527a1036
+>             write(*,*) 'Debug pring line 854'
+544c1053
+< cc modified index if (iread.le.nint) then
+---
+> cc modified index_nf if (iread.le.nint) then
+572a1082
+>       endif
+579a1090
+>          write(*,*) 'lc debug, line 833'
+586c1097,1104
+<       IF (WORD2.EQ.'COMPLETED.'.OR.WORD2.EQ.'COMPLETED') THEN
+---
+> cc lc:   for ef algo, the keyword is **  CONVERGENCE 
+>       IF (
+>      &(WORD2.EQ.'COMPLETED.'.OR.WORD2.EQ.'COMPLETED') .OR.
+>      &(WORD2.EQ.'CONVERGENCE'.AND. WORD5.EQ.'SATISFIED')
+>      & ) THEN
+> c  This part relies on the completed optimization, the problem 
+> c  relies on single point calculations
+>          write(*,*) 'Optimization convergence criterion met'
+591a1110
+>             write(*,*) 'Debug print line 928'
+594a1114
+>             write(*,*) 'lc debug, line 851'
+603,621c1123,1138
+<             do iread = 1 , nint
+<                CALL LineRead2 (11)
+< c              write (6,*) 'iread in g09 test',iread,nint,ntau,word,
+< c    $ word2 
+<                OPEN (unit=64,status='unknown')
+<                REWIND (64)
+<                WRITE (64,910) word3,word2,word
+< c              write (6,*) 'word test',word3,word2,word
+<  910           FORMAT (3A20)
+<                REWIND (64)
+< c              write (6,*) 'iread test',iread,natom,ntau
+< cc modified index if (iread.le.nint) then
+<                if (iread.le.(nint-ntau)) then
+<                   READ (64,*) xint(iread)
+<                else
+<                   itau = iread-(natom*3-6-ntau)
+< c                 write (6,*) 'itau test',itau
+<                   READ (64,*) tauopt(itau)
+<                   if (tauopt(itau).gt.360.0d0) tauopt(itau) = 
+---
+> c  lc:   Debug for EigenvalueFollow optimization algorithm start
+>             if (.not. EFalgo) then
+>                do iread = 1 , nint
+>                   CALL LineRead2 (11)
+>                   OPEN (unit=64,status='unknown')
+>                   REWIND (64)
+>                   WRITE (64,910) word3,word2,word
+>                   WRITE (*,910) word3,word2,word
+> 910              FORMAT (3A20)
+>                   REWIND (64)
+>                   if (iread.le.(nint-ntau)) then
+>                      READ (64,*) xint(iread)
+>                   else
+>                      itau = iread-(natom*3-6-ntau)
+>                      READ (64,*) tauopt(itau)
+>                      if (tauopt(itau).gt.360.0d0) tauopt(itau) = 
+623c1140
+<                   if (tauopt(itau).lt.0.0d0) tauopt(itau) = 
+---
+>                      if (tauopt(itau).lt.0.0d0) tauopt(itau) = 
+625,627c1142,1178
+<                endif
+<                close (unit=64,status='keep')
+<             enddo
+---
+>                   endif
+>                   close (unit=64,status='keep')
+>                enddo
+> c  lc :  debugging for eigenfollow algorithm, it must write
+> c        also the freezed internal coordinates. So if
+> c        iread is equal to nint that is setted to the number
+> c        of internal coordinates minus the number of freezed coordinates
+> c        so in this case it must write 
+>             else 
+>                do iread = 1 , nint
+>                   CALL LineRead2 (11)
+>                   OPEN (unit=64,status='unknown')
+>                   REWIND (64)
+>                   if (iread .le. (nint-ircons)) then 
+>                      WRITE (64,'(3(A20))') word3,word2,word
+>                      WRITE (*,'(3(A20))') word3,word2,word
+>                   else 
+>                      read(157,'(A)') vlstring
+>                      write(64,*) trim(adjustl(vlstring))//'  !'
+>                      write(*,*)  trim(vlstring)//'  !'
+>                   end if 
+>                   rewind(64)
+>                   if (iread.le.(nint-ntau)) then
+>                      READ (64,*) xint(iread)
+>                   else
+>                      itau = iread-(natom*3-6-ntau)
+>                      READ (64,*) tauopt(itau)
+>                      if (tauopt(itau).gt.360.0d0) tauopt(itau) = 
+>      $             tauopt(itau) - 360.0d0
+>                      if (tauopt(itau).lt.0.0d0) tauopt(itau) = 
+>      $             tauopt(itau) + 360.0d0
+>                   endif
+>                   close (unit=64,status='keep')
+>                enddo
+>                close(157)
+>             end if 
+> c  lc:   Debug for EigenvalueFollow optimization algorithm end
+639c1190
+<             index=0
+---
+>             index_nf=0
+682c1233
+<                   index=index+1
+---
+>                   index_nf=index_nf+1
+687c1238
+<                   if(index.eq.natom) goto 1222
+---
+>                   if(index_nf.eq.natom) goto 1222
+716a1268
+>             write(*,*) 'Rotational constants check'
+731,737c1283,1284
+< c           if (word.eq.'FULL') then
+< c              read (11,*) ct1,ct2,ct3,(abcrot(idim),idim=1,3)
+< c        write (6,*) 'starting rotational constant determination'
+< c read frequencies
+< c              write (6,*) 'ifreq in g09 test',ifreq
+< c              ifreq=0
+<             if (ifreq.eq.1) then
+---
+>             write(*,*) 'ifreq is   ',ifreq
+>             if ((ifreq.eq.1) .or. (OptFreq.eqv..true.)) then
+740a1288,1315
+> c  lc : mod start anharmonic frequencies reading from here START
+> c  lc:   in this case the anharmonic fundamental bands are taken
+> c        with a simple bash command that is composed by a format
+> c        specification  
+> c        the command is 
+> c        grep -i -m1 -A(jfreqtot+2) fundamental bands geom.log | 
+> c        tail -n(jfreqtot) | sed 's/[H,L]//g' | awk '{print $4}' 
+> 
+>                if (AnhFlag .ne. 0) then
+>                   write(*,*) 'Anharmonic frequencies reading activated'
+>                   write(longcommand1,987) jfreqtot+2,jfreqtot
+>                   call commrun(longcommand1) 
+>                   open(977,file='Anharmonic_frequencies.dat')
+>                   do AnhCounter=1,jfreqtot 
+>                      read(977,*) freq(AnhCounter)
+>                   end do 
+>                   close(977)
+>                   goto 9100                  
+>  987        FORMAT(                                                    
+>      &   "grep -i -m1 -A",I0,1x," 'fundamental bands' geom.log |",1x,
+>      &   "tail -n",I0,1x,"| sed 's/[H,L]//g' |",1x, 
+>      &   " awk '{print $4}' >",1x,
+>      &   "Anharmonic_frequencies.dat"
+>      &       ) 
+>                end if
+> 
+> C  lc: mod start anharmonic frequencies reading from here END
+>                write(*,*) 'line debugging 1138'
+743,747d1317
+< c                 write (6,990) word,word2,word3,word4,word5,'tw'
+< c 990           format (5a20)
+< c               if (WORD.eq.'JOB') then
+< c                  go to 9000
+< c               endif
+748a1319
+>                   write(*,*) 'Debug print, frequencies checked 1'
+761d1331
+< c     write (6,*) 'freq test',word,word2,word3,word4,word5
+772a1343
+>                   write(*,*) 'Debug print, frequencies checked 2'
+785,787d1355
+< c                 if (jfreq0.lt.(3*natom-6)) go to 314
+< cc                  close(unit=11,status='keep')
+< cc                  return
+790,791d1357
+< cc                  close(unit=11,status='keep')
+< cc                  return
+794a1361,1363
+> c  lc : this goto 264 sets the cycle to go up to 
+> c        rotational keyword search. The frequencies
+> c        parsing is activated if rotational is checked
+803,807c1372,1378
+<       vtot = 1.0d20
+<       irepeat=irepeat+1
+<       write(6,*)'ires = ', ires
+<       write(6,*)'irepeat = ', irepeat
+<       if(irepeat.le.ires) then
+---
+> c  lc :  arrivi a questa flag se la opt fallisce 
+>       if (lc_flag .gt. 0) then
+>          vtot = 2.0d20
+>          irepeat=irepeat+1
+>          write(6,*)'ires = ', ires
+>          write(6,*)'irepeat = ', irepeat
+>          if(irepeat.le.ires) then
+810,830c1381,1401
+<          iqc_term=0
+<          open (unit=99,status='unknown')
+<          rewind (99)
+<          write (99,1919)
+<          rewind (99)
+<          read (99,1920) command1
+<          close (99)
+<          call commrun(command1)
+<          open (unit=99,file='tmp2.dat',status='unknown')
+<          write(99,*)'qc file end'
+<          close (99)
+<          command1='cat tmp1.dat tmp2.dat > tmp.dat'
+<          call commrun(command1)
+<          open (unit=99,file='tmp.dat',status='unknown')
+<          read(99,*)cjunk,cjunk,iqclab
+<          if(iqclab.ne.'end')then
+<             if(iqclab.eq.'criterion') then 
+<                iqc=1
+<                iqc_term=1
+<                write(6,*)'setting iqc  = 1 '
+<             endif
+---
+>             iqc_term=0
+>             open (unit=99,status='unknown')
+>             rewind (99)
+>             write (99,1919)
+>             rewind (99)
+>             read (99,1920) command1
+>             close (99)
+>             call commrun(command1)
+>             open (unit=99,file='tmp2.dat',status='unknown')
+>             write(99,*)'qc file end'
+>             close (99)
+>             command1='cat tmp1.dat tmp2.dat > tmp.dat'
+>             call commrun(command1)
+>             open (unit=99,file='tmp.dat',status='unknown')
+>             read(99,*)cjunk,cjunk,iqclab
+>             if(iqclab.ne.'end')then
+>                if(iqclab.eq.'criterion') then 
+>                   iqc=1
+>                   iqc_term=1
+>                   write(6,*)'setting iqc  = 1 '
+>                endif
+832,833c1403,1404
+<          endif
+<          close (99)
+---
+>             endif
+>             close (99)
+837c1408
+<  1920 format (A100)
+---
+>  1920 format (A300)
+842,865c1413,1436
+<          icsy_term=0
+<          open (unit=99,status='unknown')
+<          rewind (99)
+<          write (99,2919)
+<          rewind (99)
+<          read (99,1920) command1
+<          close (99)
+<          call commrun(command1)
+<          open (unit=99,file='tmp2.dat',status='unknown')
+<          write(99,*)'csy file end'
+<          close (99)
+<          command1='cat tmp1.dat tmp2.dat > tmp.dat'
+<          call commrun(command1)
+<          open (unit=99,file='tmp.dat',status='unknown')
+<          read(99,*)cjunk,cjunk,iqclab
+<          if(iqclab.ne.'end')then
+<             if(iqclab.eq.'internal'.and.ired.eq.1) then 
+<                icsy=1
+<                icsy_term=1
+<                ired=2
+<                if(irecov.ne.1)irepeat=irepeat-1
+<                write(6,*)'setting icsy  = 1 '
+<                write(6,*)'setting ired  = 2 '
+<             endif
+---
+>             icsy_term=0
+>             open (unit=99,status='unknown')
+>             rewind (99)
+>             write (99,2919)
+>             rewind (99)
+>             read (99,1920) command1
+>             close (99)
+>             call commrun(command1)
+>             open (unit=99,file='tmp2.dat',status='unknown')
+>             write(99,*)'csy file end'
+>             close (99)
+>             command1='cat tmp1.dat tmp2.dat > tmp.dat'
+>             call commrun(command1)
+>             open (unit=99,file='tmp.dat',status='unknown')
+>             read(99,*)cjunk,cjunk,iqclab
+>             if(iqclab.ne.'end')then
+>                if(iqclab.eq.'internal'.and.ired.eq.1) then 
+>                   icsy=1
+>                   icsy_term=1
+>                   ired=2
+>                   if(irecov.ne.1)irepeat=irepeat-1
+>                   write(6,*)'setting icsy  = 1 '
+>                   write(6,*)'setting ired  = 2 '
+>                endif
+867c1438
+<          endif
+---
+>             endif
+869,883c1440,1454
+<          close (99)
+<          open (unit=99,status='unknown')
+<          rewind (99)
+<          write (99,2920)
+<          rewind (99)
+<          read (99,1920) command1
+<          close (99)
+<          call commrun(command1)
+<          open (unit=99,file='tmp2.dat',status='unknown')
+<          write(99,*)'csy file end'
+<          close (99)
+<          command1='cat tmp1.dat tmp2.dat > tmp.dat'
+<          call commrun(command1)
+<          open (unit=99,file='tmp.dat',status='unknown')
+<          read(99,*)cjunk,cjunk,iqclab
+---
+>             close (99)
+>             open (unit=99,status='unknown')
+>             rewind (99)
+>             write (99,2920)
+>             rewind (99)
+>             read (99,1920) command1
+>             close (99)
+>             call commrun(command1)
+>             open (unit=99,file='tmp2.dat',status='unknown')
+>             write(99,*)'csy file end'
+>             close (99)
+>             command1='cat tmp1.dat tmp2.dat > tmp.dat'
+>             call commrun(command1)
+>             open (unit=99,file='tmp.dat',status='unknown')
+>             read(99,*)cjunk,cjunk,iqclab
+885,893c1456,1464
+<          if(iqclab.ne.'end')then
+<             if(iqclab.eq.'Z-matrix'.and.ired.eq.1) then 
+<                icsy=1
+<                icsy_term=1
+<                ired=2
+<                if(irecov.ne.1)irepeat=irepeat-1
+<                write(6,*)'setting icsy  = 1 '
+<                write(6,*)'setting ired  = 2 '
+<             endif
+---
+>             if(iqclab.ne.'end')then
+>                if(iqclab.eq.'Z-matrix'.and.ired.eq.1) then 
+>                   icsy=1
+>                   icsy_term=1
+>                   ired=2
+>                   if(irecov.ne.1)irepeat=irepeat-1
+>                   write(6,*)'setting icsy  = 1 '
+>                   write(6,*)'setting ired  = 2 '
+>                endif
+895c1466
+<          endif
+---
+>             endif
+897c1468
+<          close (99)
+---
+>             close (99)
+904c1475
+<          if(ired.eq.1.and.iqc_term.ne.1)then
+---
+>             if(ired.eq.1.and.iqc_term.ne.1)then
+917,918c1488,1490
+<          goto 999
+<       endif
+---
+>             goto 999
+>          endif
+>       end if
+919a1492,1493
+>       write(*,'(A,/,50("-"))') 'Frequencies'
+>       write(*,'(f0.8,/)')  freq(1:jfreqtot)
+945a1520
+> 
+985d1559
+<       imd=imdtunn
+1115c1689
+<             index=numpoints+1-inumpoints
+---
+>             index_nf=numpoints+1-inumpoints
+1117c1691
+<             index=numpointsf+inumpoints+1
+---
+>             index_nf=numpointsf+inumpoints+1
+1120,1121c1694,1695
+<             read (108,'(A80)') atgeom_me(iatom,index)
+< c            write (*,*)iatom, atgeom_me(iatom,index)
+---
+>             read (108,'(A80)') atgeom_me(iatom,index_nf)
+> c            write (*,*)iatom, atgeom_me(iatom,index_nf)
+1171c1745
+<  1401 format (A180)
+---
+>  1401 format (A300)
+1182c1756
+<  1035 format (A120)
+---
+>  1035 format (A300)
+1189c1763
+<             index=numpoints+1-inumpoints
+---
+>             index_nf=numpoints+1-inumpoints
+1191c1765
+<                read (108,'(A70)') grad(iatom,index)
+---
+>                read (108,'(A70)') grad(iatom,index_nf)
+1194c1768
+<             index=numpointsf+inumpoints+1
+---
+>             index_nf=numpointsf+inumpoints+1
+1196c1770
+<                read (108,'(A70)') grad(iatom,index)
+---
+>                read (108,'(A70)') grad(iatom,index_nf)
+1210,1214c1784,1787
+<          if(imd.ne.1) then
+<             do iatom = 1, natom
+<                grad(iatom,numpointsf)=grad(iatom,numpointsf-1)
+<                grad(iatom,numpointsf+1)=grad(iatom,numpointsf-1)
+<                grad(iatom,numpointsf+2)=grad(iatom,numpointsf+3)
+---
+>          do iatom = 1, natom
+>             grad(iatom,numpointsf)=grad(iatom,numpointsf-1)
+>             grad(iatom,numpointsf+1)=grad(iatom,numpointsf-1)
+>             grad(iatom,numpointsf+2)=grad(iatom,numpointsf+3)
+1217,1223c1790
+<             enddo
+<          else if(imd.eq.1) then
+<             do iatom = 1, natom
+< c               grad(iatom,numpointsf+1)='1  1  0.0 0.0 0.0'
+<                grad(iatom,numpointsf+1)=grad(iatom,numpointsf)
+<             enddo
+<          endif
+---
+>          enddo
+1224a1792
+> 
+1232c1800
+<             index=numpoints+2-inumpoints           
+---
+>             index_nf=numpoints+2-inumpoints           
+1234,1235c1802,1803
+<                read (108,'(A77)') force_con(inumlines,index)
+< c               write (*,*) force_con(inumlines,index)
+---
+>                read (108,'(A77)') force_con(inumlines,index_nf)
+> c               write (*,*) force_con(inumlines,index_nf)
+1240c1808
+<             index=numpointsf+inumpoints
+---
+>             index_nf=numpointsf+inumpoints
+1242c1810
+<                read (108,'(A77)') force_con(inumlines,index)
+---
+>                read (108,'(A77)') force_con(inumlines,index_nf)
+1313c1881
+<             index=numpoints+2-inumpoints           
+---
+>             index_nf=numpoints+2-inumpoints           
+1315c1883
+<             index=numpointsf+numpointsb-inumpoints+2
+---
+>             index_nf=numpointsf+numpointsb-inumpoints+2
+1317c1885
+<          write(*,*)'index is ',index
+---
+>          write(*,*)'index_nf is ',index_nf
+1319,1320c1887,1888
+<          rc_ene(index) = en_irc
+<          rc_coord(index) = coord_irc
+---
+>          rc_ene(index_nf) = en_irc
+>          rc_coord(index_nf) = coord_irc
+1328c1896
+<  1030 format (A120)
+---
+>  1030 format (A300)
+1342c1910
+<       character*70 comline1
+---
+>       character*(*) comline1
+1372c1940
+<          igkey='3'
+---
+>          igkey='4'
+1375c1943
+<          igkey='3'
+---
+>          igkey='4'
+1378c1946
+<          igkey='3'
+---
+>          igkey='4'
+1387c1955
+<          igkey='3'
+---
+>          igkey='4'
+1390c1958
+<          igkey='3'
+---
+>          igkey='4'
+1393c1961
+<          igkey='3'
+---
+>          igkey='4'
+1402c1970
+<          igkey='3'
+---
+>          igkey='4'
+1405c1973
+<          igkey='3'
+---
+>          igkey='4'
+1408c1976
+<          igkey='3'
+---
+>          igkey='4'
+1452,1455c2020,2023
+<       character*70 comline1
+<       character*70 comline2
+<       character*70 comline3
+<       character*70 comline4
+---
+>       character*(*) comline1
+>       character*(*) comline2
+>       character*(*) comline3
+>       character*(*) comline4
+1472a2041
+> 
+1505,1506c2074,2075
+<             comline4='opt(calcfc,ts,maxcyc=1) iop(7/33=1) guess=read
+<      $ geom=check'
+---
+>             comline4='opt(calcfc,ts,maxcyc=1,noeigentest)  
+>      $ iop(7/33=1) guess=read geom=check'
+1508,1509c2077,2079
+<           comline4='opt(calcfc,ts,maxcyc=1) iop(7/33=1) guess=read geom=
+<      $check int=ultra'
+---
+>           comline4='opt(calcfc,ts,maxcyc=1,noeigentest)  
+>      $ iop(7/33=1) guess=read geom=check int=ultra 
+>      $'
+1513,1514c2083,2084
+<             comline4='opt(calcfc,maxcyc=1) iop(7/33=1) guess=read 
+<      $ geom=check'
+---
+>             comline4='opt(calcfc,maxcyc=1,noeigentest) iop(7/33=1) 
+>      $ guess=read geom=check'
+1516,1517c2086,2087
+<       comline4='opt(calcfc,maxcyc=1) iop(7/33=1) guess=read geom=check
+<      $ int=ultra'
+---
+>       comline4='opt(calcfc,maxcyc=1,noeigentest) iop(7/33=1)  
+>      $ guess=read geom=check int=ultra'
+1532,1535c2102,2105
+<       character*70 comline1
+<       character*70 comline2
+<       character*70 comline5
+<       character*70 comline6
+---
+>       character*(*) comline1
+>       character*(*) comline2
+>       character*(*) comline5
+>       character*(*) comline6
+1593,1594c2163,2164
+<          comline6='opt(calcfc,ts,maxcycle=1) iop(7/33=1) guess=read
+<      $ geom=check'
+---
+>          comline6='opt(calcfc,ts,maxcycle=1,noeigentest) iop(7/33=1) 
+>      $ guess=read geom=check'
+1601c2171
+<  101  format(A70)
+---
+>  101  format(A300)
+1619,1622c2189,2192
+<       character*70 comline1
+<       character*70 comline2
+<       character*70 comline3
+<       character*70 comline4
+---
+>       character*300 comline1
+>       character*300 comline2
+>       character*300 comline3
+>       character*300 comline4
+1655c2225,2228
+<       if (WORD.eq.'JOB')goto 9000
+---
+>       if (WORD.eq.'JOB') then 
+>       write(*,*) 'lc debug, line 1941'
+>       goto 9000
+>       endif 
+1679,1682c2252,2255
+<       character*70 comline1
+<       character*70 comline2
+<       character*70 comline3
+<       character*70 comline4
+---
+>       character*300 comline1
+>       character*300 comline2
+>       character*300 comline3
+>       character*300 comline4
+1716c2289,2292
+<       if (WORD.eq.'JOB')goto 9000
+---
+>       if (WORD.eq.'JOB') then 
+>          write(*,*) 'lc debug, line 1941'
+>          goto 9000
+>       endif
+1738,1741c2314,2317
+<       character*70 comline1
+<       character*70 comline2
+<       character*70 comline3
+<       character*70 comline4
+---
+>       character*300 comline1
+>       character*300 comline2
+>       character*300 comline3
+>       character*300 comline4
+1752a2329
+> c  lc : goto loop untile job reading
+1756a2334,2357
+> c  lc debug : insert energy reading 
+>       
+>       if ((igkey.eq.'notfound').or.(igkey.eq.'4'))then
+>          if(ilevcode.eq.1)then
+>             command1='formchk09 tmp.chk'
+>          else if (ilevcode.eq.3)then
+>             command1='formchk09 tmp.chk'
+>          endif
+>          call commrun(command1) 
+>          open(unit=778,file='tmp.fchk',iostat=iStatus,status='old')
+>             if (iStatus .ne. 0 ) then 
+>                command1='formchk09 tmp.chk'
+>                call commrun(command1)  
+>             end if 
+>             close(778,status='keep')        
+>          command1="egrep 'Total Energy' tmp.fchk > temp.log"
+>          call commrun(command1)         
+>          open(unit=65,file='temp.log',status='unknown')
+>          read(65,*)cjunk,cjunk,cjunk,vtot
+>          energy = vtot
+>          close(65)
+> 
+>       end if
+> 
+1767,1779c2368,2383
+<       else if (igkey.eq.'4') then
+<          IF (WORD4.EQ.gkeyword) THEN
+<             OPEN (unit=65,status='unknown')
+<             REWIND (65)
+<             WRITE (65,1000) WORD5
+<             REWIND (65)
+<             READ (65,*) vtot
+<             close(unit=65,status='keep')
+<             energy = vtot
+<          ENDIF
+<       ENDIF
+<       if (WORD.eq.'JOB')goto 9000
+<       goto 114
+---
+>       endif 
+> c         else if (igkey.eq.'4') then
+> c            IF (WORD4.EQ.gkeyword) THEN
+> c               OPEN (unit=65,status='unknown')
+> c               REWIND (65)
+> c               WRITE (65,1000) WORD5
+> c               REWIND (65)
+> c               READ (65,*) vtot
+> c               close(unit=65,status='keep')
+> c               energy = vtot
+> c            ENDIF
+>          if (WORD.eq.'JOB') then 
+>             write(*,*) 'lc debug, line 2089'
+>             goto 9000
+>          endif
+>          goto 114
+1803,1806c2407,2410
+<       character*70 comline1
+<       character*70 comline2
+<       character*70 comline3
+<       character*70 comline4
+---
+>       character*300 comline1
+>       character*300 comline2
+>       character*300 comline3
+>       character*300 comline4
+1834c2438
+< cc read and write Hessian
+---
+> cc read and write gradient
+1868c2472,2475
+<       if (WORD.eq.'JOB')goto 9000
+---
+>       if (WORD.eq.'JOB') then 
+>          write(*,*) 'lc debug, line 2182'
+>          goto 9000
+>       endif
+1895,1898c2502,2505
+<       character*70 comline1
+<       character*70 comline2
+<       character*70 comline3
+<       character*70 comline4
+---
+>       character*300 comline1
+>       character*300 comline2
+>       character*300 comline3
+>       character*300 comline4
+1930c2537,2540
+<       if (WORD.eq.'JOB')goto 9000
+---
+>       if (WORD.eq.'JOB') then 
+>          write(*,*) 'lc debug, line 2247'
+>          goto 9000
+>       endif
+1951c2561,2564
+<          if (WORD.eq.'JOB')goto 9000
+---
+>          if (WORD.eq.'JOB') then 
+>             write(*,*) 'lc debug, line 2271'
+>             goto 9000
+>          endif
+1958a2572,2590
+>          function Up_to_low(vlstring)
+>          implicit none
+>          character(len=*),intent(in) :: vlstring 
+>          character(len=len_trim(vlstring)) :: Up_to_low
+>          integer ::  i             ! COUNTER 
+>          intrinsic :: achar
+>       
+>          Up_to_low=vlstring
+>          do i=1,len_trim(vlstring)      
+>             select case (vlstring(i:i))
+>             case ('A':'Z')
+>                      Up_to_low(i:i)=achar(  ichar(vlstring(i:i))+32  )
+>                   case default
+>                      cycle
+>             end select
+>          end do
+>       
+>       end function Up_to_low
+> 

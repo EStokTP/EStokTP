@@ -388,7 +388,7 @@ cc first check if the framework group is linear
 
       open(unit=920,file='temp1.dat',status='unknown')
       read(920,*)cjunk,cjunk,cgroup
-      if((cgroup.ne.'C*V').and.(cgroup.ne.'D*H')) then 
+      if(cgroup.ne.'C*V') then 
          ilin_fr=0
          ilin=0
       endif

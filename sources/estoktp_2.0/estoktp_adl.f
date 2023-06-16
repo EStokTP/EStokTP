@@ -103,12 +103,12 @@ c initializations
       igeom_wellr=0
       iopt_wellp=0
       igeom_wellp=0
-      igrid_opt_ts=0
       i2dgrid_opt_ts=0
 cadl keyword to run GSM for TS localization
       igsm_opt_ts=0
       issm_opt_ts=0
 cadl end modified part
+      igrid_opt_ts=0
       iopt_ts_0=0
       itauo_ts=0
       iopt_reac1_1=0
@@ -253,9 +253,6 @@ cadl end modified part
       endif
       if (WORD.EQ.'RESIRCALL') then
          iresirc = 2
-      endif
-      if (WORD.EQ.'RESIRCALL_RES') then
-         iresirc = 3      
       endif
       if (WORD.EQ.'FROZRTS') then
          ifrozrts = 1
@@ -3209,7 +3206,6 @@ c      stop
          xint(iint) = xinti(iint)
          write(*,*)'xint ',iint,xint(iint),intcoor(iint)
       enddo
-c      stop
 
 cc move angle and dih angle to last three positions
 
@@ -3257,13 +3253,11 @@ c      intcoor(idih)=intcoor(nint-2)
 c      xint(idih)=xint(nint-2)
 c      xint(iang)=xint(nint-1)
 
-      if(natom.gt.3)then
-         intcoor(nint-2)=dihb
-         xint(nint-2)=temp_dih
-      endif
-
       intcoor(nint-1)=angb
+      intcoor(nint-2)=dihb
+
       xint(nint-1)=temp_ang
+      xint(nint-2)=temp_dih
 
       rts=rdist
 
@@ -6499,7 +6493,6 @@ cc if linear molecule reacting with linear radical in abs assume TS is linear
 c        natomt = natomt1+natomt2+1
          
          ibarrfr=0
-         ib_froz=0
          if(ibarr.gt.1)then
             rewind(15)
             do while (WORD.NE.'IBOND')
@@ -6515,22 +6508,6 @@ c        natomt = natomt1+natomt2+1
             if(word4.eq.'ALL')ib_froz=5
             read (15,*) ireact,rdist
             frozcoo=rdist
-
-
-c check if prod1 has 2 atoms
-            open (unit=67,file='./data/prod1.dat',status='unknown')
-            nat_pr1=0
-            do while (WORD.NE.'NATOM')
-               call LineRead (67)
-               if (WORD.EQ.'END') then
-                write (7,*) 'in sub lev1 could not open data/prod1.dat'
-                stop
-               endif
-            enddo
-            read (67,*) nat_pr1
-            close(67)
-c
-            if(nat_pr1.eq.2.and.ib_froz.ne.0)ib_froz=2
 
          endif
          close (unit=15,status='keep')
@@ -6854,7 +6831,6 @@ cc move to end frozen coordinates for barrierless reactions
          endif
       endif
 c      write(*,*)'ircons is',ircons
-c      write(*,*)'ib_froz is',ib_froz
 c      stop
 
       if(ilev1code.eq.1) then
@@ -6877,21 +6853,6 @@ c      stop
      $     comline1,comline2,icharge,ispin,ircons,
      $     atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires
      $     ,ixyz,ired,ispecies,iaspace)
-      endif
-
-
-      if(vtotr.gt.0)then
-         write(7,*)'failed in level1 calculations'
-         write(7,*)'in subroutine level1'
-         write(7,*)'with vtot ',vtotr
-         write(7,*)'terminating code with error'
-         open(unit=99,file='failed',status='unknown')
-         write(99,*)'failed in level1 calculations'
-         write(99,*)'in subroutine level1'
-         write(99,*)'with vtot ',vtotr
-         write(99,*)'terminating code with error'
-         close(99)
-         stop
       endif
 
       if (inp_type.eq.1) then
@@ -14051,7 +14012,7 @@ cc write input for multidimensional tunneling calculations
       write(333,*)'Delta_Energy_rea:           0.'
       write(333,*)'Delta_Energy_pro:           0.'
       write(333,*)'Maxstep:                   ',numpointstot
-      write(333,*)'Npointsint:                 5 '
+      write(333,*)'Npointsint:                 0 '
       write(333,*)'Maxtdev:                    0.5'
       write(333,*)'Rearrange(1=yes,0=no)       1'
       write(333,*)'SaddlePoint                ',numpointsf
@@ -14062,7 +14023,7 @@ cc write input for multidimensional tunneling calculations
          endif
       write(333,*)'isct_vtst(1=vtst_sct,0=sct) 1'
       write(333,*)'zerocurvature(1)            0'
-      write(333,*)'reduced_mass                -10.0'
+      write(333,*)'reduced_mass                1.0'
       write(333,*)'minimum_frequency            50'
       write(333,*)'anim_freq(if_Maxstep=1)          2'
       write(333,*)'onlyrotors(0=yes,1=no)        1'
@@ -14096,7 +14057,7 @@ c     +         status='unknown')
          endif
          write(133,*)'isct_vtst(1=vtst_sct,0=sct) 1'
          write(133,*)'zerocurvature(1)            0'
-         write(133,*)'reduced_mass                -10.0'
+         write(133,*)'reduced_mass                1.0'
          write(133,*)'minimum_frequency            50'
          write(133,*)'anim_freq(if_Maxstep=1)       2'
          write(133,*)'onlyrotors(0=yes,1=no)        0'
@@ -14279,9 +14240,7 @@ c     +         status='unknown')
          endif
          write(133,*)'isct_vtst(1=vtst_sct,0=sct) 1'
          write(133,*)'zerocurvature(1)            0'
-cc         write(133,*)'reduced_mass                1.0'
-cc setting red mass to -1 lets the code compute its red mass
-         write(133,*)'reduced_mass                -10.0'
+         write(133,*)'reduced_mass                1.0'
          write(133,*)'minimum_frequency            50'
          write(133,*)'anim_freq(if_Maxstep=1)       2'
          write(133,*)'onlyrotors(0=yes,1=no)        0'
@@ -14932,7 +14891,7 @@ c         stop
 
 cc now rescale potential if requested
 
-      if(iresirc.eq.2.or.iresirc.eq.3) then
+      if(iresirc.eq.2) then
 
          if(iallen.eq.1)then
             write(7,*)'the rescale 2 option is not necessary'
@@ -14940,21 +14899,6 @@ cc now rescale potential if requested
             write(7,*)'change values and restart'
             close(7)
             stop
-         endif
-
-         intres=0
-         if(iresirc.eq.3)then
-            open (unit=107, file='./irc_files/hl_en_int.dat', 
-     $           status='unknown')
-            read(107,*)intres
-            do ij=1,intres                  
-               read (107,*)cjunk,rc_ene_hl(ij)
-            enddo
-            close(107)
-           write(96,*)'restarting HL IRC energy scan from point ',intres
-           write(7,*)
-           write(7,*)'restarting HL IRC energy scan from point ',intres
-           write(7,*)
          endif
 
 cc perform High level calculations for all points, unless they have already been done
@@ -15380,8 +15324,7 @@ ccccc
       open(unit=17,file='freq_proj_xyz.out',status='unknown')
       do inumpoints=1,numpointstot
          write(17,8001)rc_coord(inumpoints),
-c     +                 (freqproj(j,inumpoints),j=1,nfreqw)
-     +                 (freqproj(j,inumpoints),j=1,nfreq)
+     +                 (freqproj(j,inumpoints),j=1,nfreqw)
       enddo
       close(17)
 
@@ -15389,8 +15332,7 @@ c     +                 (freqproj(j,inumpoints),j=1,nfreqw)
          open(unit=16,file='freq_proj_int.out',status='unknown')
          do inumpoints=1,numpointstot
             write(16,8001)rc_coord(inumpoints),
-c     +                    (freqintproj(j,inumpoints),j=1,nfreqw)
-     +                    (freqintproj(j,inumpoints),j=1,nfreq)
+     +                    (freqintproj(j,inumpoints),j=1,nfreqw)
          enddo
          close(16)
       endif
@@ -20200,11 +20142,10 @@ c      stop
          intcoor(icoord) = intcoort(icoord)
       enddo
 
-      do icoord = 1 , natom1p
-         write(6,*)icoord, xinti(icoord)
-         write(6,*)icoord, intcoor(icoord)
-      enddo
-c      stop
+c      do icoord = 1 , natom1p
+c         write(6,*)icoord, xinti(icoord)
+c         write(6,*)icoord, intcoor(icoord)
+c      enddo
 
       write (116,*) 'past z-matrix'
 
@@ -20524,8 +20465,6 @@ c         write(7,*)'please check, the execution will be stopped'
 c         close(7)
 c         stop
 c      endif
-      nclose_ss=0
-      nopen_ss=0
       if(ispin.eq.1)then
          numorb=neltot/2
       else if (ispin.eq.2)then
@@ -20566,13 +20505,8 @@ c      if(ispin.eq.3)write(101,900)neltot,2
             nopen=numorb+j
             if(ispin.eq.2.and.j.ne.numopentot)nopen=nopen+1
          endif
-c         if(nlps.gt.1.and.j.gt.numopentot)nstatew=nstates
-         if(nlps.gt.0.and.j.gt.numopentot)nstatew=nstates
+         if(nlps.gt.1.and.j.gt.numopentot)nstatew=nstates
          if(ispin.eq.3)nclose=nclose-2
-         if(j.eq.1)then
-            nclose_ss=nclose
-            nopen_ss=nopen
-         endif
          write(101,990)nclose,nopen,neltot,mspin,nstatew
       enddo
       if(numclosedtot.eq.0)then
@@ -20580,14 +20514,7 @@ c         if(nlps.gt.1.and.j.gt.numopentot)nstatew=nstates
             write(101,990)numorb-2,numorb,neltot,mspin,nstates
          endif
       endif
-      if(ispin.eq.1)then
-         write(101,*)'commands for spin splitting'
-         write(101,990)nclose,nopen,neltot,mspin+2,nstatew
-         write(101,991)nclose_ss,nopen_ss,neltot,mspin+2,1
-         write(101,992)neltot,mspin+2
-      endif
       close(101)
-
 c      write(7,*)'number of orbitals is ',numorb
 c      close(7)
 c      stop
@@ -20597,9 +20524,6 @@ cc
 
  990  format('{multi;closed,',I2,';occ,',I2,';wf,',I3,',1,',I1',;state,'
      $ ,I1';maxiter,40}')
- 991  format('{multi;closed,',I2,';occ,',I2,';wf,',I3,',1,',I1',;state,'
-     $ ,I1';maxiter,40;canorb,2101.2}')
- 992  format('{rhf;wf,',I3,',1,',I1';start,2101.2}')
 
       return
       end
@@ -23086,7 +23010,7 @@ c     +         status='unknown')
       write(133,*)'internalcoord(1=yes)     1'            
       write(133,*)'isct_vtst(1=vtst_sct,0=sct) 1'
       write(133,*)'zerocurvature(1)            0'
-      write(133,*)'reduced_mass                 1.0'
+      write(133,*)'reduced_mass                1.0'
       write(133,*)'minimum_frequency            50'
       write(133,*)'anim_freq(if_Maxstep=1)       2'
       write(133,*)'onlyrotors(0=yes,1=no)        0'
@@ -23298,8 +23222,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       dimension potg(npespointsmx),potgr(npespointsmx)
       dimension pothl(npespointsmx),pothlr(npespointsmx)
       dimension potco(npespointsmx),potco_geom(npespointsmx)
-      dimension potco_hl(npespointsmx),pot_tot(npespointsmx)
-      dimension potzpe(npespointsmx)
+      dimension potco_hl(npespointsmx)
       dimension cooxt(natommx),cooyt(natommx),coozt(natommx)
       dimension cooxp1(natommx),cooyp1(natommx),coozp1(natommx)
       dimension cooxp2(natommx),cooyp2(natommx),coozp2(natommx)
@@ -23648,16 +23571,12 @@ c     $ status='unknown')
          goto 105
       endif
       if(word2.eq.'ENCORR')then
-         open(unit=151,file='../100/me_files/potcorr_inf.me',
+         open(unit=15,file='../100/me_files/potcorr_inf.me',
      $ status='unknown')
-         read(151,*)vinfen
-         close(151)
+         read(15,*)vinfen
+         close(15)
 c         vinfen=100.000
-         if(nstates.eq.1)then
-            write(11,*)'   molpro_energy = energy +',abs(vinfen)
-         else
-            write(11,*)'   molpro_energy = energy(1) +',abs(vinfen)
-         endif
+         write(11,*)'   molpro_energy = energy +',abs(vinfen)
          goto 100
       endif
       if(word2.eq.'ENERGY')then
@@ -24060,8 +23979,7 @@ cc now we determine the total number of pivot points
       endif
       ipivtot1=ipivtot1+iaddpiv1*2
 
-      write(*,*)'npiv1 is',npiv1
-      write(*,*)'ipivtot1 is',ipivtot1
+c      write(*,*)'npiv1 is',npiv1
 c      stop
 
       if(npiv2.eq.1)then
@@ -24076,10 +23994,6 @@ c      stop
          ipivtot2=ipivtot2+2
       endif
       ipivtot2=ipivtot2+iaddpiv2*2
-
-      write(*,*)'npiv2 is',npiv2
-      write(*,*)'ipivtot2 is',ipivtot2
-c      stop
 
 cc now we are ready to compute the position of the pivot atoms for fragment 1
 
@@ -24134,6 +24048,7 @@ c      write(7,*)'test',sqrt(xsitep1**2+ysitep1**2)
          xsitep1=xsitep1-xsite1
          ysitep1=ysitep1-ysite1
          zsitep1=zsitep1-zsite1
+
       endif
 
 c
@@ -24148,50 +24063,39 @@ c
          dih=90.
          iang=iang+1
 
-         if(natom1.gt.2)then
-             call zmat_to_xyz(xsitep1,ysitep1,zsitep1,cooxp1(nrat1(j)),
-     $           cooyp1(nrat1(j)),coozp1(nrat1(j)),cooxp1(nrat2(j)),
-     $           cooyp1(nrat2(j)),coozp1(nrat2(j)),cooxp1(nrat3(j)),
-     $           cooyp1(nrat3(j)),coozp1(nrat3(j)),dist,ang,dih)
+         call zmat_to_xyz(xsitep1,ysitep1,zsitep1,cooxp1(nrat1(j)),
+     $        cooyp1(nrat1(j)),coozp1(nrat1(j)),cooxp1(nrat2(j)),
+     $        cooyp1(nrat2(j)),coozp1(nrat2(j)),cooxp1(nrat3(j)),
+     $        cooyp1(nrat3(j)),coozp1(nrat3(j)),dist,ang,dih)
 
-           write(7,*)''
-           write(7,*)'additional piv coords: ',j,xsitep1,ysitep1,zsitep1
+         write(7,*)''
+         write(7,*)'additional piv coords: ',j,xsitep1,ysitep1,zsitep1
 c         write(7,*)'ref atoms: ',j,nrat1(j),nrat2(j),nrat3(j)
 c         write(7,*)'ref atoms: ',j,cooxp1(1),cooyp1(1),coozp1(1)
 c         write(7,*)'ref atoms: ',j,cooxp1(2),cooyp1(2),coozp1(2)
 c         write(7,*)'ref atoms: ',j,cooxp1(6),cooyp1(6),coozp1(6)
 
-            xsitep1=xsitep1-cooxp1(nrat1(j))
-            ysitep1=ysitep1-cooyp1(nrat1(j))
-            zsitep1=zsitep1-coozp1(nrat1(j))
+         xsitep1=xsitep1-cooxp1(nrat1(j))
+         ysitep1=ysitep1-cooyp1(nrat1(j))
+         zsitep1=zsitep1-coozp1(nrat1(j))
 
-            rho1=sqrt(xsitep1**2+ysitep1**2+zsitep1**2)
-            if(abs(xsitep1).lt.0.01.and.abs(ysitep1).lt.0.01)then
-               theta(iang)=0.01
-            else if (abs(xsitep1).lt.0.01.and.abs(ysitep1).gt.0.1)then
-               theta(iang)=3.14159/2.*180./3.14159
-            else
-               theta(iang)=(atan2(ysitep1,xsitep1))*180./3.14159
+         rho1=sqrt(xsitep1**2+ysitep1**2+zsitep1**2)
+         if(abs(xsitep1).lt.0.01.and.abs(ysitep1).lt.0.01)then
+            theta(iang)=0.01
+         else if (abs(xsitep1).lt.0.01.and.abs(ysitep1).gt.0.1)then
+            theta(iang)=3.14159/2.*180./3.14159
+         else
+            theta(iang)=(atan2(ysitep1,xsitep1))*180./3.14159
 c         theta1=(acos(xsitep1/sqrt(xsitep1**2+ysitep1**2)))*180./3.14159
-            endif
-         
-            if(abs(zsitep1).lt.0.01)then
-               phi(iang)=3.14159/2.*180./3.14159
-            else
-             phi(iang)=(atan2(sqrt(xsitep1**2+ysitep1**2),zsitep1))*180.
-     +           /3.14159
-            endif
-         write(7,*)'pivot j polar coords are: ,',j,theta(iang),phi(iang)
-         else if (natom1.eq.2)then
-            write(7,*)'requested second pivo point on frag 1'
-c            xsitep1=-rts*cos(aabs1)
-c            ysitep1=-rts*sin(aabs1)
-c            zsitep1=0.
-c            xsitep1=xsitep1-xsite1
-c            ysitep1=ysitep1-ysite1
-c            zsitep1=zsitep1-zsite1
-
          endif
+
+         if(abs(zsitep1).lt.0.01)then
+            phi(iang)=3.14159/2.*180./3.14159
+         else
+            phi(iang)=(atan2(sqrt(xsitep1**2+ysitep1**2),zsitep1))*180.
+     +           /3.14159
+         endif
+         write(7,*)'pivot j polar coords are: ,',j,theta(iang),phi(iang)
       enddo
 
 cc if natom2>1 we compute the pivot atom coords also for fragment 2
@@ -24341,10 +24245,8 @@ c      stop
       write(11,*)'#  4--->2'
       write(11,*)
       id=1
-      iv=0
       if(natom1.eq.2.and.npiv1.eq.2)then
          ip=ip+1
-         iv=iv+1
          if(ip.lt.10)then
             write(11,302)ip,xsite1,id,iv,ip,ysite1,id,iv,ip,zsite1
          else
@@ -24352,23 +24254,10 @@ c      stop
          endif
          ip=ip+1
          if(ip.lt.10)then
-            write(11,313)ip,xsite1,id,iv,ip,ysite1,id,iv,ip,zsite1
+            write(11,303)ip,xsite1,id,iv,ip,ysite1,id,iv,ip,zsite1
          else
-            write(11,3131)ip,xsite1,id,iv,ip,ysite1,id,iv,ip,zsite1
+            write(11,3031)ip,xsite1,id,iv,ip,ysite1,id,iv,ip,zsite1
          endif
-c         write(*,*)'iaddpiv1 is',iaddpiv1
-c         stop
-         do j=1,iaddpiv1
-            ip=ip+1
-            iv=iv+1
-            write(11,322)ip,cooxp1(nrat1(j)),id,iv,ip,cooyp1(nrat1(j))
-     +            ,id,iv,ip,coozp1(nrat1(j))
-            ip=ip+1
-            write(11,323)ip,cooxp1(nrat1(j)),id,iv,ip,cooyp1(nrat1(j))
-     +            ,id,iv,ip,coozp1(nrat1(j))
-         enddo
-         write(11,*)
-
 c         write(11,122)xsite1,ysite1,zsite1
 c         write(11,126)xsite1,ysite1,zsite1
          write(11,*)
@@ -24381,7 +24270,7 @@ c         write(11,141)xsite1,ysite1,zsite1
             write(11,3011)ip,xsite1,ip,ysite1,ip,zsite1
          endif
          write(11,*)
-      else if (natom1.gt.2.and.npiv1.ne.1)then
+      else if (natom1.gt.2.and.npiv1.eq.0)then
          ip=ip+1
          iv=iv+1
          if(ip.lt.10)then
@@ -24516,73 +24405,16 @@ c            endif
          write(11,*)'EndSurface'
          write(11,*)
       else if(natom2.eq.1.and.natom1.eq.2)then
-         write(11,*)'PivotPoints     ',ipivtot2
+         write(11,*)'PivotPoints     2'
          write(11,*)'Frame 0 0 0 0'
          write(11,*)
-         ip=ip+1
-         write(11,301)ip,xc,ip,yc,ip,zc
-c         write(11,301)ip,xsite4,ip,ysite4,ip,zsite4
-         write(11,*)
-         write(11,*)'# interpointal distances'
-         write(11,*)'#'
-         write(11,*)
-         write(11,*)'Distances'
-         write(11,*)
-         if(ipivtot1.eq.1)then
-            write(11,*)'r11 = r'
-         else 
-            do j=1,ipivtot1
-               if(j.lt.10)then
-                  write(11,401)j
-               else
-                  write(11,501)j
-               endif
-c            write(11,*)'r11 = r-d1'
-c            write(11,*)'r21 = r-d1'
-            enddo
-         endif
-
-         write(11,*)
-         write(11,*)'Conditions 0'
-         write(11,*)
-         numcycles=0
-         if(ipivtot1.eq.1)then
-            numcycles=1
-         else
-            numcycles=2+ipivtot1/2
-c            numcycles=3
-         endif
-         write(11,*)'Cycles ',numcycles
-         write(11,*)
-         write(11,*)'r = (8.5, 8.25, 8.0, 7.5, 7.0, 6.5, 6.0, 5.75, 5.5, 
-     + 5.0, 4.75, 4.5)'
-         if(ipivtot1.gt.1)then         
-            write(11,*)'d1 = (0.01, 0.15, 0.3)'
-c            if(iaddpivtot.gt.0)then
-c               do j=1,iaddpivtot
-c                  write(11,406)j+1
-c               enddo
-c            endif
-            if(ipivtot1.gt.2)then
-               do j=1,ipivtot1/2
-c     write(11,402)j,phi(j)
-c     write(11,403)j,theta(j)
-                  write(11,403)j,aabs1
-c                  write(11,403)j,-aabs1
-               enddo
-            else
-                  write(11,403)j,aabs1
-            endif
-         endif
-         write(11,*)
-         write(11,*)'EndSurface'
-         write(11,*)
+cc to be continued     
       else if(natom2.ge.2.and.natom1.ge.2)then
          write(11,*)'PivotPoints    ',ipivtot2
          write(11,*)'Frame 0 0 0 0'
          write(11,*)
-         ip=ip+1
          if(ipivtot2.eq.1)then
+            ip=ip+1
             if(ip.lt.10)then
                write(11,301)ip,xsite4,ip,ysite4,ip,zsite4
             else
@@ -24749,7 +24581,7 @@ cc
      + 5.5, 5.0, 4.75, 4.5)'
          else if(ipivtot1.eq.1.and.ipivtot2.eq.2)then
             write(11,*)'r = (8.5,8.0,7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
-            write(11,*)'d1 = (0.01, 0.15, 0.3)'
+            write(11,*)'d1 = (0.01, 0.3, 0.5)'
             if(natom2.eq.2)then
                write(11,128)aabs2
             else if (natom2.gt.2)then
@@ -24760,7 +24592,7 @@ c               write(11,110)theta2
             endif
          else if(ipivtot1.eq.2.and.ipivtot2.eq.1)then
             write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
-            write(11,*)'d1 = (0.01, 0.15, 0.3)'
+            write(11,*)'d1 = (0.01, 0.3, 0.5)'
             if(natom1.eq.2)then
                write(11,127)aabs1
             else if (natom1.gt.2)then
@@ -24771,8 +24603,8 @@ c               write(11,108)theta1
             endif
          else if(ipivtot1.eq.2.and.ipivtot2.eq.2)then
             write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
-            write(11,*)'d1 = (0.01, 0.15, 0.3)'
-            write(11,*)'d2 = (0.01, 0.15, 0.3)'
+            write(11,*)'d1 = (0.01, 0.3, 0.5)'
+            write(11,*)'d2 = (0.01, 0.3, 0.5)'
             if(natom2.eq.2)then
                write(11,128)aabs2
             else if (natom2.gt.2)then
@@ -24791,15 +24623,15 @@ c               write(11,108)theta1
             endif
          else if(ipivtot1.ge.2.and.ipivtot2.eq.1)then
             write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
-            write(11,*)'d1 = (0.01, 0.15, 0.3)'
+            write(11,*)'d1 = (0.01, 0.3, 0.5)'
             do j=1,ipivtot1/2
                write(11,402)j,phi(j)
                write(11,403)j,theta(j)
             enddo
          else if(ipivtot1.ge.2.and.ipivtot2.ge.2)then
             write(11,*)'r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)'
-            write(11,*)'d1 = (0.01, 0.15, 0.3)'
-            write(11,*)'d2 = (0.01, 0.15, 0.3)'
+            write(11,*)'d1 = (0.01, 0.3, 0.5)'
+            write(11,*)'d2 = (0.01, 0.3, 0.5)'
             do j=1,ipivtot1/2+ipivtot2/2
                write(11,402)j,phi(j)
                write(11,403)j,theta(j)
@@ -24824,8 +24656,7 @@ cc now create the correction potential input file for vrc calculations
       read(12,*)npoints
       write(11,*)npoints
       write(14,*)npoints
-      write(14,602)
-      write(14,601)
+      write(14,*)'Point Geom corr HL corr (kcal/mol'
 
       do j=1,npoints
          read(12,*)rinp(j)
@@ -24851,13 +24682,6 @@ cc now create the correction potential input file for vrc calculations
          read(15,*)pothlr(j)
          close(15)
          rewind(99)
-         write(99,106)cfile
-         rewind(99)
-         read(99,'(A40)')filename
-         open(unit=15,file=filename,status='unknown')
-         read(15,*)potzpe(j)
-         close(15)
-         rewind(99)
       enddo
       close(99)
 
@@ -24873,10 +24697,6 @@ cc reference infinte energy is assigned to npoints+1 position
       read(15,*)pothl(npoints+1)
       read(15,*)pothlr(npoints+1)
       close(15)
-      filename='../100/me_files/ts_zpe.me'
-      open(unit=15,file=filename,status='unknown')
-      read(15,*)potzpe(npoints+1)
-      close(15)
 
       do j=1,npoints
          potco_geom(j)=potgr(j)-potgr(npoints+1)-potg(j)+potg(npoints+1)
@@ -24886,13 +24706,9 @@ cc reference infinte energy is assigned to npoints+1 position
          potco_geom(j)=potco_geom(j)*627.5
          potco_hl(j)=potco_hl(j)*627.5
          potco(j)=potco_geom(j)+potco_hl(j)
-         pot_tot(j)=(pothlr(j)-pothlr(npoints+1))*627.5
 
          write(11,*)rinp(j),potco(j)
-         pzpe=0.
-         pzpe=(potzpe(j)- potzpe(npoints+1))*627.5
-         write(14,603)rinp(j),potco_geom(j),potco_hl(j),pot_tot(j),pzpe
-c     +(potzpe(j)- potzpe(npoints+1))*627.5
+         write(14,*)rinp(j),potco_geom(j),potco_hl(j)
       enddo
 
       close(11)
@@ -24930,7 +24746,6 @@ c 102  format('x1  = ',F5.2,' +d1*sin(p1)*cos(a1) y1 = ',F5.2,
 c     + '+d1*sin(p1)*sin(a1) z1 = ',F5.2,1X,' +d1*cos(p1)')
  103  format('../',A8,'/me_files/potcorr_geom.me')
  104  format('../',A8,'/me_files/potcorr_hl.me')
- 106  format('../',A8,'/me_files/ts_zpe.me')
 c 106  format('x2  = ',F5.2,' -d1*sin(p1)*cos(a1) y2 = ',F5.2,
 c     + '-d1*sin(p1)*sin(a1) z2 = ',F5.2,1X,' -d1*cos(p1)')
 c 107  format('p1 = (',F7.2,')')
@@ -24974,14 +24789,6 @@ c 143  format('x3  = ',F5.2,' y3 = ',F5.2,' z3 = ',F5.2,1X)
      + ,F5.2,'-d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
  3031 format('x',I2,' = ',F5.2,' -d',I1,'*cos(a',I1,') y',I2,' = '
      + ,F5.2,'-d',I1,'*sin(a',I1,') z',I2,' = ',F5.2,1X)
- 313  format('x',I1,' = ',F5.2,' +d',I1,'*cos(a',I1,') y',I1,' = '
-     + ,F5.2,'-d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
- 322  format('x',I1,' = ',F5.2,' -d',I1,'*cos(a',I1,') y',I1,' = '
-     + ,F5.2,'+d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
- 323  format('x',I1,' = ',F5.2,' -d',I1,'*cos(a',I1,') y',I1,' = '
-     + ,F5.2,'-d',I1,'*sin(a',I1,') z',I1,' = ',F5.2,1X)
- 3131 format('x',I2,' = ',F5.2,' +d',I1,'*cos(a',I1,') y',I2,' = '
-     + ,F5.2,'-d',I1,'*sin(a',I1,') z',I2,' = ',F5.2,1X)
 
  304  format('x',I1,' = ',F5.2,' +d',I1,'*sin(p',I1,')*cos(a',I1,') y'
      + ,I1,' = ',F5.2,'+d',I1,'*sin(p',I1,')*sin(a',I1,') z',I1,' = ',
@@ -25006,12 +24813,6 @@ c 143  format('x3  = ',F5.2,' y3 = ',F5.2,' z3 = ',F5.2,1X)
  504  format('r',I2,I1,' = r-d1/2-d2/2')
  405  format('r',I1,'1 = r-d1/2')
  505  format('r',I2,'1 = r-d1/2')
- 601  format(2X,'Distance',4X,'Geom Corr',4X,'HL Corr',3X,'Potential',
-     +  3X,'ZPE')
- 602  format(2X,'All energies in kcal/mol with respect to fragments')
- 603  format(1X,F7.2,7X,F7.4,5X,F7.4,2X,F7.2,2X,F7.2)
-c      write(14,601)' Point  Geom corr HL corr (kcal/mol)'
-
 c 406  format('d',I1,' = (0.01, 0.3, 0.5)')
 
       return
@@ -25227,10 +25028,6 @@ c input data
          endif
          inp_type=2
       endif
-
-cc initialization of algorithm type
-
-      ilocmin=0
 
 cc first read blocks that are common for input type 1 and 2
 
@@ -25554,26 +25351,6 @@ cc read level of theory
          command1='cp -f data/tmp_na2.chk .'
          call commrun(command1)
       endif
-      if(word4.eq.'DUMMY')then
-C         if(ilevcode.eq.2)then
-C            write(7,*)'guess and molpro are incompatible keywords'
-C            write(7,*)'change selection and restart'
-C            stop
-C         endif
-         ilocmin=1
-         iguess2=2
-         write(7,*)
-         write(7,*)'assuming PES2 and PES1 as equal'
-         write(7,*)'skipping calculations for PES2'
-         write(7,*)
-         write(31,*)
-         write(31,*)'assuming PES2 and PES1 as equal'
-         write(31,*)'skipping calculations for PES2'
-         write(31,*)
-         command1='cp -f data/tmp_na2.chk .'
-         call commrun(command1)
-      endif
-
 
       close(21)
 
@@ -25753,22 +25530,10 @@ c         stop
                write (15,*) intcoori(iint),xinti(iint),ibondi(iint)
             enddo
             write(15,*)'Theory for NA-TST'
-            write(15,*)ilevcode
-            if(ilevcode.eq.1.or.ilevcode.eq.3)then
-               write(15,*)comline1
-               write(15,*)comline2
-               write(15,*)comline3
-               write(15,*)comline4
-            else if (ilevcode.eq.2)then
-               write(15,*)'./data/natst_pes1_molpro.dat'
-               write(15,*)'./data/natst_pes2_molpro.dat'
-               write(15,*)'key1'
-               write(15,*)'key2'
-            else
-               write(7,*)'it seems the code choice is not defined'
-               write(7,*)'please check the input'
-               write(7,*)stop
-            endif
+            write(15,*)comline1
+            write(15,*)comline2
+            write(15,*)comline3
+            write(15,*)comline4
             write(15,*)'Spin charge and guess of surface 1 and 2'
             write(15,*)icharge,ispin1,iguess1
             write(15,*)icharge,ispin2,iguess2
@@ -25781,11 +25546,7 @@ c         stop
             write(7,*)'Energies on PES1 (En1) and PES2 (En2) '
             write(7,*)
 c            stop
-            if(ilocmin.eq.0)then
-               call na_tst_opt()
-            else
-               call con_min_opt()
-            endif
+            call na_tst_opt()
             xinti(ncoord)=con_min(1)+deltastep
          enddo
 
@@ -25812,26 +25573,10 @@ c            stop
                write (15,*) intcoori(iint),xinti(iint),ibondi(iint)
             enddo
             write(15,*)'Theory for NA-TST'
-            write(15,*)ilevcode
-            if(ilevcode.eq.1.or.ilevcode.eq.3)then
-               write(15,*)comline1
-               write(15,*)comline2
-               write(15,*)comline3
-               write(15,*)comline4
-            else if (ilevcode.eq.2)then
-               write(15,*)'./data/natst_pes1_molpro.dat'
-               write(15,*)'./data/natst_pes2_molpro.dat'
-               write(15,*)'key1'
-               write(15,*)'key2'
-            else
-               write(7,*)'it seems the code choice is not defined'
-               write(7,*)'please check the input'
-               write(7,*)stop
-            endif
-c            write(15,*)comline1
-c            write(15,*)comline2
-c            write(15,*)comline3
-c            write(15,*)comline4
+            write(15,*)comline1
+            write(15,*)comline2
+            write(15,*)comline3
+            write(15,*)comline4
             write(15,*)'Spin charge and guess of surface 1 and 2'
             write(15,*)icharge,ispin1,iguess1
             write(15,*)icharge,ispin2,iguess2
@@ -25847,11 +25592,7 @@ c            write(15,*)comline4
             write(31,*)'Energies on PES1 (En1) and PES2 (En2) '
             write(31,*)
 c            stop
-            if(ilocmin.eq.0)then
-               call na_tst_opt()
-            else
-               call con_min_opt()
-            endif
+            call na_tst_opt()
             xinti(ncoord-inatst_const+1)=con_min(1)+deltastep
          enddo
       else
@@ -26746,7 +26487,6 @@ cc isite here refers to prod1/reac1
          call calc_transitional(ibond,jbond,kbond,natom,natomt_compl
      +      ,aabs1v,babs1v,aabs2v,babs2v,babs3v)
 
-c         if(natom.gt.4)then
          aabs1=aabs1v
          babs1=babs1v
          if(jcheck.eq.1)then
@@ -26892,12 +26632,8 @@ cc
          command1="sed -ie '/\;active/,+1d' level0_molpro1.dat"
          call commrun(command1)
 
-         if(natom2.eq.1.and.natom1.gt.2)then
+         if(natom2.eq.1)then
             command1="sed -ie 's/inactive,/active,aabs1,babs1/' 
-     $ level0_molpro1.dat"
-            call commrun(command1)
-         else if(natom2.eq.1.and.natom1.eq.2)then
-            command1="sed -ie 's/inactive,/active,aabs1/' 
      $ level0_molpro1.dat"
             call commrun(command1)
          else if (natom1.gt.2.and.natom2.eq.2.and.natomt2.eq.2)then
@@ -27133,19 +26869,23 @@ cc save original coords in xinti e incoordi
          xinti(iint) = xint(iint)
          intcoori(iint)=intcoor(iint)
       enddo
-cc move babs3 
-      if(natom1.ge.2.and.natom2.gt.2)then
-         do iint = 1 , nint
-            if(intcoori(iint).eq.'BABS3')then
-               intcoor(1)='BABS3'
-               xint(1)=xinti(iint)
-               intcoor(iint)=intcoori(1)
-               xint(iint)=xinti(1)
-            endif
-         enddo
-      endif
-cc move babs2 
-      if(natom1.ge.2.and.natom2.gt.2)then
+
+cadl##################################################################
+cadl QUESTA è CORREZIONE TEMPORANEA PER VRCTST STEP4 - ignora x GSM
+cadl invece di spostare le trans coor in ordine inverso, da babs3 a
+cadl aabs1, le sposto in ordine aabs1, babs1, aabs2, babs2, babs3
+cc original version from estoktp1.15+correction for H by adl March23
+cc move babs3 to first position
+      do iint = 1 , nint
+         if(intcoori(iint).eq.'BABS3')then
+            intcoor(1)='BABS3'
+            xint(1)=xinti(iint)
+            intcoor(iint)=intcoori(1)
+            xint(iint)=xinti(1)
+         endif
+      enddo
+cc move babs2 to second position
+      if(natom1.ne.2)then
          do iint = 1 , nint
             if(intcoori(iint).eq.'BABS2')then
                intcoor(2)='BABS2'
@@ -27154,19 +26894,10 @@ cc move babs2
                xint(iint)=xinti(2)
             endif
          enddo
-         else if (natom1.ge.2.and.natom2.eq.2)then
-            do iint = 1 , nint
-               if(intcoori(iint).eq.'BABS2')then
-                  intcoor(1)='BABS2'
-                  xint(1)=xinti(iint)
-                  intcoor(iint)=intcoori(1)
-                  xint(iint)=xinti(1)
-               endif
-            enddo
-       endif
+      endif
 c
-cc move aabs2 
-      if(natom1.ge.2.and.natom2.gt.2)then
+cc move aabs2 to third position
+      if(natom1.ne.2)then
          do iint = 1 , nint
             if(intcoori(iint).eq.'AABS2')then
                intcoor(3)='AABS2'
@@ -27175,7 +26906,7 @@ cc move aabs2
                xint(iint)=xinti(3)
             endif
          enddo
-      else if (natom1.ge.2.and.natom2.eq.2)then
+      else
          do iint = 1 , nint
             if(intcoori(iint).eq.'AABS2')then
                intcoor(2)='AABS2'
@@ -27186,17 +26917,27 @@ cc move aabs2
          enddo
       endif
 c
-cc move babs1 
-      if(natom1.gt.2.and.natom2.gt.2)then
+cc move babs1 to fourth position
+cadl if prod2 = H move to first position
+      if(natom1.ne.2)then
          do iint = 1 , nint
             if(intcoori(iint).eq.'BABS1')then
-               intcoor(4)='BABS1'
-               xint(4)=xinti(iint)
-               intcoor(iint)=intcoori(4)
-               xint(iint)=xinti(4)
+cadl adding from here               
+               if(natom2.eq.1)then
+                  intcoor(1)='BABS1'
+                  xint(1)=xinti(iint)
+                  intcoor(iint)=intcoori(1)
+                  xint(iint)=xinti(1)
+               else
+cadl to here, if not H do usual stuff
+                  intcoor(4)='BABS1'
+                  xint(4)=xinti(iint)
+                  intcoor(iint)=intcoori(4)
+                  xint(iint)=xinti(4)
+               endif
             endif
          enddo
-      else if (natom1.gt.2.and.natom2.eq.2)then
+      else
          do iint = 1 , nint
             if(intcoori(iint).eq.'BABS1')then
                intcoor(3)='BABS1'
@@ -27205,73 +26946,95 @@ cc move babs1
                xint(iint)=xinti(3)
             endif
          enddo
-      else if (natom1.gt.2.and.natom2.eq.1)then
+      endif
+cc move abs1 to fifth position or to 2nd position if prod2 = H
+      if(natom1.ne.2)then
          do iint = 1 , nint
-            if(intcoori(iint).eq.'BABS1')then
-               intcoor(1)='BABS1'
-               xint(1)=xinti(iint)
-               intcoor(iint)=intcoori(1)
-               xint(iint)=xinti(1)
+            if(intcoori(iint).eq.'AABS1')then
+cadl adding from here
+               if(natom2.eq.1)then
+                  intcoor(2)='AABS1'
+                  xint(2)=xinti(iint)
+                  intcoor(iint)=intcoori(2)
+                  xint(iint)=xinti(2)
+               else
+cadl to here, if not H do usual stuff
+                  intcoor(5)='AABS1'
+                  xint(5)=xinti(iint)
+                  intcoor(iint)=intcoori(5)
+                  xint(iint)=xinti(5)
+               endif
             endif
          enddo
       endif
-cc move abs1
-      if(natom1.gt.2.and.natom2.gt.2)then
-         do iint = 1 , nint
-            if(intcoori(iint).eq.'AABS1')then
-               intcoor(5)='AABS1'
-               xint(5)=xinti(iint)
-               intcoor(iint)=intcoori(5)
-               xint(iint)=xinti(5)
-            endif
-         enddo
-      else if(natom1.gt.2.and.natom2.eq.2)then
-         do iint = 1 , nint
-            if(intcoori(iint).eq.'AABS1')then
-               intcoor(4)='AABS1'
-               xint(4)=xinti(iint)
-               intcoor(iint)=intcoori(4)
-               xint(iint)=xinti(4)
-            endif
-         enddo
-      else if(natom1.gt.2.and.natom2.eq.1)then
-         do iint = 1 , nint
-            if(intcoori(iint).eq.'AABS1')then
-               intcoor(2)='AABS1'
-               xint(2)=xinti(iint)
-               intcoor(iint)=intcoori(2)
-               xint(iint)=xinti(2)
-            endif
-         enddo
-      else if(natom1.eq.2.and.natom2.gt.2)then
-         do iint = 1 , nint
-            if(intcoori(iint).eq.'AABS1')then
-               intcoor(4)='AABS1'
-               xint(4)=xinti(iint)
-               intcoor(iint)=intcoori(4)
-               xint(iint)=xinti(4)
-            endif
-         enddo
-      else if(natom1.eq.2.and.natom2.eq.2)then
-         do iint = 1 , nint
-            if(intcoori(iint).eq.'AABS1')then
-               intcoor(3)='AABS1'
-               xint(3)=xinti(iint)
-               intcoor(iint)=intcoori(3)
-               xint(iint)=xinti(3)
-            endif
-         enddo
-      else if(natom1.eq.2.and.natom2.eq.1)then
-         do iint = 1 , nint
-            if(intcoori(iint).eq.'AABS1')then
-               intcoor(1)='AABS1'
-               xint(1)=xinti(iint)
-               intcoor(iint)=intcoori(1)
-               xint(iint)=xinti(1)
-            endif
-         enddo
-      endif
+cc
 
+cQui sopra riprendo l'originale'
+cadl qui sotto la versione che ho provato a modificare oggi e failed
+cadl################################################################
+ccc move aabs to first position
+c      do iint = 1 , nint
+c         if(intcoori(iint).eq.'AABS1')then
+c            intcoor(1)='AABS1'
+c            xint(1)=xinti(iint)
+c            intcoor(iint)=intcoori(1)
+c            xint(iint)=xinti(1)
+c         endif
+c      enddo
+ccc move babs1 to second position
+c      if(natom1.ne.2)then
+c         do iint = 1 , nint
+c            if(intcoori(iint).eq.'BABS1')then
+c               intcoor(2)='BABS1'
+c               xint(2)=xinti(iint)
+c               intcoor(iint)=intcoori(2)
+c               xint(iint)=xinti(2)
+c            endif
+c         enddo
+c      endif
+cc
+ccc move aabs2 to third position
+c      if(natom1.ne.2)then
+c         do iint = 1 , nint
+c            if(intcoori(iint).eq.'AABS2')then
+c               intcoor(3)='AABS2'
+c               xint(3)=xinti(iint)
+c               intcoor(iint)=intcoori(3)
+c               xint(iint)=xinti(3)
+c            endif
+c         enddo
+cC       else
+cC          do iint = 1 , nint
+cC             if(intcoori(iint).eq.'AABS2')then
+cC                intcoor(2)='AABS2'
+cC                xint(2)=xinti(iint)
+cC                intcoor(iint)=intcoori(2)
+cC                xint(iint)=xinti(2)
+cC             endif
+cC          enddo
+c      endif
+ccc move aabs3 to fourth position
+c      if(natom1.ne.2)then
+c         do iint = 1 , nint
+c            if(intcoori(iint).eq.'AABS3')then
+c               intcoor(4)='AABS3'
+c               xint(4)=xinti(iint)
+c               intcoor(iint)=intcoori(4)
+c               xint(iint)=xinti(4)
+c            endif
+c         enddo
+c      endif
+ccc move babs3 to fifth position
+c      if(natom1.ne.2)then
+c         do iint = 1 , nint
+c            if(intcoori(iint).eq.'BABS3')then
+c               intcoor(5)='BABS3'
+c               xint(5)=xinti(iint)
+c               intcoor(iint)=intcoori(5)
+c               xint(iint)=xinti(5)
+c            endif
+c         enddo
+c      endif
 cc
       ircons=1
       ifreq=0
@@ -27341,22 +27104,15 @@ cc
             ircons=nint-2
          else if (natom1.gt.2.and.natom2.eq.2)then
             ircons=nint-4
-         else if (natom1.eq.2)then
-            ircons=nint-4
+         else if (natom1.eq.2.and.natom2.eq.2)then
+            ircons=nint-3
          else
             ircons=nint-5
          endif
          ircons=ircons+naddres
          if(ircons.gt.nint)ircons=nint
-cc if using gaussian for optimization of ref distance then set spin from 1 to 3
-         ispinsave=0
-         if(ipottype.eq.3.and.ispin.eq.1)then
-            ispinsave=ispin
-            ispin=3
-         endif
          if (idebug.ge.2) write (26,*) 'entering g09fopt'
          numproc=numprocll
-         ires=1
          call g09fopt(ilev0code,tau,ntau,natom,natomt,numproc,gmem,
      $        coord,vtot_0,vtotr,freq,ifreq,ilin,ismp,
      $        comline1,comline2,icharge,ispin,ircons,
@@ -27365,7 +27121,6 @@ cc if using gaussian for optimization of ref distance then set spin from 1 to 3
          write (26,*) 'finished g09pot'
          command1="cp -f geom.log ./geoms/potcorr_geom.log"
          call commrun(command1)
-         if(ipottype.eq.3.and.ispinsave.eq.1)ispin=ispinsave
 
 cc perform energy only level1 calculations with molpro on gaussian structure
 cc with relaxations only for transitional dofs
@@ -27415,21 +27170,6 @@ cc with full relaxation
       enddo
       write(12,*)'End'
       close(12)
-
-      check=(-vtotr+vtotref)*627.5
-
-      if(check.gt.1.or.vtotr.gt.0)then
-         write(7,*)'failed in geom pot correction'
-         write(7,*)'in subroutine pot_corr'
-         write(7,*)'with vtotref-vtot ',check
-         write(7,*)'terminating code with error'
-         open(unit=99,file='failed',status='unknown')
-         write(99,*)'failed in geom pot correction'
-         write(99,*)'in subroutine pot_corr'
-         write(99,*)'with vtorref-vtot ',check
-         close(99)
-         stop
-      endif
 
  1000 continue
 
@@ -28679,153 +28419,60 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       include 'filcomm.f'
 
-      aabs1v=0.
-      babs1v=0.
-      aabs2v=0.
-      babs2v=0.
-      babs3v=0.
-
       open (unit=15,file='./output/ts_opt.out',status='old')
 
-      if(natom.gt.3)then
-         if(ibond.lt.3)then
-            write(7,*)'automatic det of transitional'
-            write(7,*)'is not possible with ibond smaller than 3'
-            write(7,*)'disable jk bond line and restart'
-            stop
-         endif
-         if(ibond.eq.3.and.natom.eq.4)then
-            call LineRead3 (15)
-            do j=1,natomt
-               call LineRead3 (15)
-               if(j.eq.ibond)then
-                  aabs1_name=word5
-               endif
-            enddo
-
-            rewind(15)
-            call LineRead3 (15)
-            do j=1,natomt
-               call LineRead3 (15)
-               if(j.eq.jbond)then
-                  aabs2_name=word5
-                  babs2_name=word7
-               endif
-            enddo
-            nvar=3*natom-6
-            do j=1,nvar
-               read(15,*)vname,vvalue
-c         write(*,*)aabs2_name,vname,vvalue
-               if(vname.eq.aabs1_name)aabs1v=vvalue
-c               if(vname.eq.babs1_name)babs1v=vvalue
-               if(vname.eq.aabs2_name)aabs2v=vvalue
-c               if(vname.eq.aabs1_name)write(*,*)'read var1'
-c               if(vname.eq.aabs2_name)write(*,*)'read var2'
-               if(vname.eq.babs2_name)babs2v=vvalue
-c               if(vname.eq.babs3_name)babs3v=vvalue
-            enddo
-c         write(*,*)aabs2v
-
-         else if(ibond.gt.3)then
-            call LineRead3 (15)
-
-c      write(*,*)'natom is',natom
-c      write(*,*)'natomt is',natomt
-
-            do j=1,natomt
-               call LineRead3 (15)
-               if(j.eq.ibond)then
-                  aabs1_name=word5
-                  babs1_name=word7
-               endif
-            enddo
-
-            rewind(15)
-            call LineRead3 (15)
-
-            do j=1,natomt
-               call LineRead3 (15)
-               if(j.eq.jbond)then
-                  aabs2_name=word5
-                  babs2_name=word7
-               endif
-               if(j.eq.kbond)then
-                  babs3_name=word7
-               endif
-            enddo
-            nvar=3*natom-6
-            do j=1,nvar
-               read(15,*)vname,vvalue
-c         write(*,*)vname,vvalue
-               if(vname.eq.aabs1_name)aabs1v=vvalue
-               if(vname.eq.babs1_name)babs1v=vvalue
-               if(vname.eq.aabs2_name)aabs2v=vvalue
-               if(vname.eq.babs2_name)babs2v=vvalue
-               if(vname.eq.babs3_name)babs3v=vvalue
-            enddo
-c      write(*,*)aabs1_name,aabs1v
-c      write(*,*)babs1_name,babs1v
-c      write(*,*)aabs2_name,aabs2v
-c      write(*,*)babs2_name,babs2v
-c      write(*,*)babs3_name,babs3v
-c      stop
-
-c 1000 continue 
-         else
-            write(7,*)'automatic det of transitional'
-            write(7,*)'is not possible with ibond smaller than 4'
-            write(7,*)'and natom gt 4'
-            write(7,*)'disable jk bond line and restart'
-            stop
-         endif
-      else if (natom.eq.3) then
-         call LineRead3 (15)
-
-c      write(*,*)'natom is',natom
-c      write(*,*)'natomt is',natomt
-
-         do j=1,natomt
-            call LineRead3 (15)
-            if(j.eq.ibond)then
-               aabs1_name=word5
-c               babs1_name=word7
-            endif
-         enddo
-
-         rewind(15)
-         call LineRead3 (15)
-
-         do j=1,natomt
-            call LineRead3 (15)
-c            if(j.eq.jbond)then
-c               aabs2_name=word5
-c               babs2_name=word7
-c            endif
-c            if(j.eq.kbond)then
-c               babs3_name=word7
-c            endif
-         enddo
-         nvar=3*natom-6
-         do j=1,nvar
-            read(15,*)vname,vvalue
-c         write(*,*)vname,vvalue
-            if(vname.eq.aabs1_name)aabs1v=vvalue
-c            if(vname.eq.babs1_name)babs1v=vvalue
-c            if(vname.eq.aabs2_name)aabs2v=vvalue
-c            if(vname.eq.babs2_name)babs2v=vvalue
-c            if(vname.eq.babs3_name)babs3v=vvalue
-         enddo
-c      write(*,*)aabs1_name,aabs1v
-c      write(*,*)babs1_name,babs1v
-c      write(*,*)aabs2_name,aabs2v
-c      write(*,*)babs2_name,babs2v
-c      write(*,*)babs3_name,babs3v
-c      stop
-
-
+      if(ibond.lt.4)then
+         write(7,*)'automatic det of transitional'
+         write(7,*)'is not possible with ibond smaller than 4'
+         write(7,*)'disable jk bond line and restart'
+         stop
       endif
 
+      call LineRead3 (15)
+
+c      write(*,*)'natom is',natom
+c      write(*,*)'natomt is',natomt
+
+      do j=1,natomt
+         call LineRead3 (15)
+         if(j.eq.ibond)then
+            aabs1_name=word5
+            babs1_name=word7
+         endif
+      enddo
+
+      rewind(15)
+      call LineRead3 (15)
+
+      do j=1,natomt
+         call LineRead3 (15)
+         if(j.eq.jbond)then
+            aabs2_name=word5
+            babs2_name=word7
+         endif
+         if(j.eq.kbond)then
+            babs3_name=word7
+         endif
+      enddo
+      nvar=3*natom-6
+      do j=1,nvar
+         read(15,*)vname,vvalue
+c         write(*,*)vname,vvalue
+         if(vname.eq.aabs1_name)aabs1v=vvalue
+         if(vname.eq.babs1_name)babs1v=vvalue
+         if(vname.eq.aabs2_name)aabs2v=vvalue
+         if(vname.eq.babs2_name)babs2v=vvalue
+         if(vname.eq.babs3_name)babs3v=vvalue
+      enddo
+c      write(*,*)aabs1_name,aabs1v
+c      write(*,*)babs1_name,babs1v
+c      write(*,*)aabs2_name,aabs2v
+c      write(*,*)babs2_name,babs2v
+c      write(*,*)babs3_name,babs3v
+c      stop
       close(15)
+
+ 1000 continue 
 
       return
       end
@@ -29285,6 +28932,7 @@ calb  from Numerical Recipes in FORTRAN77 page 187
       END
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
+
 cadl Subroutine to call Double Ended GSM for isomerization reactions.
 c    Modified from grid_opt_iso
 c    Requires both REAC1 and PROD1 structures
@@ -30395,7 +30043,6 @@ c Level of theory
 cadl Write gstart file (g09 lot)
       open (unit=59,file='./gstart',status='unknown')
       write (59,*) '# '//comline1(:k)//' nosymm '//'Force '//'test'
-c     + ' scf=qc'
       write (59,*)
       write (59,*) 'Title Card Required'
       write (59,*)
@@ -31062,5 +30709,3 @@ cadl report info in gsm_opt.out
       end
 cadl End Modified part
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-

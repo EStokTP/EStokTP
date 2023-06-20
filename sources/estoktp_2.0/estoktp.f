@@ -30795,37 +30795,44 @@ cadl check if inpfileq.dat exist in data, otherwise write default
       close (59)
       write (26,*) 'Written inpfileq file'
  
-cadl start calculation
-      command1='mkdir -p ./scratch'
-      call commrun(command1)
-      command1='cp initial0001.xyz scratch/initial0001.xyz'
-      call commrun(command1)
-      write(26,*) 'Starting GSM calculation now...'
-      command1='gfstringq.exe 1 16 > stdout_gsm0001.out'
-      call commrun(command1)
-      command1='rm scratch/*chk'
-      call commrun(command1)
+ccadl check if geoms/ts_gsm.xyz exists. If yes, skip calculation and
+c to postprocessing
+      inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
+      if (.not.ex) then
+         command1='mkdir -p ./scratch'
+         call commrun(command1)
+         command1='cp initial0001.xyz scratch/initial0001.xyz'
+         call commrun(command1)
+         write(26,*) 'Starting GSM calculation now...'
+         command1='gfstringq.exe 1 16 > stdout_gsm0001.out'
+         call commrun(command1)
+         command1='rm scratch/*chk'
+         call commrun(command1)
 
-cadl copy everything into gsm/ and interesting stuff into output
-      command1='mkdir -p ./gsm'
-      call commrun(command1)
-      command1='mkdir -p ./gsm/scratch'
-      call commrun(command1)
-      command1='mv inpfileq gstart initial0001.xyz ./gsm/'
-      call commrun(command1)
-      command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
-      call commrun(command1)
-      command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
-      call commrun(command1)
-      command1='mv ./scratch/* ./gsm/scratch/'
-      call commrun(command1)
-      command1='rm -rf ./scratch'
-      call commrun(command1)
-      command1='cp  stdout_gsm0001.out ./output/ts_gsm.out'
-      call commrun(command1)
-      command1='mv  stdout_gsm0001.out ./gsm/'
-      call commrun(command1)
-      write (26,*) 'Done :)'
+coadl copy everything into gsm/ and interesting stuff into output
+         command1='mkdir -p ./gsm'
+         call commrun(command1)
+         command1='mkdir -p ./gsm/scratch'
+         call commrun(command1)
+         command1='mv inpfileq gstart initial0001.xyz ./gsm/'
+         call commrun(command1)
+         command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
+         call commrun(command1)
+         command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
+         call commrun(command1)
+         command1='mv ./scratch/* ./gsm/scratch/'
+         call commrun(command1)
+         command1='rm -rf ./scratch'
+         call commrun(command1)
+         command1='cp  stdout_gsm0001.out ./output/ts_gsm.out'
+         call commrun(command1)
+         command1='mv  stdout_gsm0001.out ./gsm/'
+         call commrun(command1)
+         write (26,*) 'Done :)'
+      else
+         write (26,*) 'Skipped GSM calculation :)'
+      endif
+cadl End of modified part
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -31638,6 +31645,10 @@ cadl check if inpfileq.dat exist in data, otherwise write default
       write (26,*) 'Written inpfileq file'
 
 cadl Start calculation
+cadl check if geoms/ts_gsm.xyz exists. If yes, skip calculation and
+c to postprocessing
+      inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
+      if (.not.ex) then
         command1='mkdir -p ./scratch'
         call commrun(command1)
         command1='cp initial0001.xyz scratch/initial0001.xyz'
@@ -31650,7 +31661,7 @@ cadl Start calculation
         command1='rm addedbonds.tmp brokenbonds.tmp'
         call commrun(command1)
 
-cadl Copy everything into gsm/ and interesting stuff into output
+coadl Copy everything into gsm/ and interesting stuff into output
         command1='mkdir -p ./gsm'
         call commrun(command1)
         command1='mkdir -p ./gsm/scratch'
@@ -31670,6 +31681,10 @@ cadl Copy everything into gsm/ and interesting stuff into output
         command1='mv  stdout_gsm0001.out ./gsm/'
         call commrun(command1)
         write (26,*) 'Done :)'
+      else
+         write (26,*) 'Skipped GSM calculation :)'
+      endif
+cadl End of modified part
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

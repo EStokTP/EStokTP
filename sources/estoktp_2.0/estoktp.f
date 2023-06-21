@@ -30795,252 +30795,282 @@ cadl check if inpfileq.dat exist in data, otherwise write default
       close (59)
       write (26,*) 'Written inpfileq file'
  
-cadl start calculation
-      command1='mkdir -p ./scratch'
-      call commrun(command1)
-      command1='cp initial0001.xyz scratch/initial0001.xyz'
-      call commrun(command1)
-      write(26,*) 'Starting GSM calculation now...'
-      command1='gfstringq.exe 1 16 > stdout_gsm0001.out'
-      call commrun(command1)
-      command1='rm scratch/*chk'
-      call commrun(command1)
+ccadl check if geoms/ts_gsm.xyz exists. If yes, skip calculation and
+c to postprocessing
+      inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
+      if (.not.ex) then
+         command1='mkdir -p ./scratch'
+         call commrun(command1)
+         command1='cp initial0001.xyz scratch/initial0001.xyz'
+         call commrun(command1)
+         write(26,*) 'Starting GSM calculation now...'
+         command1='gfstringq.exe 1 16 > stdout_gsm0001.out'
+         call commrun(command1)
+         command1='rm scratch/*chk'
+         call commrun(command1)
 
-cadl copy everything into gsm/ and interesting stuff into output
-      command1='mkdir -p ./gsm'
-      call commrun(command1)
-      command1='mkdir -p ./gsm/scratch'
-      call commrun(command1)
-      command1='mv inpfileq gstart initial0001.xyz ./gsm/'
-      call commrun(command1)
-      command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
-      call commrun(command1)
-      command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
-      call commrun(command1)
-      command1='mv ./scratch/* ./gsm/scratch/'
-      call commrun(command1)
-      command1='rm -rf ./scratch'
-      call commrun(command1)
-      command1='cp  stdout_gsm0001.out ./output/ts_gsm.out'
-      call commrun(command1)
-      command1='mv  stdout_gsm0001.out ./gsm/'
-      call commrun(command1)
-      write (26,*) 'Done :)'
+coadl copy everything into gsm/ and interesting stuff into output
+         command1='mkdir -p ./gsm'
+         call commrun(command1)
+         command1='mkdir -p ./gsm/scratch'
+         call commrun(command1)
+         command1='mv inpfileq gstart initial0001.xyz ./gsm/'
+         call commrun(command1)
+         command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
+         call commrun(command1)
+         command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
+         call commrun(command1)
+         command1='mv ./scratch/* ./gsm/scratch/'
+         call commrun(command1)
+         command1='rm -rf ./scratch'
+         call commrun(command1)
+         command1='cp  stdout_gsm0001.out ./output/ts_gsm.out'
+         call commrun(command1)
+         command1='mv  stdout_gsm0001.out ./gsm/'
+         call commrun(command1)
+         write (26,*) 'Done :)'
+      else
+         write (26,*) 'Skipped GSM calculation :)'
+      endif
+cadl End of modified part
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c POST PROCESSING
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cadl Convert xyz into zmatrix for further calculations
-c inspiration and usage of xyz_to_zmat
-      open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
-      read (59,*) natom1
-      read (59,*)
-c cycle on atoms and call subroutine for each line
-c need to save xyz coords somewhere, use coord(natommx,ndim)
-      do k=1,natom1
-         read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
-c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
-      enddo
-      close (unit=59)
+cadl V3.0 This version is interfaced with xyz_to_zmat subroutine to
+c create a zmatrix with the same connectivity as reac1.dat
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cadl I add this new species keyword, 100, to read atomlabels from 
+c reac1.dat instead of ts_opt.out since I don't have those yet!
+      
+      command1='cp  geoms/ts_gsm.xyz geom_inp.xyz'
+      call commrun(command1)
 
-c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
-c and run subroutine to convert xyz to zmat for one line
-      open (unit=59,file='./output/grid_opt.out',status='unknown')
-      write (59,*) 'grid is the word I am looking for'
-      do iatom=1,natomt1
-         if (iatom.EQ.1) then
-            write (26,*) iatom
-c            write (59,*) atomlabel(iatom)
+      call xyz_to_int(1)
 
-         else if (iatom.EQ.2) then
-            open (unit=64,status='scratch')
-            write (64,*) atomlabel(iatom)
-            rewind(64)
-            read (64,*) ct1,ct2,ct3
-            rewind(64)
-            close (64)
-            do j=1,ncoord
-               write (26,*) 'Vediamo che fa: ', intcoor(j), ct3
-               if (intcoor(j).EQ.ct3) idist=j
-            enddo
-            xa=coord(iatom,1)
-            ya=coord(iatom,2)
-            za=coord(iatom,3)
-            xb=coord(ibconn(iatom),1)
-            yb=coord(ibconn(iatom),2)
-            zb=coord(ibconn(iatom),3)
-            dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-            xints(idist)=dist
-            write (26,*) iatom,dist
-c            write (59,*) atomlabel(iatom)
-            xints(idist)=dist
+      command1='cp  zmat.com output/grid_opt.out'
+      call commrun(command1)
+      command1='sed -i s/z-matrix/grid/ output/grid_opt.out'
+      call commrun(command1)
+
+cadl End of modified part
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cadl Older versions, commented a bit in ssm subroutine
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C coadl Convert xyz into zmatrix for further calculations
+
+C cadl Convert xyz into zmatrix for further calculations
+C c inspiration and usage of xyz_to_zmat
+C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
+C       read (59,*) natom1
+C       read (59,*)
+C c cycle on atoms and call subroutine for each line
+C c need to save xyz coords somewhere, use coord(natommx,ndim)
+C       do k=1,natom1
+C          read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
+C c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
+C       enddo
+C       close (unit=59)
+
+C c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
+C c and run subroutine to convert xyz to zmat for one line
+C       open (unit=59,file='./output/grid_opt.out',status='unknown')
+C       write (59,*) 'grid is the word I am looking for'
+C       do iatom=1,natomt1
+C          if (iatom.EQ.1) then
+C             write (26,*) iatom
+C c            write (59,*) atomlabel(iatom)
+
+C          else if (iatom.EQ.2) then
+C             open (unit=64,status='scratch')
+C             write (64,*) atomlabel(iatom)
+C             rewind(64)
+C             read (64,*) ct1,ct2,ct3
+C             rewind(64)
+C             close (64)
+C             do j=1,ncoord
+C                write (26,*) 'Vediamo che fa: ', intcoor(j), ct3
+C                if (intcoor(j).EQ.ct3) idist=j
+C             enddo
+C             xa=coord(iatom,1)
+C             ya=coord(iatom,2)
+C             za=coord(iatom,3)
+C             xb=coord(ibconn(iatom),1)
+C             yb=coord(ibconn(iatom),2)
+C             zb=coord(ibconn(iatom),3)
+C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C             xints(idist)=dist
+C             write (26,*) iatom,dist
+C c            write (59,*) atomlabel(iatom)
+C             xints(idist)=dist
          
-         else if (iatom.EQ.3) then
-            open (unit=64,status='scratch')
-            write (64,*) atomlabel(iatom)
-            rewind(64)
-            read (64,*) ct1,ct2,ct3,ct4,ct5
-            rewind(64)
-            close (64)
-            do j=1,ncoord
-               if (intcoor(j).EQ.ct3) idist=j
-               if (intcoor(j).EQ.ct5) iang=j
-            enddo
-            xa=coord(iatom,1)
-            ya=coord(iatom,2)
-            za=coord(iatom,3)
-            xb=coord(ibconn(iatom),1)
-            yb=coord(ibconn(iatom),2)
-            zb=coord(ibconn(iatom),3)
-            xc=coord(iaconn(iatom),1)
-            yc=coord(iaconn(iatom),2)
-            zc=coord(iaconn(iatom),3)
-            dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-c repeat one atom, only care about planar angle here
-            call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xc,yc,zc,ang,dihed)
-            write (26,*) iatom,dist,ang
-c            write (59,*) atomlabel(iatom) 
-            xints(idist)=dist
-            xints(iang)=ang
+C          else if (iatom.EQ.3) then
+C             open (unit=64,status='scratch')
+C             write (64,*) atomlabel(iatom)
+C             rewind(64)
+C             read (64,*) ct1,ct2,ct3,ct4,ct5
+C             rewind(64)
+C             close (64)
+C             do j=1,ncoord
+C                if (intcoor(j).EQ.ct3) idist=j
+C                if (intcoor(j).EQ.ct5) iang=j
+C             enddo
+C             xa=coord(iatom,1)
+C             ya=coord(iatom,2)
+C             za=coord(iatom,3)
+C             xb=coord(ibconn(iatom),1)
+C             yb=coord(ibconn(iatom),2)
+C             zb=coord(ibconn(iatom),3)
+C             xc=coord(iaconn(iatom),1)
+C             yc=coord(iaconn(iatom),2)
+C             zc=coord(iaconn(iatom),3)
+C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C c repeat one atom, only care about planar angle here
+C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xc,yc,zc,ang,dihed)
+C             write (26,*) iatom,dist,ang
+C c            write (59,*) atomlabel(iatom) 
+C             xints(idist)=dist
+C             xints(iang)=ang
 
-         else
-            open (unit=64,status='scratch')
-            write (64,*) atomlabel(iatom)
-            rewind(64)
-            read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-            rewind(64)
-            close (64)
-            do j=1,ncoord
-               if (intcoor(j).EQ.ct3) idist=j
-               if (intcoor(j).EQ.ct5) iang=j
-               if (intcoor(j).EQ.ct7) idih=j
-            enddo
-            xa=coord(iatom,1)
-            ya=coord(iatom,2)
-            za=coord(iatom,3)
-            xb=coord(ibconn(iatom),1)
-            yb=coord(ibconn(iatom),2)
-            zb=coord(ibconn(iatom),3)
-            xc=coord(iaconn(iatom),1)
-            yc=coord(iaconn(iatom),2)
-            zc=coord(iaconn(iatom),3)
-            xd=coord(idconn(iatom),1)
-            yd=coord(idconn(iatom),2)
-            zd=coord(idconn(iatom),3)
-            dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-            call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xd,yd,zd,ang,dihed)
-            write (26,*) iatom,dist,ang,dihed
-c            write (59,*) atomlabel(iatom)
-            xints(idist)=dist
-            xints(iang)=ang
-            xints(idih)=dihed
-         endif
-      enddo
+C          else
+C             open (unit=64,status='scratch')
+C             write (64,*) atomlabel(iatom)
+C             rewind(64)
+C             read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C             rewind(64)
+C             close (64)
+C             do j=1,ncoord
+C                if (intcoor(j).EQ.ct3) idist=j
+C                if (intcoor(j).EQ.ct5) iang=j
+C                if (intcoor(j).EQ.ct7) idih=j
+C             enddo
+C             xa=coord(iatom,1)
+C             ya=coord(iatom,2)
+C             za=coord(iatom,3)
+C             xb=coord(ibconn(iatom),1)
+C             yb=coord(ibconn(iatom),2)
+C             zb=coord(ibconn(iatom),3)
+C             xc=coord(iaconn(iatom),1)
+C             yc=coord(iaconn(iatom),2)
+C             zc=coord(iaconn(iatom),3)
+C             xd=coord(idconn(iatom),1)
+C             yd=coord(idconn(iatom),2)
+C             zd=coord(idconn(iatom),3)
+C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C             write (26,*) iatom,dist,ang,dihed
+C c            write (59,*) atomlabel(iatom)
+C             xints(idist)=dist
+C             xints(iang)=ang
+C             xints(idih)=dihed
+C          endif
+C       enddo
 
-c funziona ma non modifico connettività di ireact ad ora
-c modifico la riga di ireact
-      if (ireact.EQ.3) then
-         open (unit=64,status='scratch')
-         write (64,*) atomlabel(ireact)
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5
-         rewind(64)
-         close (64)
-         do j=1,ncoord
-            if (intcoor(j).EQ.ct3) idist=j
-            if (intcoor(j).EQ.ct5) iang=j
-         enddo
-         intcoor(idist)='RTS'
-         intcoor(iang)='AABS'
-         ct3='RTS'
-         ct5='AABS'
-         xa=coord(ireact,1)
-         ya=coord(ireact,2)
-         za=coord(ireact,3)
-         xb=coord(isite,1)
-         yb=coord(isite,2)
-         zb=coord(isite,3)
-         xc=coord(jsite,1)
-         yc=coord(jsite,2)
-         zc=coord(jsite,3)
-c repeat one atom, only care about planar angle here    
-         xd=coord(jsite,1)
-         yd=coord(jsite,2)
-         zd=coord(jsite,3)
-         dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-         call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xd,yd,zd,ang,dihed)
-         xints(idist)=dist
-         xints(iang)=ang
-         open (unit=64,status='scratch')
-         write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5
-         close (64)
-         atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5
-         write (26,*) ireact,dist,ang
-      else
-         open (unit=64,status='scratch')
-         write (64,*) atomlabel(ireact)
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-         rewind(64)
-         close (64)
-         do j=1,ncoord
-            if (intcoor(j).EQ.ct3) idist=j
-            if (intcoor(j).EQ.ct5) iang=j
-            if (intcoor(j).EQ.ct7) idih=j
-         enddo
-         intcoor(idist)='RTS'
-         intcoor(iang)='AABS'
-         intcoor(idih)='BABS'
-         ct3='RTS'
-         ct5='AABS'
-         ct7='BABS'
-         xa=coord(ireact,1)
-         ya=coord(ireact,2)
-         za=coord(ireact,3)
-         xb=coord(isite,1)
-         yb=coord(isite,2)
-         zb=coord(isite,3)
-         xc=coord(jsite,1)
-         yc=coord(jsite,2)
-         zc=coord(jsite,3)
-         xd=coord(ksite,1)
-         yd=coord(ksite,2)
-         zd=coord(ksite,3)
-         dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-         call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xd,yd,zd,ang,dihed)
-         xints(idist)=dist
-         xints(iang)=ang
-         xints(idih)=dihed
-         open (unit=64,status='scratch')
-         write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5,
-     $      atname(ksite),ct7
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-         close (64)
-         atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
-         write (26,*) ireact,dist,ang,dihed
-      endif
+C c funziona ma non modifico connettività di ireact ad ora
+C c modifico la riga di ireact
+C       if (ireact.EQ.3) then
+C          open (unit=64,status='scratch')
+C          write (64,*) atomlabel(ireact)
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5
+C          rewind(64)
+C          close (64)
+C          do j=1,ncoord
+C             if (intcoor(j).EQ.ct3) idist=j
+C             if (intcoor(j).EQ.ct5) iang=j
+C          enddo
+C          intcoor(idist)='RTS'
+C          intcoor(iang)='AABS'
+C          ct3='RTS'
+C          ct5='AABS'
+C          xa=coord(ireact,1)
+C          ya=coord(ireact,2)
+C          za=coord(ireact,3)
+C          xb=coord(isite,1)
+C          yb=coord(isite,2)
+C          zb=coord(isite,3)
+C          xc=coord(jsite,1)
+C          yc=coord(jsite,2)
+C          zc=coord(jsite,3)
+C c repeat one atom, only care about planar angle here    
+C          xd=coord(jsite,1)
+C          yd=coord(jsite,2)
+C          zd=coord(jsite,3)
+C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C          xints(idist)=dist
+C          xints(iang)=ang
+C          open (unit=64,status='scratch')
+C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5
+C          close (64)
+C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5
+C          write (26,*) ireact,dist,ang
+C       else
+C          open (unit=64,status='scratch')
+C          write (64,*) atomlabel(ireact)
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C          rewind(64)
+C          close (64)
+C          do j=1,ncoord
+C             if (intcoor(j).EQ.ct3) idist=j
+C             if (intcoor(j).EQ.ct5) iang=j
+C             if (intcoor(j).EQ.ct7) idih=j
+C          enddo
+C          intcoor(idist)='RTS'
+C          intcoor(iang)='AABS'
+C          intcoor(idih)='BABS'
+C          ct3='RTS'
+C          ct5='AABS'
+C          ct7='BABS'
+C          xa=coord(ireact,1)
+C          ya=coord(ireact,2)
+C          za=coord(ireact,3)
+C          xb=coord(isite,1)
+C          yb=coord(isite,2)
+C          zb=coord(isite,3)
+C          xc=coord(jsite,1)
+C          yc=coord(jsite,2)
+C          zc=coord(jsite,3)
+C          xd=coord(ksite,1)
+C          yd=coord(ksite,2)
+C          zd=coord(ksite,3)
+C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C          xints(idist)=dist
+C          xints(iang)=ang
+C          xints(idih)=dihed
+C          open (unit=64,status='scratch')
+C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5,
+C      $      atname(ksite),ct7
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C          close (64)
+C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
+C          write (26,*) ireact,dist,ang,dihed
+C       endif
 
-cadl Save data in grid_opt.out in order to make it readable to ts_0
-      do iatom=1,natom
-         write (59,*) atomlabel(iatom)
-      enddo
-      do iint=1,ncoord
-         write(59,*) intcoor(iint),xints(iint)
-      enddo
-      close (unit=59)
+C cadl Save data in grid_opt.out in order to make it readable to ts_0
+C       do iatom=1,natom
+C          write (59,*) atomlabel(iatom)
+C       enddo
+C       do iint=1,ncoord
+C          write(59,*) intcoor(iint),xints(iint)
+C       enddo
+C       close (unit=59)
 
 cadl report info in gsm_opt.out
       write (26,*)
@@ -31615,6 +31645,10 @@ cadl check if inpfileq.dat exist in data, otherwise write default
       write (26,*) 'Written inpfileq file'
 
 cadl Start calculation
+cadl check if geoms/ts_gsm.xyz exists. If yes, skip calculation and
+c to postprocessing
+      inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
+      if (.not.ex) then
         command1='mkdir -p ./scratch'
         call commrun(command1)
         command1='cp initial0001.xyz scratch/initial0001.xyz'
@@ -31627,7 +31661,7 @@ cadl Start calculation
         command1='rm addedbonds.tmp brokenbonds.tmp'
         call commrun(command1)
 
-cadl Copy everything into gsm/ and interesting stuff into output
+coadl Copy everything into gsm/ and interesting stuff into output
         command1='mkdir -p ./gsm'
         call commrun(command1)
         command1='mkdir -p ./gsm/scratch'
@@ -31647,216 +31681,242 @@ cadl Copy everything into gsm/ and interesting stuff into output
         command1='mv  stdout_gsm0001.out ./gsm/'
         call commrun(command1)
         write (26,*) 'Done :)'
+      else
+         write (26,*) 'Skipped GSM calculation :)'
+      endif
+cadl End of modified part
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c POST PROCESSING
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cadl Convert xyz into zmatrix for further calculations
-c inspiration and usage of xyz_to_zmat
-      open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
-      read (59,*) natom1
-      read (59,*)
-c cycle on atoms and call subroutine for each line
-c need to save xyz coords somewhere, use coord(natommx,ndim)
-      do k=1,natom1
-         read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
-c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
-      enddo
-      close (unit=59)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cadl V3.0 This version is interfaced with xyz_to_zmat subroutine to
+c create a zmatrix with the same connectivity as reac1.dat
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
-c and run subroutine to convert xyz to zmat for one line
-      open (unit=59,file='./output/grid_opt.out',status='unknown')
-      write (59,*) 'grid is the word I am looking for'
-      do iatom=1,natomt1
-         if (iatom.EQ.1) then
-            write (26,*) iatom
-c            write (59,*) atomlabel(iatom)
+      command1='cp  geoms/ts_gsm.xyz geom_inp.xyz'
+      call commrun(command1)
 
-         else if (iatom.EQ.2) then
-            open (unit=64,status='scratch')
-            write (64,*) atomlabel(iatom)
-            rewind(64)
-            read (64,*) ct1,ct2,ct3
-            rewind(64)
-            close (64)
-            do j=1,ncoord
-               write (26,*) 'Vediamo che fa: ', intcoor(j), ct3
-               if (intcoor(j).EQ.ct3) idist=j
-            enddo
-            xa=coord(iatom,1)
-            ya=coord(iatom,2)
-            za=coord(iatom,3)
-            xb=coord(ibconn(iatom),1)
-            yb=coord(ibconn(iatom),2)
-            zb=coord(ibconn(iatom),3)
-            dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-            xints(idist)=dist
-            write (26,*) iatom,dist
-c            write (59,*) atomlabel(iatom)
-            xints(idist)=dist
+      call xyz_to_int(1)
+
+      command1='cp  zmat.com output/grid_opt.out'
+      call commrun(command1)
+      command1='sed -i s/z-matrix/grid/ output/grid_opt.out'
+      call commrun(command1)
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cadl V2.0 This version allows to change connectivity of TS zmatrix 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c following instructions in ts.dat (isite, ireact)
+c Doesn't account for dummies
+C cadl Convert xyz into zmatrix for further calculations
+C c inspiration and usage of xyz_to_zmat
+C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
+C       read (59,*) natom1
+C       read (59,*)
+C c cycle on atoms and call subroutine for each line
+C c need to save xyz coords somewhere, use coord(natommx,ndim)
+C       do k=1,natom1
+C          read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
+C c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
+C       enddo
+C       close (unit=59)
+
+C c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
+C c and run subroutine to convert xyz to zmat for one line
+C       open (unit=59,file='./output/grid_opt.out',status='unknown')
+C       write (59,*) 'grid is the word I am looking for'
+C       do iatom=1,natomt1
+C          if (iatom.EQ.1) then
+C             write (26,*) iatom
+C c            write (59,*) atomlabel(iatom)
+
+C          else if (iatom.EQ.2) then
+C             open (unit=64,status='scratch')
+C             write (64,*) atomlabel(iatom)
+C             rewind(64)
+C             read (64,*) ct1,ct2,ct3
+C             rewind(64)
+C             close (64)
+C             do j=1,ncoord
+C                write (26,*) 'Vediamo che fa: ', intcoor(j), ct3
+C                if (intcoor(j).EQ.ct3) idist=j
+C             enddo
+C             xa=coord(iatom,1)
+C             ya=coord(iatom,2)
+C             za=coord(iatom,3)
+C             xb=coord(ibconn(iatom),1)
+C             yb=coord(ibconn(iatom),2)
+C             zb=coord(ibconn(iatom),3)
+C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C             xints(idist)=dist
+C             write (26,*) iatom,dist
+C c            write (59,*) atomlabel(iatom)
+C             xints(idist)=dist
          
-         else if (iatom.EQ.3) then
-            open (unit=64,status='scratch')
-            write (64,*) atomlabel(iatom)
-            rewind(64)
-            read (64,*) ct1,ct2,ct3,ct4,ct5
-            rewind(64)
-            close (64)
-            do j=1,ncoord
-               if (intcoor(j).EQ.ct3) idist=j
-               if (intcoor(j).EQ.ct5) iang=j
-            enddo
-            xa=coord(iatom,1)
-            ya=coord(iatom,2)
-            za=coord(iatom,3)
-            xb=coord(ibconn(iatom),1)
-            yb=coord(ibconn(iatom),2)
-            zb=coord(ibconn(iatom),3)
-            xc=coord(iaconn(iatom),1)
-            yc=coord(iaconn(iatom),2)
-            zc=coord(iaconn(iatom),3)
-            dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-c repeat one atom, only care about planar angle here
-            call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xc,yc,zc,ang,dihed)
-            write (26,*) iatom,dist,ang
-c            write (59,*) atomlabel(iatom) 
-            xints(idist)=dist
-            xints(iang)=ang
+C          else if (iatom.EQ.3) then
+C             open (unit=64,status='scratch')
+C             write (64,*) atomlabel(iatom)
+C             rewind(64)
+C             read (64,*) ct1,ct2,ct3,ct4,ct5
+C             rewind(64)
+C             close (64)
+C             do j=1,ncoord
+C                if (intcoor(j).EQ.ct3) idist=j
+C                if (intcoor(j).EQ.ct5) iang=j
+C             enddo
+C             xa=coord(iatom,1)
+C             ya=coord(iatom,2)
+C             za=coord(iatom,3)
+C             xb=coord(ibconn(iatom),1)
+C             yb=coord(ibconn(iatom),2)
+C             zb=coord(ibconn(iatom),3)
+C             xc=coord(iaconn(iatom),1)
+C             yc=coord(iaconn(iatom),2)
+C             zc=coord(iaconn(iatom),3)
+C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C c repeat one atom, only care about planar angle here
+C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xc,yc,zc,ang,dihed)
+C             write (26,*) iatom,dist,ang
+C c            write (59,*) atomlabel(iatom) 
+C             xints(idist)=dist
+C             xints(iang)=ang
 
-         else
-            open (unit=64,status='scratch')
-            write (64,*) atomlabel(iatom)
-            rewind(64)
-            read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-            rewind(64)
-            close (64)
-            do j=1,ncoord
-               if (intcoor(j).EQ.ct3) idist=j
-               if (intcoor(j).EQ.ct5) iang=j
-               if (intcoor(j).EQ.ct7) idih=j
-            enddo
-            xa=coord(iatom,1)
-            ya=coord(iatom,2)
-            za=coord(iatom,3)
-            xb=coord(ibconn(iatom),1)
-            yb=coord(ibconn(iatom),2)
-            zb=coord(ibconn(iatom),3)
-            xc=coord(iaconn(iatom),1)
-            yc=coord(iaconn(iatom),2)
-            zc=coord(iaconn(iatom),3)
-            xd=coord(idconn(iatom),1)
-            yd=coord(idconn(iatom),2)
-            zd=coord(idconn(iatom),3)
-            dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-            call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xd,yd,zd,ang,dihed)
-            write (26,*) iatom,dist,ang,dihed
-c            write (59,*) atomlabel(iatom)
-            xints(idist)=dist
-            xints(iang)=ang
-            xints(idih)=dihed
-         endif
-      enddo
+C          else
+C             open (unit=64,status='scratch')
+C             write (64,*) atomlabel(iatom)
+C             rewind(64)
+C             read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C             rewind(64)
+C             close (64)
+C             do j=1,ncoord
+C                if (intcoor(j).EQ.ct3) idist=j
+C                if (intcoor(j).EQ.ct5) iang=j
+C                if (intcoor(j).EQ.ct7) idih=j
+C             enddo
+C             xa=coord(iatom,1)
+C             ya=coord(iatom,2)
+C             za=coord(iatom,3)
+C             xb=coord(ibconn(iatom),1)
+C             yb=coord(ibconn(iatom),2)
+C             zb=coord(ibconn(iatom),3)
+C             xc=coord(iaconn(iatom),1)
+C             yc=coord(iaconn(iatom),2)
+C             zc=coord(iaconn(iatom),3)
+C             xd=coord(idconn(iatom),1)
+C             yd=coord(idconn(iatom),2)
+C             zd=coord(idconn(iatom),3)
+C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C             write (26,*) iatom,dist,ang,dihed
+C c            write (59,*) atomlabel(iatom)
+C             xints(idist)=dist
+C             xints(iang)=ang
+C             xints(idih)=dihed
+C          endif
+C       enddo
 
-c funziona ma non modifico connettività di ireact ad ora
-c modifico la riga di ireact
-      if (ireact.EQ.3) then
-         open (unit=64,status='scratch')
-         write (64,*) atomlabel(ireact)
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5
-         rewind(64)
-         close (64)
-         do j=1,ncoord
-            if (intcoor(j).EQ.ct3) idist=j
-            if (intcoor(j).EQ.ct5) iang=j
-         enddo
-         intcoor(idist)='RTS'
-         intcoor(iang)='AABS'
-         ct3='RTS'
-         ct5='AABS'
-         xa=coord(ireact,1)
-         ya=coord(ireact,2)
-         za=coord(ireact,3)
-         xb=coord(isite,1)
-         yb=coord(isite,2)
-         zb=coord(isite,3)
-         xc=coord(jsite,1)
-         yc=coord(jsite,2)
-         zc=coord(jsite,3)
-c repeat one atom, only care about planar angle here    
-         xd=coord(jsite,1)
-         yd=coord(jsite,2)
-         zd=coord(jsite,3)
-         dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-         call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xd,yd,zd,ang,dihed)
-         xints(idist)=dist
-         xints(iang)=ang
-         open (unit=64,status='scratch')
-         write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5
-         close (64)
-         atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5
-         write (26,*) ireact,dist,ang
-      else
-         open (unit=64,status='scratch')
-         write (64,*) atomlabel(ireact)
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-         rewind(64)
-         close (64)
-         do j=1,ncoord
-            if (intcoor(j).EQ.ct3) idist=j
-            if (intcoor(j).EQ.ct5) iang=j
-            if (intcoor(j).EQ.ct7) idih=j
-         enddo
-         intcoor(idist)='RTS'
-         intcoor(iang)='AABS'
-         intcoor(idih)='BABS'
-         ct3='RTS'
-         ct5='AABS'
-         ct7='BABS'
-         xa=coord(ireact,1)
-         ya=coord(ireact,2)
-         za=coord(ireact,3)
-         xb=coord(isite,1)
-         yb=coord(isite,2)
-         zb=coord(isite,3)
-         xc=coord(jsite,1)
-         yc=coord(jsite,2)
-         zc=coord(jsite,3)
-         xd=coord(ksite,1)
-         yd=coord(ksite,2)
-         zd=coord(ksite,3)
-         dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-     $      (za-zb)*(za-zb))
-         call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-     $      xc,yc,zc,xd,yd,zd,ang,dihed)
-         xints(idist)=dist
-         xints(iang)=ang
-         xints(idih)=dihed
-         open (unit=64,status='scratch')
-         write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5,
-     $      atname(ksite),ct7
-         rewind(64)
-         read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-         close (64)
-         atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
-         write (26,*) ireact,dist,ang,dihed
-      endif
-
+C c funziona ma non modifico connettività di ireact ad ora
+C c modifico la riga di ireact
+C       if (ireact.EQ.3) then
+C          open (unit=64,status='scratch')
+C          write (64,*) atomlabel(ireact)
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5
+C          rewind(64)
+C          close (64)
+C          do j=1,ncoord
+C             if (intcoor(j).EQ.ct3) idist=j
+C             if (intcoor(j).EQ.ct5) iang=j
+C          enddo
+C          intcoor(idist)='RTS'
+C          intcoor(iang)='AABS'
+C          ct3='RTS'
+C          ct5='AABS'
+C          xa=coord(ireact,1)
+C          ya=coord(ireact,2)
+C          za=coord(ireact,3)
+C          xb=coord(isite,1)
+C          yb=coord(isite,2)
+C          zb=coord(isite,3)
+C          xc=coord(jsite,1)
+C          yc=coord(jsite,2)
+C          zc=coord(jsite,3)
+C c repeat one atom, only care about planar angle here    
+C          xd=coord(jsite,1)
+C          yd=coord(jsite,2)
+C          zd=coord(jsite,3)
+C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C          xints(idist)=dist
+C          xints(iang)=ang
+C          open (unit=64,status='scratch')
+C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5
+C          close (64)
+C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5
+C          write (26,*) ireact,dist,ang
+C       else
+C          open (unit=64,status='scratch')
+C          write (64,*) atomlabel(ireact)
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C          rewind(64)
+C          close (64)
+C          do j=1,ncoord
+C             if (intcoor(j).EQ.ct3) idist=j
+C             if (intcoor(j).EQ.ct5) iang=j
+C             if (intcoor(j).EQ.ct7) idih=j
+C          enddo
+C          intcoor(idist)='RTS'
+C          intcoor(iang)='AABS'
+C          intcoor(idih)='BABS'
+C          ct3='RTS'
+C          ct5='AABS'
+C          ct7='BABS'
+C          xa=coord(ireact,1)
+C          ya=coord(ireact,2)
+C          za=coord(ireact,3)
+C          xb=coord(isite,1)
+C          yb=coord(isite,2)
+C          zb=coord(isite,3)
+C          xc=coord(jsite,1)
+C          yc=coord(jsite,2)
+C          zc=coord(jsite,3)
+C          xd=coord(ksite,1)
+C          yd=coord(ksite,2)
+C          zd=coord(ksite,3)
+C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C      $      (za-zb)*(za-zb))
+C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C          xints(idist)=dist
+C          xints(iang)=ang
+C          xints(idih)=dihed
+C          open (unit=64,status='scratch')
+C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5,
+C      $      atname(ksite),ct7
+C          rewind(64)
+C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C          close (64)
+C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
+C          write (26,*) ireact,dist,ang,dihed
+C       endif
+C
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c old version 
+cadl V1.0 - old version
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C This doesn't change connectivity and doesn't account for dummies
+C coadl Convert xyz into zmatrix for further calculations
 C cadl Convert xyz into zmatrix for further calculations
 C c inspiration and usage of xyz_to_zmat
 C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
@@ -32037,15 +32097,15 @@ C                k=k+2
 C             endif
 C          endif
 C       enddo
-
-cadl Save data in grid_opt.out in order to make it readable to ts_0
-      do iatom=1,natom1
-         write (59,*) atomlabel(iatom)
-      enddo
-      do iint=1,ncoord
-         write(59,*) intcoor(iint),xints(iint)
-      enddo
-      close (unit=59)
+C
+C cadl Save data in grid_opt.out in order to make it readable to ts_0
+C       do iatom=1,natom1
+C          write (59,*) atomlabel(iatom)
+C       enddo
+C       do iint=1,ncoord
+C          write(59,*) intcoor(iint),xints(iint)
+C       enddo
+C       close (unit=59)
 
 cadl report info in gsm_opt.out
       write (26,*)

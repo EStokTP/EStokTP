@@ -2165,7 +2165,8 @@ c     rewind 25
          endif
       enddo
       read (25,*) icharge,ispin
-      rewind(25)
+c      rewind(25)
+      close (unit=25,status='keep')
 
       do while (WORD.NE.'LEVEL0')
          call LineRead (21)
@@ -2325,7 +2326,7 @@ c        if (natom2.ge.3) xinti(natomtp+1) = rts
          else 
             call elstructopt(ilev0code,tau,ntau,natom,natomt,numproc,
      $           gmem,
-     $           coord,vtot_0,vtot,freq,ifreq,ilin,ismp,
+     $           coord,vtot_0,vtotr,freq,ifreq,ilin,ismp,
      $           comline1,comline2,icharge,ispin,ircons,
      $           atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires
      $           ,ixyz,ired,ispecies,iaspace)
@@ -2384,7 +2385,7 @@ c save key data
       babs3 = xints(natomtp+5)
       rts = xints(natomtp+6)
 
-      close (unit=25,status='keep')
+c      close (unit=25,status='keep')
       close (unit=26,status='keep')
       return
       end
@@ -3255,7 +3256,7 @@ c            exit
 c build z-mat input
 
       natom = natom1
-      natomt = natom1
+      natomt = natomt1
       ntau = ntau1
       ismp=0
       iopt=0
@@ -19831,24 +19832,33 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       dummycustom=.false. 
 
-      open (newunit=TSUnit,file='./data/ts.dat',status='old')
+c      open (newunit=TSUnit,file='./data/ts.dat',status='old')
+      open (unit=25,file='./data/ts.dat',status='old')
       do 
-         read(TSUnit,'(A)',iostat=StatuFlag) iostring
-         if ( index(iostring,'dummycustom') .gt. 0 )  then 
-               dummycustom= .true. 
+         call Lineread(25)
+         iostring=word
+c         read(TSUnit,'(A)',iostat=StatuFlag) iostring
+c         if ( index(iostring,'dummycustom') .gt. 0 )  then 
+         if ( index(iostring,'DUMMYCUSTOM') .gt. 0. )  then 
+            dummycustom= .true. 
 c            write(99,1900) 'X111 ',isite,xbond,jsite,xangle,ksite,xdihed
-1900          format(a4,4x,i4,1x,3(f4.2,2x,i4,1x))
-1899          format(a4,4x,i4,1x,2(f4.2,2x,i4,1x))
+1900        format(a4,4x,i4,1x,3(f4.2,2x,i4,1x))
+1899        format(a4,4x,i4,1x,2(f4.2,2x,i4,1x))
             do 
-               read(TSUnit,'(A)') iostring
+c               read(TSUnit,'(A)') iostring
+               read(25,'(A)') iostring
                if (iostring(1:1) .eq. '!') cycle 
                read(iostring,*) xbond,xangle,xdihed
                exit
             end do 
             exit
          end if 
+         if(iostring.eq.'end')exit
+         if(iostring.eq.'End')exit
+         if(iostring.eq.'END')exit
       end do
-      close(TSUnit,status='keep')
+      close(25,status='keep')
+c      close(TSUnit,status='keep')
 
       open (unit=116,file='./output/ts_zmat.out',status='unknown')
       write (116,*) 'entering ts_zmat'
@@ -27740,6 +27750,7 @@ cc initialize active space determination
             neltot=neltot1+neltot2
          call activespace(nbonds_vrc,nlps_vrc,nstates_vrc,neltot,ispin)
             command1="cp -f activespace.dat ./activespace_vrc.dat"
+            call commrun(command1)
             call activespace(nbonds,nlps,nstates,neltot,ispin)
          endif
 
@@ -28520,6 +28531,7 @@ c         ilev0code=1
 c         ilevhlcode=1
       else if (word2.eq.'MOLPRO')then
          ilev0code=2
+         close(13)
       endif
       if(word3.eq.'G09')then
          ilev0code=1
@@ -29516,7 +29528,7 @@ c            read (15,*) bislab(itau),taumn(itau),taumx(itau)
          enddo
 c         itau=0
          do j = 1, ntau
-            intcoor(nint-ntau+1)=bislab(j)
+            intcoor(nint-ntau+j)=bislab(j)
          enddo
          rewind(15)
       endif

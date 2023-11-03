@@ -2,7 +2,7 @@
 
 if [ "$#" != "3" ] 
 then
-    echo " usage  ./get_files.com  #from #to #directory"
+    echo " usage  ./get_files.com  #to #from #directory"
     exit
 fi
 

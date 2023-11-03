@@ -52,6 +52,7 @@ echo "$HOST" > host.dat
 #sed -ie 's/NODESLOW/'$NODESLOW'/g' data/estoktp.dat
 #sed -ie 's/NODESHIGH/'$NODESHIGH'/g' data/estoktp.dat
 
+# define locally 'python' as the path to a python3.x interpreter e.g. 'export python=/usr/bin/python3.6'
 
 #if [ "x$HOST" != "x" ]; then
 
@@ -66,6 +67,3 @@ echo "$HOST" > host.dat
 #else
 #  estoktp.x >& estoktp.log &
 #fi
-
-
-

@@ -16061,7 +16061,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       dimension tau(ntaumx)
       dimension tauopt(ntaumx)
 
-      LOGICAL leof,lsec,ltit
+      LOGICAL leof,lsec,ltit,lhle
 
       CHARACTER*1000 line,string
       CHARACTER*160 sename,word,word2,word3,title,title1,
@@ -16080,7 +16080,7 @@ c     lc new   New variable initialization
       
       call lineread(0)
 
-cc output to EStokTP file
+cc output to EStokTP file, 1 of 2
 
       write(7,*)'****'
       write(7,*)'entering subroutine HL'
@@ -16105,8 +16105,6 @@ cc output to EStokTP file
       else if(ispecies.eq.6)then
          write(7,*)'product vdW well'
       endif
-      write(7,*)'number of processors for HL run:',numprochl
-      write(7,*)'****'
 
 cc initialize parameters
       irescale=0
@@ -16134,6 +16132,15 @@ c open files
       enddo
 c      call LineRead (21)
       code_name=word2
+
+cc output to EStokTP file, 2 of 2
+      if(code_name.eq.'COMPOSITE')then
+         write(7,*)'launching external script for composite job'
+      else
+         write(7,*)'number of processors for HL run:',numprochl
+      endif
+      write(7,*)'****'
+
       if(code_name.eq.'MOLPRO')then
          ilev1code=2
 c  lc new   here introduce the iterative keyword START
@@ -16164,6 +16171,9 @@ c special check on this
          ilev1code=1
       else if (code_name.eq.'G16')then
          ilev1code=3
+      else if (code_name.eq.'COMPOSITE')then
+         ilev1code=99
+         commandcopy='cp -f ./data/hl_composite.dat ./hl_composite.dat'
       else if (code_name.eq.'LEVEL1')then
          ilev1code=0
       else
@@ -16460,6 +16470,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_reac1_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_reac1_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16476,6 +16489,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_reac2_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_reac2_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16492,6 +16508,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_prod1_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_prod1_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16508,6 +16527,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_prod2_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_prod2_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16524,6 +16546,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_wellr_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_wellr_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16540,6 +16565,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_wellr_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_wellr_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16556,6 +16584,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_wellp_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_wellp_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16572,6 +16603,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_wellp_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_wellp_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16588,6 +16622,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_reacs_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_reacs_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16604,6 +16641,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_prods_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_prods_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16644,6 +16684,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_ts_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_ts_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16660,6 +16703,9 @@ cc now check for code specific/species specific input commands
          if(WORD2.eq.'MOLPRO')then
             commandcopy='cp -f ./data/hl_ts_molpro.dat 
      $ hl_molpro.dat'            
+         else if (WORD2.eq.'COMPOSITE')then
+            commandcopy='cp -f ./data/hl_ts_composite.dat
+     + hl_composite.dat'
          else if (WORD2.eq.'LEVEL1')then
             ilev1code=0
             code_name=word2
@@ -16675,61 +16721,133 @@ c      call commrun(commandcopy)
          open (unit=15,file='./data/reac1.dat',status='old')
          open (unit=17,file='./output/reac1_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/reac1_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/reac1/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.2) then
          open (unit=15,file='./data/reac2.dat',status='old')
          open (unit=17,file='./output/reac2_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/reac2_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/reac2/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.3) then
          open (unit=15,file='./data/prod1.dat',status='old')
          open (unit=17,file='./output/prod1_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/prod1_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/prod1/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.4) then
          open (unit=15,file='./data/prod2.dat',status='old')
          open (unit=17,file='./output/prod2_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/prod2_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/prod2/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.5) then
          open (unit=15,file='./data/wellr.dat',status='old')
          open (unit=17,file='./output/wellr_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/wellr_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/wellr/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.51) then
          open (unit=15,file='./data/wellr.dat',status='old')
          open (unit=17,file='./output/wellr_opt.out',status='unknown')
          inp_type=2
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/wellr_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/wellr/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.6) then
          open (unit=15,file='./data/wellp.dat',status='old')
          open (unit=17,file='./output/wellp_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/wellp_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/wellp/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.61) then
          open (unit=15,file='./data/wellp.dat',status='old')
          open (unit=17,file='./output/wellp_opt.out',status='unknown')
          inp_type=2
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/wellp_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/wellp/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.11) then
          open (unit=15,file='./data/reacs.dat',status='old')
          open (unit=17,file='./output/reacs_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/reacs_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/reacs/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.12) then
          open (unit=15,file='./data/prods.dat',status='old')
          open (unit=17,file='./output/prods_opt.out',status='unknown')
          inp_type=1
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/prods_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/prods/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.0) then
          open (unit=15,file='./data/ts.dat',status='old')
          open (unit=17,file='./output/ts_opt.out',status='unknown')
          inp_type=2
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/tsgta_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/ts/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
       if (ispecies.eq.100.or.ispecies.eq.101) then
          open (unit=15,file='./data/ts.dat',status='old')
          open (unit=17,file='input.xyz',status='unknown')
          inp_type=2
+         if (ilev1code.eq.99) then
+            command1="cp ./geoms/tsgta_l1.xyz ./hl_composite.xyz"
+            call commrun(command1)
+            command1="sed -i '2s/.*/ts/' ./hl_composite.xyz"
+            call commrun(command1)
+         endif
       endif
 
       if (inp_type.eq.1) then
@@ -16803,6 +16921,15 @@ c            write (67,*) icharge,ispin
 c               write (67,*)atomlabel(iatom)
             enddo
 c            write(67,*)
+            rewind(15)
+         else if (code_name.eq.'COMPOSITE') then
+            call commrun(commandcopy)
+            write(command1,'(A,I4,I4,A)')"sed -i '2s/$/",icharge,ispin,
+     + "/' ./hl_composite.xyz"
+            call commrun(command1)
+            do iatom = 1 , natomt
+               read (15,'(A60)') atomlabel(iatom)
+            enddo
             rewind(15)
          else
             write(66,*) 'code not supported'
@@ -17123,6 +17250,15 @@ c            write (67,*)'}'
             do iatom = 1 , natomt
                read (17,'(A60)') atomlabel(iatom)
             enddo
+         else if (code_name.eq.'COMPOSITE') then
+            call commrun(commandcopy)
+            write(command1,'(A,I4,I4,A)')"sed -i '2s/$/",icharge,ispin,
+     + "/' ./hl_composite.xyz"
+            call commrun(command1)
+            read (17,*)
+            do iatom = 1 , natomt
+               read (17,'(A60)') atomlabel(iatom)
+            enddo
          else if (code_name.eq.'LEVEL1')then
             read (17,*)
             do iatom = 1 , natomt
@@ -17175,6 +17311,21 @@ cc now run the high level calculation
      $ coord,vtotr,freq,ifreq,ilin,ismp,icharge,ispin,ircons,
      $ atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires,ixyz,ilev
      $ ,ispecies,iaspace)
+
+      else if (ilev1code.eq.99.and.iskiptheo.eq.0) then
+         command1="exec $(which $python) $(which hl_composite.x)"
+         call commrun(command1)
+         inquire( file="./output/hl_composite.en", exist=lhle )
+         if (lhle) then
+             open(unit=17,file="./output/hl_composite.en",
+     + status="unknown")
+             read(17,*)vtotr
+             close(17)
+         else
+             write(7,*)'error in the composite hl module'
+             close(7)
+             stop
+         endif
 
       else if (ilev1code.eq.0.and.iskiptheo.eq.0) then
          if (ispecies.eq.1) then

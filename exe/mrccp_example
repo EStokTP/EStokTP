@@ -1,0 +1,23 @@
+#!/bin/sh               
+
+#to be edited to point to the mrcc installation executable
+
+ncpu=$2
+echo $ncpu
+export OMP_NUM_THREADS=$ncpu
+
+
+SUB_DIR=`pwd`
+rm -f /data/scratch/*
+cp -f $3 /data/scratch/MINP
+cd /data/scratch/
+
+echo 'ok1'
+
+# replace /software/mrcc with the full path to mrcc executable
+/software/mrcc > $SUB_DIR/mrcc.log
+
+echo 'ok2'
+
+
+

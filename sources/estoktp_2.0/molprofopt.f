@@ -290,6 +290,7 @@ c        if(ispin.eq.1)then
             write (98,*) comline1
             read(15,'(A200)')comline1
             write (10,*) comline1
+c            write (10,*) comline1(1:len_trim(comline1))
             write (98,*) comline1
             close(15)
 c         endif

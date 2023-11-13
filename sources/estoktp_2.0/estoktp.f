@@ -53,7 +53,7 @@ c	for this will need to have some specificiation of additional torsional degrees
       implicit double precision (a-h,o-z)
       implicit integer (i-n)
 
-      LOGICAL leof,lsec,ltit
+      LOGICAL leof,lsec,ltit,ex
       CHARACTER*1000 line,string
       CHARACTER*160 sename,word,word2,word3,title,title1,
      $ word4,word5,word6,word7
@@ -64,35 +64,44 @@ c	for this will need to have some specificiation of additional torsional degrees
 
       include 'filcomm.f'
 
+cc check if es2k is to be used as utility 
+
+      inquire(file='es2k_ut.dat',EXIST=ex)
+      iloc=0
+      if (ex) then
+         iloc=1
+         open (unit=5,file='es2k_ut.dat',status='UNKNOWN')
+      else
 cc initialize directory structure
+         open (unit=5,file='./data/estoktp.dat',status='UNKNOWN')
+         command1='mkdir -p output'
+         call commrun(command1)
+         command1='mkdir -p geoms'
+         call commrun(command1)
+         command1='mkdir -p irc_files'
+         call commrun(command1)
+         command1='mkdir -p me_files'
+         call commrun(command1)
+         command1='mkdir -p me_blocks'
+         call commrun(command1)
+         command1='mkdir -p hl_logs'
+         call commrun(command1)
+         command1='mkdir -p hr_geoms'
+         call commrun(command1)
+         command1='mkdir -p md_tunn'
+         call commrun(command1)
+         command1='rm -f ./finished'
+         call commrun(command1)
 
-      open (unit=5,file='./data/estoktp.dat',status='UNKNOWN')
-
-      command1='mkdir -p output'
-      call commrun(command1)
-      command1='mkdir -p geoms'
-      call commrun(command1)
-      command1='mkdir -p irc_files'
-      call commrun(command1)
-      command1='mkdir -p me_files'
-      call commrun(command1)
-      command1='mkdir -p me_blocks'
-      call commrun(command1)
-      command1='mkdir -p hl_logs'
-      call commrun(command1)
-      command1='mkdir -p hr_geoms'
-      call commrun(command1)
-      command1='mkdir -p md_tunn'
-      call commrun(command1)
-      command1='rm -f ./finished'
-      call commrun(command1)
-
-      open (unit=6,file='./output/messages.out',status='UNKNOWN')
-      open (unit=7,file='./output/estoktp.out',status='UNKNOWN')
-
+         open (unit=6,file='./output/messages.out',status='UNKNOWN')
+         open (unit=7,file='./output/estoktp.out',status='UNKNOWN')
 c random number generator
 
-      call mtinit()
+         call mtinit()
+         write(7,*)'EStokTP log file'
+         call initial_info
+      endif
+
 
 c initializations
 
@@ -136,6 +145,7 @@ cadl end modified part
       ix2z_wellr=0
       ix2z_wellp=0
       ix2z_ts=0
+      ix2z_ut=0
       iintfr_ts=0
       i1dtau_reac1=0
       i1dtau_reac2=0
@@ -201,8 +211,7 @@ cadl end modified part
       inatst=0
       iguessna=0
 
-      write(7,*)'EStokTP log file'
-      call initial_info
+
 
   100 continue
 c  lc Opt words initialization 
@@ -453,6 +462,10 @@ cadl end modified part
          ix2z_ts=1
          itotcalc=itotcalc+1
       endif
+      if (WORD.EQ.'X2Z_UT') then
+         ix2z_ut=1
+         itotcalc=itotcalc+1
+      endif
       if (WORD.EQ.'BMAT_REAC1') then
          ibmat_reac1=1
          itotcalc=itotcalc+1
@@ -671,14 +684,15 @@ c  lc:   TolNum implicitly defined in double precision
       endif
 
 c how many processors to use for low level and high level calculations
-      read (5,*) numprocll,numprochl
-      read (5,*)
+      if(iloc.eq.0)then
+         read (5,*) numprocll,numprochl
+         read (5,*)
 c memory for low level and high level calculations
-      call LineRead(5)
+         call LineRead(5)
 
-      gmemlow=word
-      gmemhigh=word2
-
+         gmemlow=word
+         gmemhigh=word2
+      endif
 cc intro closure of unit 5
       close (unit=5,status='keep')
 
@@ -941,6 +955,11 @@ c convert geom.xyz to z-matrix for selected species
          ispecies=0
          call xyz_to_int(ispecies)
       endif
+      if (ix2z_ut.eq.1) then
+c         if (idebug.ge.1) write (6,*) 'computing zmat'
+         ispecies=666
+         call xyz_to_int(ispecies)
+      endif
 
 c determine 1-dimensional torsional potentials
       if (i1dtau_reac1.eq.1) then
@@ -1070,14 +1089,15 @@ c determine higher level energies for ts, reactants, and products
 
 c second part of the calculations, high level of nodes and memory      
 
-      numproc=numprochl
-      open (unit=99,status='unknown') 
-      REWIND (99)
-      write (99,*) gmemhigh
-      REWIND (99)
-      read (99,*) gmem
-      close (99)
-
+      if(iloc.eq.0)then
+         numproc=numprochl
+         open (unit=99,status='unknown') 
+         REWIND (99)
+         write (99,*) gmemhigh
+         REWIND (99)
+         read (99,*) gmem
+         close (99)
+      endif
 c      gmem=gmemhigh
 
       if (ihl_reac1.eq.1) then
@@ -1129,13 +1149,15 @@ c      gmem=gmemhigh
       endif
 
 cc perform IRC of TS
-      numproc=numprocll
-      open (unit=99,status='unknown') 
-      REWIND (99)
-      write (99,*) gmemlow
-      REWIND (99)
-      read (99,*) gmem
-      close (99)
+      if(iloc.eq.0)then
+         numproc=numprocll
+         open (unit=99,status='unknown') 
+         REWIND (99)
+         write (99,*) gmemlow
+         REWIND (99)
+         read (99,*) gmem
+         close (99)
+      endif
 c      gmem=gmemlow
 
       if (iirc.eq.1) then
@@ -1180,10 +1202,12 @@ c produced modified Arrhenius fit and output for CHEMKIN
       close(5)
       close(6)
       close(7)
-      open(unit=99,file='finished',status='unknown')
-      write(99,*)'job completed'
-      close(99)
-      call clean_files
+      if(iloc.eq.0)then
+         open(unit=99,file='finished',status='unknown')
+         write(99,*)'job completed'
+         close(99)
+         call clean_files
+      endif
 
       stop
       end
@@ -7225,37 +7249,64 @@ c            call commrun(command1)
 c           write (116,*) atomname, '  0.  0.  0. '
             close (100)
          endif
+
          if (ispecies.eq.2) then 
-            open (unit=126,file='./me_files/reac1_ge.me',status=
-     $       'unknown')
-            do while (WORD.NE.'SYMMETRYFACTOR')
-               call LineRead (126)
+            natom1=0
+            open (unit=25,file='./data/reac1.dat',status='old')
+                        do while (WORD.NE.'NATOM')
+               call LineRead (25)
+               if (WORD.EQ.'END') then
+                  write (66,*) 'natom in reac1 must be defined'
+                  stop
+               endif
             enddo
-            open (unit=99)
-            rewind (99)
-            write (99,*) word2
-            rewind (99)
-            read (99,*) symfr1
-            close (unit=99)
-            symfr = symfr1*symf
+            read (25,*) natom1
+            close (25)
+            if(natom1.ne.1)then
+               open (unit=126,file='./me_files/reac1_ge.me',status=
+     $       'unknown')
+               do while (WORD.NE.'SYMMETRYFACTOR')
+                  call LineRead (126)
+               enddo
+               open (unit=99)
+               rewind (99)
+               write (99,*) word2
+               rewind (99)
+               read (99,*) symfr1
+               close (unit=99)
+               symfr = symfr1*symf
 c            write (116,*) '		SymmetryFactor ',symfr
-            close (unit=126,status='keep')
+               close (unit=126,status='keep')
+            endif
          endif
          if (ispecies.eq.4) then 
-            open (unit=126,file='./me_files/prod1_ge.me',status=
-     $       'unknown')
-            do while (WORD.NE.'SYMMETRYFACTOR')
-               call LineRead (126)
+            natom2=0
+            open (unit=25,file='./data/prod1.dat',status='old')
+            do while (WORD.NE.'NATOM')
+               call LineRead (25)
+               if (WORD.EQ.'END') then
+                  write (66,*) 'natom in prod1 must be defined'
+                  stop
+               endif
             enddo
-            open (unit=99)
-            rewind (99)
-            write (99,*) word2
-            rewind (99)
-            read (99,*) symfp1
-            close (unit=99)
-            symfp = symfp1*symf
+            read (25,*) natom2
+            close (25)
+            if(natom2.ne.1)then
+               open (unit=126,file='./me_files/prod1_ge.me',status=
+     $           'unknown')
+               do while (WORD.NE.'SYMMETRYFACTOR')
+                  call LineRead (126)
+               enddo
+               open (unit=99)
+               rewind (99)
+               write (99,*) word2
+               rewind (99)
+               read (99,*) symfp1
+               close (unit=99)
+               symfp = symfp1*symf
 c            write (116,*) '		SymmetryFactor ',symfp
-            close (unit=126,status='keep')
+               close (unit=126,status='keep')
+            endif
          endif
 c         if ((ispecies.eq.2).or.(ispecies.eq.4)) then
 c            write (116,*) '          PotentialPrefactor[au] 	10.' 
@@ -8304,67 +8355,73 @@ C        IN ATOM LABEL ARRAY AND THAN PROCESS THE STRING
 C        IF IT FINDS AN INTEGER CONVERT TO THE RELATIVE 
 C        ATOM LABEL IN THE ARRAY
 C        AFTER THAT WRITE THE COORDINATES IN THE NEW TS_OPT_FILE
-         refatom=' '
-         atlab1=' '
-         atlab2=' '
-         atlab3=' '
-         rval=' '
-         angval=' '
-         diedval=' '
-         i_LC_counter=0
-         customcommand='cp ./output/ts_opt.out 
-     &    ./output/ts_opt_template.out'
-         call commrun(customcommand)
-         customcommand=' '
-         open(unit=155,file='./output/ts_opt_template.out',
-     &   action='read',status='old')
-         read(155,'(A)') mstring
-         open (unit=17,file='./output/ts_opt.out'
-     &    ,status='unknown',action='write')
-         write(17,*) trim(mstring)
-         do 
-            read(155,'(A)',iostat=iEoFFl) mstring
-            if (iEoFFl .ne. 0) then 
-               exit 
-            endif  
-               do 
-                  read(mstring,*,iostat=iEoRFl) 
-     &            refatom,atlab1,rval,atlab2,angval,atlab3,diedval 
-                  if (index(atlab1,'.') .gt. 0) then 
-                     write(17,'(A)') trim(mstring)
-                     exit
-                  end if 
-                  i_LC_counter=i_LC_counter+1
-                  read(mstring,*) LC_At_lab(i_LC_counter)
-                  read(atlab1,*,iostat=ReaSts) TstInt
-                  if (ReaSts .eq. 0) then 
-                     atlab1 = LC_At_lab(TstInt)
-                  endif 
-                  read(atlab2,*,iostat=ReaSts) TstInt
-                  if (ReaSts .eq. 0) then 
-                     atlab2 = LC_At_lab(TstInt)
-                  endif 
-                  read(atlab3,*,iostat=ReaSts) TstInt
-                  if (ReaSts .eq. 0) then 
-                     atlab3 = LC_At_lab(TstInt)
-                  endif 
-                  write(17,'(*(A,1x))')
-     &             trim(refatom),trim(atlab1),trim(rval),
-     &             trim(atlab2),trim(angval),trim(atlab3),
-     &             trim(diedval) 
-                  atlab1=' '
-                  atlab2=' '
-                  atlab3=' '
-                  rval=' '
-                  angval=' '
-                  diedval=' '
-                  exit
-               end do 
-         end do
-         close(17)
-         close(155)
-         
+
+cc commented by cc from here, all lines commented, decomment all to reactivate
+
+c         refatom=' '
+c         atlab1=' '
+c         atlab2=' '
+c         atlab3=' '
+c         rval=' '
+c         angval=' '
+c         diedval=' '
+c         i_LC_counter=0
+c         customcommand='cp ./output/ts_opt.out 
+c     &    ./output/ts_opt_template.out'
+c         call commrun(customcommand)
+c         customcommand=' '
+c         open(unit=155,file='./output/ts_opt_template.out',
+c     &   action='read',status='old')
+c         read(155,'(A)') mstring
+c         open (unit=17,file='./output/ts_opt.out'
+c     &    ,status='unknown',action='write')
+c         write(17,*) trim(mstring)
+c         do 
+c            read(155,'(A)',iostat=iEoFFl) mstring
+c            if (iEoFFl .ne. 0) then 
+c               exit 
+c            endif  
+c               do 
+c                  read(mstring,*,iostat=iEoRFl) 
+c     &            refatom,atlab1,rval,atlab2,angval,atlab3,diedval 
+c                  if (index(atlab1,'.') .gt. 0) then 
+c                     write(17,'(A)') trim(mstring)
+c                     exit
+c                  end if 
+c                  i_LC_counter=i_LC_counter+1
+c                  read(mstring,*) LC_At_lab(i_LC_counter)
+c                  read(atlab1,*,iostat=ReaSts) TstInt
+c                  if (ReaSts .eq. 0) then 
+c                     atlab1 = LC_At_lab(TstInt)
+c                  endif 
+c                  read(atlab2,*,iostat=ReaSts) TstInt
+c                  if (ReaSts .eq. 0) then 
+c                     atlab2 = LC_At_lab(TstInt)
+c                  endif 
+c                  read(atlab3,*,iostat=ReaSts) TstInt
+c                  if (ReaSts .eq. 0) then 
+c                     atlab3 = LC_At_lab(TstInt)
+c                  endif 
+c                  write(17,'(*(A,1x))')
+c     &             trim(refatom),trim(atlab1),trim(rval),
+c     &             trim(atlab2),trim(angval),trim(atlab3),
+c     &             trim(diedval) 
+c                  atlab1=' '
+c                  atlab2=' '
+c                  atlab3=' '
+c                  rval=' '
+c                  angval=' '
+c                  diedval=' '
+c                  exit
+c               end do 
+c         end do
+c         close(17)
+c         close(155)
+
+cc decomment up to here to reactivate
+
 c lc debug stop
+
          speclabel='ts'
          open (unit=15,file='./data/ts.dat',status='unknown')
          open (unit=16,file='./output/ts_hr.out',status='unknown')
@@ -8442,6 +8499,7 @@ c     initialize parameters
       ifreq=0
       noptg = 0
       ires=0
+      ilchr=0
 cc we assume that a linear molecule has no rotational dof         
       ilin=0
 
@@ -8452,6 +8510,9 @@ cc we assume that a linear molecule has no rotational dof
             stop
          endif
       enddo
+      if(word2.eq.'LCHR')then
+         ilchr=1
+      endif
 c      call LineRead (15)
       read (15,*) nhind
       read (15,*)
@@ -8562,7 +8623,7 @@ c read level of theory for hindered rotor scan
             close (unit=99,status='keep')
          endif
 
-         if (idebug.ge.2) write (16,*) ' comline test',comline1,comline2
+c         if (idebug.ge.2) write (16,*) ' comline test',comline1,comline2
          close(21)
 
          if (natom.ne.1) then
@@ -8598,7 +8659,7 @@ c read level of theory for hindered rotor scan
             read (15,*)
             do itau = 1 , ntau
                read (15,*) bislab(itau),taumn(itau),taumx(itau)
-               write (16,*) bislab(itau),taumn(itau),taumx(itau)
+c               write (16,*) bislab(itau),taumn(itau),taumx(itau)
                open (unit=99,status='unknown')
                rewind (99)
                write (99,*)bislab(itau)
@@ -8610,7 +8671,6 @@ c read level of theory for hindered rotor scan
             enddo
          endif
          rewind(15)
-
 
          ncoord = 3*natom-6
          read (17,*)
@@ -8626,7 +8686,7 @@ c read level of theory for hindered rotor scan
          enddo
          close(17)
 
-         if (idebug.ge.2) write (16,*) 'past z-matrix'
+c         if (idebug.ge.2) write (16,*) 'past z-matrix'
 
       endif
 
@@ -8801,8 +8861,8 @@ c            frozcoo=rdist
             close (unit=99,status='keep')
          endif
 
-         if (idebug.ge.2) write (16,*) ' comline test',comline1,comline2
-         if (idebug.ge.2) write (16,*) ' test2       ',comline3,comline4
+c         if (idebug.ge.2) write (16,*) ' comline test',comline1,comline2
+c         if (idebug.ge.2) write (16,*) ' test2       ',comline3,comline4
          close(21)
 
 cc for barrierless reactions use level1 AS
@@ -8903,7 +8963,7 @@ cc read coordinate names
          enddo
          close (unit=17,status='keep')
 
-         if (idebug.ge.2) write (16,*) 'past z-matrix'
+c         if (idebug.ge.2) write (16,*) 'past z-matrix'
 
 cc now read abstraction site from grid input file
 
@@ -8913,7 +8973,10 @@ cc now read abstraction site from grid input file
             do while (WORD.NE.'ISITE')
                call LineRead (18)
                if (WORD.EQ.'END') then
+                  write (16,*) 'error in HR input'
                   write (16,*) 'abstraction site must be defined'
+                  write (7,*) 'error in HR input'
+                  write (7,*) 'abstraction site must be defined'
                   stop
                endif
             enddo
@@ -8932,6 +8995,15 @@ cc if called from IRC read additional input
          endif
       endif
 
+cc initialize output
+
+      write(16,*)' HINDERED ROTOR OUTPUT '
+      write(16,*)' Species ',ispecies
+      write(16,*)
+      write(16,*)' Theoretical Level'
+      write(16,*)comline1(1:len_trim(comline1))
+      write(16,*)comline2(1:len_trim(comline2))
+c      write(16,*)
 
 cc scan one hindered rotor at a time
 
@@ -9181,16 +9253,6 @@ c 1011       continue
          write (7,*) 'in the assignment of atoms to tops'
          write (7,*) 'check the me input file'
  1020    continue
-         if (idebug.ge.2) then
-            write (16,*)'pivA pivB at '
-     $           ,pivotA(ihind),pivotB(ihind)
-            do iatom = 1 , natomt
-               write (16,*)'iatom atomconn',iatom,atomconn(iatom)
-            enddo
-            do iatom = 1 , natomt
-               write (16,*)'iatom top ind',iatom,itop_ind(iatom,ihind)
-            enddo
-         endif
       enddo
 
 c         stop
@@ -9377,16 +9439,32 @@ cc if recovering data skip PES re-evaluation
 
       do ihind = 1 , nhind
 
+cc here we start the scan of the PES for each rotor
+
+         if (idebug.ge.2) then
+            write(16,*)
+            write(16,*)'Determination of pivot of rotor ',ihind
+            write (16,*)'pivA pivB at '
+     $           ,pivotA(ihind),pivotB(ihind)
+            do iatom = 1 , natomt
+               write (16,*)'iatom atomconn',iatom,atomconn(iatom)
+            enddo
+            do iatom = 1 , natomt
+               write (16,*)'iatom top ind',iatom,itop_ind(iatom,ihind)
+            enddo
+         endif
+
 cc for each rotor start from first level theory
 
-      comline1=comsave1
-      comline2=comsave2
+         comline1=comsave1
+         comline2=comsave2
 
 cc start rotational scan for hind rotor ihind
 
 cc    re-order z-matrix, taking out torsion ihind      
 
-         write (16,*) 're-ordered z-matrix of hind rotor'
+         write (16,*)
+         write (16,*) 're-ordered Z-Matrix and values'
 
          index_v=0
          ncoord = 3*natom-6
@@ -9425,9 +9503,15 @@ cc save starting coordinate of scanned dihedreal
          endif
 cc start scan on nhind scan points
 c         stop
-         write (16,*) 'hindered_rotor ',ihind
-
          ihind_step = (dhindmx(ihind)-dhindmn(ihind))/nhindsteps(ihind)
+
+         write (16,*)
+         write (16,*) 'scanned coordinate  : ',hindlab(ihind)
+         write (16,*) 'number of PES points: ',nhindsteps(ihind)
+         write (16,*) 'step:               : ',ihind_step
+         write (16,*)
+         write (16,*) 'potential for hindered rotor ',ihind
+
 
 
          ircons=1
@@ -9473,6 +9557,7 @@ c         stop
 !        GREP THE NORMAL TERMINATION STRING
 !        THE 2007 IS AN ECHO OF THE FILENAME 
 !        THE 2008 IS THE FILENAME COMPOSITION
+
             open(unit=208,file='HindNormalCheck.log',
      &       iostat=icheck,status='old') 
             if (icheck .eq. 0) close(208,status='delete')
@@ -9491,26 +9576,30 @@ c         stop
                call commrun(customcommand)
                close(208,status='keep')
             end if 
+
+
 !        IF NORMAL TERMINATION IS OBTAINED COPY THIS TO THE GEOM.LOG FILE
 !        AND GENERATE A FILE THAT CONTAINS THE INSTRUCTION FOR G09FOPT
 !        TO SKIP THE GAUSSIAN CALL AND PROCESS THIS FILE
  
-               call g09fopt(ilev1code,tau,ntau,natom,natomt,numproc,
+            call g09fopt(ilev1code,tau,ntau,natom,natomt,numproc,
      $ gmem,coord,vtot_0,vtot,freq,ifreq,ilin,ismp,comline1,
      $ comline2,icharge,ispin,ircons,
      $ atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires,ixyz,ired)
 
 !        BE SURE TO REMOVE THE INSTRUCTION FILE 
 
+             if(ilchr.eq.1)then
                customcommand='rm HindNormalCheck.log'
                call commrun(customcommand)
                customcommand='mkdir -p hindered_rotors_gaussian_files'
                call commrun(customcommand) 
                write(customcommand,2005) ismp,trim(speclabel)
-               call commrun(customcommand)
-               write(customcommand,2009) ismp,trim(speclabel)
-               call commrun(customcommand)
-               customcommand=' '
+                call commrun(customcommand)
+                write(customcommand,2009) ismp,trim(speclabel)
+                call commrun(customcommand)
+                customcommand=' '
+              endif
             else if (ilev1code.eq.2) then
                numproc=numprochl         
                call molprofopt(tau,ntau,natom,natomt,numproc,gmem,
@@ -9518,13 +9607,13 @@ c         stop
      $ atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires,ixyz,ilev
      $ ,ispecies,iaspace)
                numproc=numprocll
-            else 
+           else 
          call elstructopt(ilev1code,tau,ntau,natom,natomt,numproc,
      $     gmem,coord,vtot_0,vtot,freq,ifreq,ilin,ismp,
      $     comline1,comline2,icharge,ispin,ircons,
      $     atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires
      $     ,ixyz,ired,ispecies,iaspace)
-            endif
+           endif
 
 c            write(*,*)'before g09'
 
@@ -9544,7 +9633,6 @@ c      do igr=1,igrouptot(ih)
 c      write (*,*)'hind ind atom',ih,igr,ngroup(ih,igr)
 c      enddo
 c      enddo
-
 
             write (16,*) xint(ncoord),vtot
 
@@ -15712,10 +15800,6 @@ c      enddo
 c      close(112)
 c      stop
 
-      open(unit=107,file='./me_files/de1_TSvar.me',
-     +     status='unknown')
-      write(107,*)rc_ene_kcal(1)-ts_en
-      close(107)
 
       open(unit=107,file='./me_files/variational.me',
      +     status='unknown')
@@ -15772,6 +15856,11 @@ c      stop
       if(intfreq.eq.1)then
          write(109,*)'Variational'
       endif
+
+cc index for first mep point written in variational file
+      iref_mebl=0
+      iref_mebl_xyz=0
+
       do inumpoints=1,numpointstot
          nfreqtest=3*natom-6-1-nhind
          nfreqw=0
@@ -15804,6 +15893,24 @@ c      stop
                endif
             enddo
          endif
+
+         if(intfreq.eq.0.and.iref_mebl.eq.0)then
+            if(nfreqw.eq.nfreqtest)iref_mebl=inumpoints
+         else if(intfreq.eq.1)then
+            if(iref_mebl.eq.0)then
+               if(nfreqw.eq.nfreqtest)iref_mebl=inumpoints
+            endif
+            if(iref_mebl_xyz.eq.0)then
+               if(nfreqwxyz.eq.nfreqtest.and.nfreqw.eq.nfreqtest)then
+                  iref_mebl_xyz=inumpoints
+               endif
+            endif
+         endif
+
+c         if(iref_mebl.eq.0)then
+c            if(nfreqw.eq.nfreqtest)iref_mebl=inumpoints
+c         endif
+
          if(nfreqw.ne.nfreqtest) goto 9999
          if(nfreqwxyz.ne.nfreqtest) intfreqw=0
 
@@ -15987,7 +16094,34 @@ c      write(107,*)'End '
 
       close (107)
       close (109)
+
+      open(unit=107,file='./me_files/de1_TSvar.me',
+     +     status='unknown')
+      if(iref_mebl.eq.0)then
+         write(96,*)'failed to identify index of first point'
+         write(96,*)'in variational.me file creation'
+         write(96,*)'necessary for blocks'
+         write(7,*)'failed to identify index of first point'
+         write(7,*)'in variational.me file creation'
+         write(7,*)'necessary for blocks'
+         close(7)
+         close (unit=96,status='keep')
+         stop
+      endif
+      write(96,*)'first point of MEP in variational file: ',iref_mebl
+      write(96,*)'energy(kcal/mol): ',rc_ene_kcal(iref_mebl)
+      write(7,*)'first point of MEP in variational file: ',iref_mebl
+      write(7,*)'energy(kcal/mol): ',rc_ene_kcal(iref_mebl)
+      write(107,*)rc_ene_kcal(iref_mebl)-ts_en
+      close(107)
       close (unit=96,status='keep')
+
+      if(iref_mebl_xyz.ne.0)then
+         open(unit=107,file='./me_files/de1_TSvar_xyz.me',
+     +        status='unknown')
+         write(107,*)rc_ene_kcal(iref_mebl_xyz)-ts_en
+         close(107)
+      endif
 
       if(intfreq.eq.1)then
          command1='cp -f ./me_files/variational.me 
@@ -21149,6 +21283,12 @@ c      write(*,*)'natom is ', natom
       numTe=0
       numI=0
       numXe=0
+      numLi=0
+      numBe=0
+      numNa=0
+      numMg=0
+      numK=0
+      numCa=0
       neltot=0
       do j=1,natom
          READ (116,*)aname,cjunk,cjunk,cjunk
@@ -21176,8 +21316,15 @@ c      write(*,*)'natom is ', natom
          if (aname.eq.'Sn') numSn=numSn+1
          if (aname.eq.'Sb') numSb=numSb+1
          if (aname.eq.'Te') numTe=numTe+1
-         if (aname.eq.'I') numI=numI+1
+         if (aname.eq.'I')  numI=numI+1
          if (aname.eq.'Xe') numXe=numXe+1
+         if (aname.eq.'Li') numLi=numLi+1
+         if (aname.eq.'Be') numBe=numBe+1
+         if (aname.eq.'Na') numNa=numNa+1
+         if (aname.eq.'Mg') numMg=numMg+1
+         if (aname.eq.'K')  numK=numK+1
+         if (aname.eq.'Ca') numCa=numCa+1
+
       enddo
       open(unit=117,file='stoich.res',status='unknown')
 
@@ -21324,6 +21471,48 @@ c      write(*,*)'natom is ', natom
          atomlabel(indnum)='I'
          natomnumb(indnum)=numI
          neltot=neltot+53*numI
+         indnum=indnum+1
+      endif
+      if(numXe.ne.0) then
+         atomlabel(indnum)='Xe'
+         natomnumb(indnum)=numXe
+         neltot=neltot+54*numXe
+         indnum=indnum+1
+      endif
+      if(numLi.ne.0) then
+         atomlabel(indnum)='Li'
+         natomnumb(indnum)=numLi
+         neltot=neltot+3*numLi
+         indnum=indnum+1
+      endif
+      if(numBe.ne.0) then
+         atomlabel(indnum)='Be'
+         natomnumb(indnum)=numBe
+         neltot=neltot+4*numBe
+         indnum=indnum+1
+      endif
+      if(numNa.ne.0) then
+         atomlabel(indnum)='Na'
+         natomnumb(indnum)=numNa
+         neltot=neltot+11*numNa
+         indnum=indnum+1
+      endif
+      if(numMg.ne.0) then
+         atomlabel(indnum)='Mg'
+         natomnumb(indnum)=numMg
+         neltot=neltot+12*numMg
+         indnum=indnum+1
+      endif
+      if(numK.ne.0) then
+         atomlabel(indnum)='K'
+         natomnumb(indnum)=numK
+         neltot=neltot+19*numK
+         indnum=indnum+1
+      endif
+      if(numCa.ne.0) then
+         atomlabel(indnum)='Ca'
+         natomnumb(indnum)=numCa
+         neltot=neltot+20*numCa
          indnum=indnum+1
       endif
       indnum=indnum-1
@@ -29189,6 +29378,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       include 'filcomm.f'
 
       if(aname.eq.'H')ianumb=1
+      if(aname.eq.'He')ianumb=2
       if(aname.eq.'B')ianumb=5
       if(aname.eq.'C')ianumb=6
       if(aname.eq.'N')ianumb=7
@@ -29215,20 +29405,34 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       if(aname.eq.'Te')ianumb=52
       if(aname.eq.'I')ianumb=53
       if(aname.eq.'Xe')ianumb=54
+      if(aname.eq.'Li')ianumb=3
+      if(aname.eq.'Be')ianumb=4
+      if(aname.eq.'Na')ianumb=11
+      if(aname.eq.'Mg')ianumb=12
+      if(aname.eq.'K') ianumb=19 
+      if(aname.eq.'Ca')ianumb=20
+      
 
       if(aname.eq.'H')iamass=1
+      if(aname.eq.'He')iamass=4
+      if(aname.eq.'Li')iamass=7
+      if(aname.eq.'Be')iamass=9
       if(aname.eq.'B')iamass=11
       if(aname.eq.'C')iamass=12
       if(aname.eq.'N')iamass=14
       if(aname.eq.'O')iamass=16
       if(aname.eq.'F')iamass=19
       if(aname.eq.'Ne')iamass=20
+      if(aname.eq.'Na')iamass=23
+      if(aname.eq.'Mg')iamass=24
       if(aname.eq.'Al')iamass=27
       if(aname.eq.'Si')iamass=28
       if(aname.eq.'P')iamass=31
       if(aname.eq.'S')iamass=32
       if(aname.eq.'Cl')iamass=35
       if(aname.eq.'Ar')iamass=40
+      if(aname.eq.'K')iamass=39
+      if(aname.eq.'Ca')iamass=40
       if(aname.eq.'Ga')iamass=70
       if(aname.eq.'Ge')iamass=73
       if(aname.eq.'As')iamass=75
@@ -29270,31 +29474,38 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       include 'filcomm.f'
 
       if(ianumb.eq.1)amass=1.00783
-      if(ianumb.eq.5)amass=11.
+      if(ianumb.eq.2)amass=4.00260
+      if(ianumb.eq.3)amass=7.01600
+      if(ianumb.eq.4)amass=9.01218
+      if(ianumb.eq.5)amass=11.00931
       if(ianumb.eq.6)amass=12.
       if(ianumb.eq.7)amass=14.003074
       if(ianumb.eq.8)amass=15.99491
-      if(ianumb.eq.9)amass=19.
-      if(ianumb.eq.10)amass=20.
-      if(ianumb.eq.13)amass=27.
-      if(ianumb.eq.14)amass=28.
-      if(ianumb.eq.15)amass=31.
-      if(ianumb.eq.16)amass=32.
-      if(ianumb.eq.17)amass=35.
-      if(ianumb.eq.18)amass=40.
-      if(ianumb.eq.31)amass=70.
-      if(ianumb.eq.32)amass=73.
-      if(ianumb.eq.33)amass=75.
-      if(ianumb.eq.34)amass=79.
-      if(ianumb.eq.35)amass=80.
-      if(ianumb.eq.36)amass=84.
+      if(ianumb.eq.9)amass=18.9984
+      if(ianumb.eq.10)amass=19.9924391
+      if(ianumb.eq.11)amass=22.98977
+      if(ianumb.eq.12)amass=23.98504
+      if(ianumb.eq.13)amass=26.981538
+      if(ianumb.eq.14)amass=27.976928
+      if(ianumb.eq.15)amass=30.9737634
+      if(ianumb.eq.16)amass=31.9720718
+      if(ianumb.eq.17)amass=34.968852729
+      if(ianumb.eq.18)amass=39.9623831
+      if(ianumb.eq.19)amass=38.96371
+      if(ianumb.eq.20)amass=39.96259
+      if(ianumb.eq.31)amass=68.92558
+      if(ianumb.eq.32)amass=73.92117788
+      if(ianumb.eq.33)amass=74.9215955
+      if(ianumb.eq.34)amass=78.9183361
+      if(ianumb.eq.35)amass=79.91652
+      if(ianumb.eq.36)amass=83.911506
       if(ianumb.eq.45)amass=103.
-      if(ianumb.eq.49)amass=115.
-      if(ianumb.eq.50)amass=119.
-      if(ianumb.eq.51)amass=122.
-      if(ianumb.eq.52)amass=128.
-      if(ianumb.eq.53)amass=127.
-      if(ianumb.eq.54)amass=131.
+      if(ianumb.eq.49)amass=114.9041
+      if(ianumb.eq.50)amass=117.9018
+      if(ianumb.eq.51)amass=120.9038
+      if(ianumb.eq.52)amass=129.9067
+      if(ianumb.eq.53)amass=126.9004
+      if(ianumb.eq.54)amass=131.905429
 
       return
       end
@@ -29497,7 +29708,7 @@ cc section for me files
 
       return
       end
-         
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc    
 
       subroutine initial_info
@@ -32476,6 +32687,7 @@ c      dimension natomnumb(natommx)
       character*30 nameout,nameoutc
       character*30 gmem
       character*30 intcoor(3*natommx)
+      character*30 intcoorM(3*natommx)
       character*30 intcoort(3*natommx)
       character*20 bislab(ntaumx)
 
@@ -32587,8 +32799,19 @@ c         nameoutc='na_mecp_zmat'
          inp_type=2
       endif
 
-      open (unit=66,file='./output/xyz_to_zmat.log',status='unknown')
+      if (ispecies.eq.666) then
+         open (unit=15,file='es2k_ut.dat',status='old')
+         nameout='x2z_zmat'
+c         nameoutc='na_mecp_zmat'
+         inp_type=3
+      endif
 
+
+      if (ispecies.ne.666) then
+         open (unit=66,file='./output/xyz_to_zmat.log',status='unknown')
+      else
+         open (unit=66,file='xyz_to_zmat.log',status='unknown')
+      endif
 cc initialize parameters and files
 c
 c      if(ifile.eq.1)then         
@@ -32865,17 +33088,75 @@ cc read coordinate names
             read (17,*) intcoor(iint),xint(iint)
          enddo
          close (unit=17,status='keep')
-      endif
 
-      close(66)
+cc read input for local es2k
+
+      else if (inp_type.eq.3) then
+
+c         write(66,*)'ok up to here'
+
+         do while (WORD.NE.'NATOM')
+            call LineRead (15)
+            if (WORD.EQ.'END') then
+               write (66,*) 'natom must be defined'
+               close(66)
+               stop
+            endif
+         enddo
+         read (15,*) natom,natomt,ilin
+         if (natomt.gt.natommx) then
+            write (66,*) 'natomt too large',natomt,natommx
+            close(66)
+            stop
+         endif
+         rewind(15)
+
+         do while (WORD.NE.'CHARGE')
+            call LineRead (15)
+            if (WORD.EQ.'END') then
+               write (66,*) 'charge and spin must be defined'
+               close(66)
+               stop
+            endif
+         enddo
+         read (15,*) icharge,ispin
+         do iatom = 1 , natomt
+            read (15,'(A60)') atomlabel(iatom)
+         enddo
+         rewind(15)
+
+         if (natom.ne.1) then
+            do while (WORD.NE.'INTCOOR')
+               call LineRead (15)
+               if (WORD.EQ.'END') then
+                  write (66,*) 'internal coordinates must be defined'
+                  close(66)
+                  stop
+               endif
+            enddo
+            ncoord = 3*natom-6
+            if (natom.eq.1) ncoord = 0
+            if (natom.eq.2) ncoord = 1
+            do icoord = 1 , ncoord
+               read(15,*) intcoor(icoord),xint(icoord)
+               intcoorM(icoord)=intcoor(icoord)
+               call upcase2(intcoorM(icoord))
+c               write(*,*)intcoor(icoord)
+            enddo
+            rewind(15)
+         endif
+         close (unit=15,status='keep')
+      endif
 
       ncoord = 3*natom-6
       do j=1,natomt
-         write(*,*)'atomlabel is ',atomlabel(j)
+         write(66,*)'atomlabel is ',atomlabel(j)
       enddo
       do j=1,ncoord
-         write(*,*)'coord is ',intcoor(j),xint(j)
+         write(66,*)'coord is ',intcoor(j),xint(j)
       enddo
+      close(66)
+c      stop
 
 cc initialize vectors
       do j=1,ncoord 
@@ -32892,7 +33173,7 @@ cc initialize vectors
          idconn(j)=0
       enddo
 cc
-      call read_zmat(atomlabel,natom,natomt,intcoor,bislab,ibconn,
+      call read_zmat(atomlabel,natom,natomt,intcoorM,bislab,ibconn,
      $ iaconn,idconn,bname,anname,dname,atname,idummy,isited,jsited,
      $ ksited,bconnt,aconnt,dconnt)
  
@@ -32984,50 +33265,53 @@ c      stop
 
       ntau=0
       ifilu=1
-      call update_zmat(natom,natomt,intcoor,bislab,ibconn,iaconn
+      call update_zmat(natom,natomt,intcoorM,bislab,ibconn,iaconn
      $    ,idconn,bname,anname,dname,atname,coox,cooy,cooz,xinti,tauopt,
      $     ntau,idummy,ilin_fr,aconnt,bconnt,dconnt,atomlabel,ifilu)
       if(xint(1).lt.1.0e-10)then
-         write(7,*)
-         write(7,*)'failed in updating geometry'
-         write(7,*)'probably error of g09, check output'
-         write(7,*)'stopping now'
-         write(7,*)
-         close(7)
+         write(66,*)
+         write(66,*)'failed in updating geometry'
+         write(66,*)'probably error of g09, check output'
+         write(66,*)'stopping now'
+         write(66,*)
+c         close(7)
 c         stop
       endif
 
 c      write(*,*)'ok2 '
+c      write(*,*)xinti(1)
 
 
-      open(unit=10,file='temp1.xyz',status='unknown')
-      do j=1,ncoord
-         write(10,*)intcoor(j),xint(j),xinti(j),abs(xint(j)-xinti(j))
-      enddo
-      close(10)
+c      open(unit=10,file='temp1.xyz',status='unknown')
+c      do j=1,ncoord
+c         write(10,*)intcoor(j),xint(j),xinti(j),abs(xint(j)-xinti(j))
+c      enddo
+c      close(10)
 
-      do j=1,ncoord
-         xint(j)=xinti(j)
-      enddo
+c      do j=1,ncoord
+c         xint(j)=xinti(j)
+c      enddo
 
 c      stop
 
-      open(unit=10,file='temp2.xyz',status='unknown')
-      write(10,*)natom
-      write(10,*)'test'
-      inda=0
-      do j=1,natom
-         aname1(j)=atname(j)
-         if(idummy(j).ne.1)then
-            inda=inda+1
-      endif
-      write(10,*)aname1(inda),coox(j),cooy(j),cooz(j)
-      enddo
-      close(10)
+c      open(unit=10,file='temp2.xyz',status='unknown')
+c      write(10,*)natom
+c      write(10,*)'test'
+c      inda=0
+c      do j=1,natom
+c         aname1(j)=atname(j)
+c         if(idummy(j).ne.1)then
+c            inda=inda+1
+c      endif
+c      write(10,*)aname1(inda),coox(j),cooy(j),cooz(j)
+c      enddo
+c      close(10)
 
 
 cc now we update the coordinates using those transformed in our procedure for consistentcy
 cc with dimension of dihedral angles
+
+      ncoord=3*natom-6
 
       do j=1,ncoord
          xint(j)=xinti(j)
@@ -33041,16 +33325,21 @@ cc with dimension of dihedral angles
          write(10,*)atomlabel(j)
       enddo
 c      write(10,*)
-      ncoord=3*natom-6
       do j=1,ncoord
 c         aname1(j)=atname(j)
 c         if(idummy(j).ne.1)then
 c            inda=inda+1
 c         endif
-         write(10,*)intcoor(j),xint(j)
+         write(10,100)intcoor(j),xint(j)
       enddo
       close(10)
 
+ 100  format(A20,1X,F12.6)
+
+      if (ispecies.eq.666) then
+         command1='rm -f fort.99'
+         call commruns(command1)
+      endif
       return
       END
 

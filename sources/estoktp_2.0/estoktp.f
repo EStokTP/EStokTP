@@ -2066,6 +2066,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       character*30 gmem
       character*30 revcoo
       character*100 commandcopy
+      character*70 command1
 
       LOGICAL leof,lsec,ltit
 
@@ -2088,6 +2089,14 @@ c input data
       open (unit=26,file='./output/grid_opt.out',status='unknown')
       open (unit=21,file='./data/theory.dat',status='unknown')
 
+calb  initialize trajectory files
+      command1='rm -f output/grid_traj.out '
+      call commrun(command1)
+      open(unit=41,file='./output/grid_traj.out',status='unknown')
+      command1='rm -f geoms/grid_traj.xyz '
+      call commrun(command1)
+      open(unit=42,file='./geoms/grid_traj.xyz',status='new')
+      close(42)
 
 c     write (26,*) 'idebug test',idebug
 
@@ -2357,8 +2366,32 @@ c        if (natom2.ge.3) xinti(natomtp+1) = rts
          endif
  4999    continue
          write (26,*) ir,rts,vtotr
+
+         if (vtotr.gt.1.d10) then
+            go to 5000
+         else
+calb        store current zmat
+            write(41,*)'grid optimized z-matrix',ir,vtotr,rts
+            do iatom=1,natomt
+               write (41,*)atomlabel(iatom)
+            enddo
+            do iint=1,nint
+               write (41,*) intcoor(iint),xint(iint)
+            enddo
+calb        store current xyz
+            open(unit=43,file='./headgeom1.tmp',status='unknown')
+            write(43,*)natom
+            write(43,*)'grid optimized structure',ir,vtotr,rts
+            close(43)
+            command1='cat ./headgeom1.tmp >> ./geoms/grid_traj.xyz '
+            call commrun(command1)
+            command1='rm -f ./headgeom1.tmp '
+            call commrun(command1)
+            command1='grep . ./geom.xyz >> ./geoms/grid_traj.xyz '
+            call commrun(command1)
+         endif
+
 c find maximum on grid of rts values
-         if (vtotr.gt.1.d10) go to 5000
          if (vtotr.gt.vrimax) then 
             irs = ir
             vrimax = vtotr
@@ -2411,6 +2444,7 @@ c save key data
 
 c      close (unit=25,status='keep')
       close (unit=26,status='keep')
+      close (unit=41,status='keep')
       return
       end
 
@@ -2462,6 +2496,15 @@ c input data
       open (unit=25,file='./data/ts.dat',status='old')
       open (unit=26,file='./output/grid_opt.out',status='unknown')
       open (unit=21,file='./data/theory.dat',status='unknown')
+
+calb  initialize trajectory files
+      command1='rm -f output/grid_traj.out '
+      call commrun(command1)
+      open(unit=41,file='./output/grid_traj.out',status='unknown')
+      command1='rm -f geoms/grid_traj.xyz '
+      call commrun(command1)
+      open(unit=42,file='./geoms/grid_traj.xyz',status='new')
+      close(42)
 
 cc get data from react1 file
 
@@ -2818,9 +2861,32 @@ cc we assume the TS is not linear
          endif
 
          write (26,*) ir,rts,vtotr
-c         stop
+
+         if (vtotr.gt.1.d10) then
+            go to 5000
+         else
+calb        store current zmat
+            write(41,*)'grid optimized z-matrix',ir,vtotr,rts
+            do iatom=1,natomt
+               write (41,*)atomlabel(iatom)
+            enddo
+            do iint=1,nint
+               write (41,*) intcoor(iint),xint(iint)
+            enddo
+calb        store current xyz
+            open(unit=43,file='./headgeom1.tmp',status='unknown')
+            write(43,*)natom
+            write(43,*)'grid optimized structure',ir,vtotr,rts
+            close(43)
+            command1='cat ./headgeom1.tmp >> ./geoms/grid_traj.xyz '
+            call commrun(command1)
+            command1='rm -f ./headgeom1.tmp '
+            call commrun(command1)
+            command1='grep . ./geom.xyz >> ./geoms/grid_traj.xyz '
+            call commrun(command1)
+         endif
+
 c find maximum on grid of rts values
-         if (vtotr.gt.1.d10) go to 5000
          if (vtotr.gt.vrimax) then 
             irs = ir
             vrimax = vtotr
@@ -2851,6 +2917,7 @@ c      rts = xints(natomtp+6)
 
       close (unit=25,status='keep')
       close (unit=26,status='keep')
+      close (unit=41,status='keep')
 
  1201 format ("./geoms/reac1_"I0.2".xyz")
 
@@ -2904,6 +2971,15 @@ c      write(*,*) 'passing from here'
       open (unit=25,file='./data/ts.dat',status='old')
       open (unit=26,file='./output/grid_opt.out',status='unknown')
       open (unit=21,file='./data/theory.dat',status='unknown')
+
+calb  initialize trajectory files
+      command1='rm -f output/grid_traj.out '
+      call commrun(command1)
+      open(unit=41,file='./output/grid_traj.out',status='unknown')
+      command1='rm -f geoms/grid_traj.xyz '
+      call commrun(command1)
+      open(unit=42,file='./geoms/grid_traj.xyz',status='new')
+      close(42)
 
 cc get data from react1 file
 
@@ -3088,9 +3164,32 @@ cc we assume the TS is not linear
          endif
 
          write (26,*) ir,rts,vtotr
-c         stop
+
+         if (vtotr.gt.1.d10) then
+            go to 5000
+         else
+calb        store current zmat
+            write(41,*)'grid optimized z-matrix',ir,vtotr,rts
+            do iatom=1,natomt
+               write (41,*)atomlabel(iatom)
+            enddo
+            do iint=1,nint
+               write (41,*) intcoor(iint),xint(iint)
+            enddo
+calb        store current xyz
+            open(unit=43,file='./headgeom1.tmp',status='unknown')
+            write(43,*)natom
+            write(43,*)'grid optimized structure',ir,vtotr,rts
+            close(43)
+            command1='cat ./headgeom1.tmp >> ./geoms/grid_traj.xyz '
+            call commrun(command1)
+            command1='rm -f ./headgeom1.tmp '
+            call commrun(command1)
+            command1='grep . ./geom.xyz >> ./geoms/grid_traj.xyz '
+            call commrun(command1)
+         endif
+
 c find maximum on grid of rts values
-         if (vtotr.gt.1.d10) go to 5000
          if (vtotr.gt.vrimax) then 
             irs = ir
             vrimax = vtotr
@@ -3121,6 +3220,7 @@ c      rts = xints(natomtp+6)
 
       close (unit=25,status='keep')
       close (unit=26,status='keep')
+      close (unit=41,status='keep')
 
       return
       end
@@ -3961,18 +4061,27 @@ cc parameter initialization
       iaspace=0
 c      write (*,*) 'ok1 ent 2d grid opt'
 c      stop
-
-      if (iiso.ne.1)then
-         write(26,*)'2d grid option supported only for isomerizations'
-         write(26,*)'EStokTP stops here'
-         stop
-      endif
          
 c input data
 
       open (unit=25,file='./data/ts.dat',status='old')
       open (unit=26,file='./output/grid_opt.out',status='unknown')
       open (unit=21,file='./data/theory.dat',status='unknown')
+
+      if (iiso.ne.1)then
+         write(26,*)'2d grid option supported only for isomerizations'
+         write(26,*)'EStokTP stops here'
+         stop
+      endif
+
+calb  initialize trajectory files
+      command1='rm -f output/grid_traj.out '
+      call commrun(command1)
+      open(unit=41,file='./output/grid_traj.out',status='unknown')
+      command1='rm -f geoms/grid_traj.xyz '
+      call commrun(command1)
+      open(unit=42,file='./geoms/grid_traj.xyz',status='new')
+      close(42)
 
 cc get data from react1 file
 
@@ -4518,9 +4627,33 @@ c
                enddo
             endif
 
-c         stop
+            if (vtotr.gt.1.d10) then
+               go to 5000
+            else
+calb           store current zmat
+               write(41,*)'grid optimized z-matrix',
+     + ir_1,ir_2,vtotr,rts,xint(nint-1)
+               do iatom=1,natomt
+                  write (41,*)atomlabel(iatom)
+               enddo
+               do iint=1,nint
+                  write (41,*) intcoor(iint),xint(iint)
+               enddo
+calb           store current xyz
+               open(unit=43,file='./headgeom1.tmp',status='unknown')
+               write(43,*)natom
+               write(43,*)'grid optimized structure',
+     + ir_1,ir_2,vtotr,rts,xint(nint-1)
+               close(43)
+               command1='cat ./headgeom1.tmp >> ./geoms/grid_traj.xyz '
+               call commrun(command1)
+               command1='rm -f ./headgeom1.tmp '
+               call commrun(command1)
+               command1='grep . ./geom.xyz >> ./geoms/grid_traj.xyz '
+               call commrun(command1)
+            endif
+
 c find maximum on grid of rts values
-            if (vtotr.gt.1.d10) go to 5000
             if (vtotr.gt.vrimax) then 
                irs = ir_1
                vrimax = vtotr
@@ -4556,6 +4689,7 @@ c      rts = xints(natomtp+6)
 
       close (unit=25,status='keep')
       close (unit=26,status='keep')
+      close (unit=41,status='keep')
 
  1201 format ("./geoms/reac1_"I0.2".xyz")
 

@@ -15,6 +15,7 @@ c GNU General Public License for more details.
      $ atomlabel,intcoor,bislab,tauopt,xint,abcrot,ires,ixyz,ired)
       implicit double precision (a-h,o-z)
       implicit integer (i-n)
+
 c  lc: interface to case insensitive function
       interface
             function Up_to_low(vlstring)
@@ -337,7 +338,9 @@ c   3) Check if the route contains freq and opt togheter
       if (
      &    (index(vlstring,'freq') .gt. 0) 
      &     .and.
-     &    (index(vlstring,'opt') .gt. 0)) then
+     &    (index(vlstring,'opt') .gt. 0) 
+     &    .and.
+     &    (index(vlstring,'maxcyc=1') .eq. 0))then
          OptFreq=.True.
          write(10,'(A)') '--link1--'
       end if
@@ -355,8 +358,12 @@ c  lc : Input gaussian
       write (10,*) '%mem=',gmemo
       write (10,*) '%chk=tmp'
       write (10,*) '%NProcShared=',nshared
-      write (10,*) '#',comline1
-      write (10,*) '#',comline2
+cc      write (10,*) '#',comline1
+cc      write (10,*) '#',comline2
+cc modified to cut length
+      write (10,*) '#',comline1(1:len_trim(comline1))
+      write (10,*) '#',comline2(1:len_trim(comline2))
+
 
 c  lc mod:  search in command.dat file the presence of gen keyword
 c           to handle custom basis set 
@@ -366,6 +373,9 @@ c lc  mod: from this file, read the basis flag
       open(unit=903,file='LC_custom_basis.dat',status='old')
       read(903,*) BasFlag 
       close(903)
+      command1="rm -f LC_custom_basis.dat"
+      call commrun(command1)
+
 c lc  if the basflag is set to a value different from 0, then 
 c     the path to the basis set file will be stored 
       if (BasFlag .ne. 0) then 
@@ -381,6 +391,9 @@ c  lc check for anharmonic computation
       open(unit=977,file='LC_ahn_flag.dat') 
       read(977,*) AnhFlag
       close(977)
+      command1="rm -f LC_ahn_flag.dat"
+      call commrun(command1)
+
 c  lc check for ptmodel to use 
       command1="grep -ic 'readanh' temp_route.dat > 
      & LC_pt2model_flag.dat"
@@ -397,6 +410,11 @@ c  lc check for ptmodel to use
       read(977,*) Pt2Model 
       close(977) 
       end if 
+      command1="rm -f LC_pt2Model_name.dat"
+      call commrun(command1)
+      command1="rm -f LC_pt2model_flag.dat"
+      call commrun(command1)
+
 c  lc :  CHECK FOR OPTIMIZATION FLAG START
       command1="grep -ic 'opt' temp_route.dat > LC_Opt_index.dat"
       open(unit=902,file='LC_Opt_index.dat',status='unknown')
@@ -404,6 +422,8 @@ c  lc :  CHECK FOR OPTIMIZATION FLAG START
       rewind(902)
       read(902,*) lc_flag  
       close(902,status='keep') 
+      command1="rm -f LC_Opt_index.dat"
+      call commrun(command1)
 c  lc :  CHECK FOR OPTIMIZATION FLAG END
 
       if(iqc.eq.1.and.ired.eq.0)then  
@@ -435,6 +455,9 @@ c        in geom.com file
          open(977,file='FragmentGuess.dat') 
             read(977,*) FrGueF
          close(977)
+         command1="rm -f FragmentGuess.dat"
+         call commrun(command1)
+
 c  lc :  search for substring counterpoise in comline1
       if ((BSSE_flag .gt. 0) .or. (FrGueF .gt. 0)) then
          open(977,file='data/counter_fragments.dat')
@@ -674,9 +697,14 @@ c  lc: mod link1
          write (10,*) '%mem=',gmemo
          write (10,*) '%chk=tmp'
          write (10,*) '%NProcShared=',nshared
-         write (10,*) '#',comline1
-         write (10,*) '#',comline2
-         write (10,*) '#','guess=read geom=allcheck ChkBasis'
+cc         write (10,*) '#',comline1
+cc         write (10,*) '#',comline2
+cc modified to cut length
+         write (10,*) '#',comline1(1:len_trim(comline1))
+         write (10,*) '#',comline2(1:len_trim(comline2))
+
+c         write (10,*) '#','guess=read geom=allcheck ChkBasis'
+         write (10,*) '#','guess=read geom=allcheck '
          write (10,*)
          write (10,*)
          write (10,*) 
@@ -889,7 +917,7 @@ c        a separate file
 777   continue
       OPEN (unit=11,status='old',file='geom.log')
       rewind (11)
-      open(unit=107,status='unknown',file='LC_output.out')
+c      open(unit=107,status='unknown',file='LC_output.out')
 
 c start with reference potential
 c  lc debug: here read energy from fchk file and not from 
@@ -1012,7 +1040,7 @@ c      opt in route section of gauss.com is detected
 c      so these check on the optimization failure are 
 c      neeeded
 c  lc control, write lc flag in LC_output.dat
-      write(107,*) 'LC flag is=',lc_flag
+c      write(107,*) 'LC flag is=',lc_flag
       if (lc_flag.gt.0) then
       IF(
      &   (
@@ -1205,18 +1233,25 @@ c            write(*,*)'check natom is ',natomread
                READ (11,*)ijunk,iatype,ijunk,coox(j),cooy(j),cooz(j)
 c            write(*,*)'check ',ijunk,iatype,ijunk
                if (iatype.eq.1)  aname='H'
+               if (iatype.eq.2)  aname='He'
+               if (iatype.eq.3)  aname='Li'
+               if (iatype.eq.4)  aname='Be'
                if (iatype.eq.5)  aname='B'
                if (iatype.eq.6)  aname='C'
                if (iatype.eq.7)  aname='N'
                if (iatype.eq.8)  aname='O'
                if (iatype.eq.9)  aname='F'
                if (iatype.eq.10) aname='Ne'
+               if (iatype.eq.11) aname='Na'
+               if (iatype.eq.12) aname='Mg'
                if (iatype.eq.13) aname='Al'
                if (iatype.eq.14) aname='Si'
                if (iatype.eq.15) aname='P'
                if (iatype.eq.16) aname='S'
                if (iatype.eq.17) aname='Cl'
                if (iatype.eq.18) aname='Ar'
+               if (iatype.eq.19) aname='K'
+               if (iatype.eq.20) aname='Ca'
                if (iatype.eq.31) aname='Ga'
                if (iatype.eq.32) aname='Ge'
                if (iatype.eq.33) aname='As'
@@ -1645,18 +1680,25 @@ cc now read  str1 and convert it to structure.out, determining
          do j=1,natom
             read(108,*)ijunk,iatype,kjunk,xcoo,ycoo,zcoo
             if (iatype.eq.1)  aname='H'
+            if (iatype.eq.2)  aname='He'
+            if (iatype.eq.3)  aname='Li'
+            if (iatype.eq.4)  aname='Be'
             if (iatype.eq.5)  aname='B'
             if (iatype.eq.6)  aname='C'
             if (iatype.eq.7)  aname='N'
             if (iatype.eq.8)  aname='O'
             if (iatype.eq.9)  aname='F'
             if (iatype.eq.10) aname='Ne'
+            if (iatype.eq.11) aname='Na'
+            if (iatype.eq.12) aname='Mg'
             if (iatype.eq.13) aname='Al'
             if (iatype.eq.14) aname='Si'
             if (iatype.eq.15) aname='P'
             if (iatype.eq.16) aname='S'
             if (iatype.eq.17) aname='Cl'
             if (iatype.eq.18) aname='Ar'
+            if (iatype.eq.19) aname='K'
+            if (iatype.eq.20) aname='Ca'
             if (iatype.eq.31) aname='Ga'
             if (iatype.eq.32) aname='Ge'
             if (iatype.eq.33) aname='As'

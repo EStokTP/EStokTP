@@ -1,5 +1,5 @@
 c EStokTP
-c Electronic Structure to k(T,P) 
+c Electronic Structure to k(T,P). 
 c This is a program to generate rate constants relying on calls to external codes to perform
 c electronic structure calculations and master equation simulations
 c Copyright (C) 2018  by Carlo Cavallotti and Matteo Pelucchi, Politecnico di MIlano, Italy
@@ -117,7 +117,7 @@ c initializations
       i2dgrid_opt_ts=0
 cadl keyword to run GSM for TS localization
       igsm_opt_ts=0
-      issm_opt_ts=0
+c      issm_opt_ts=0
 cadl end modified part
       iopt_ts_0=0
       itauo_ts=0
@@ -381,10 +381,10 @@ cadl begin modification
          igsm_opt_ts=1
          itotcalc=itotcalc+1
       endif
-      if (WORD.EQ.'SSM_OPT_TS') then
-         issm_opt_ts=1
-         itotcalc=itotcalc+1
-      endif
+C       if (WORD.EQ.'SSM_OPT_TS') then
+C          issm_opt_ts=1
+C          itotcalc=itotcalc+1
+C       endif
 cadl end modified part
       if (WORD.EQ.'2DGRID_OPT_TS') then
          i2dgrid_opt_ts=1
@@ -777,27 +777,27 @@ c            call grid_opt_barr_rec
             stop
          endif
       endif
-      if (issm_opt_ts.eq.1) then
-         if (idebug.ge.1) write (6,*) 'starting ssm_opt'
-c         if(iabs.eq.1.or.iadd.eq.1) then
-c            call grid_opt
-         if (iiso.eq.1) then
-            call ssm_opt_iso   
-c         else if (ibeta.eq.1) then
-c            call grid_opt_beta   
-c         else if (ibarr.eq.2) then
-c            call grid_opt_barr_dec   
-c         else if (ibarr.eq.3) then
-c            call grid_opt_barr_rec   
-         else
-            write(7,*) 'supported reacion types for SSM search'
-            write(7,*) 'isomerization'
-            write(7,*) 'make an adeguate selection and restart the code'
-            close(7)
-            stop
-         endif
-      endif
-cadl end modified part
+C       if (issm_opt_ts.eq.1) then
+C          if (idebug.ge.1) write (6,*) 'starting ssm_opt'
+C c         if(iabs.eq.1.or.iadd.eq.1) then
+C c            call grid_opt
+C          if (iiso.eq.1) then
+C             call ssm_opt_iso   
+C c         else if (ibeta.eq.1) then
+C c            call grid_opt_beta   
+C c         else if (ibarr.eq.2) then
+C c            call grid_opt_barr_dec   
+C c         else if (ibarr.eq.3) then
+C c            call grid_opt_barr_rec   
+C          else
+C             write(7,*) 'supported reacion types for SSM search'
+C             write(7,*) 'isomerization'
+C             write(7,*) 'make an adeguate selection and restart the code'
+C             close(7)
+C             stop
+C          endif
+C       endif
+C cadl end modified part
 
 c perform can of TS on 2D grid 
       if (i2dgrid_opt_ts.eq.1) then
@@ -30824,7 +30824,7 @@ c    Requires both REAC1 and PROD1 structures
       character*30 gmem
       character*70 command1
       character*40 filename
-      character*4  cjunk
+      character*4  cjunk,strproc,gssm
       character*100 commandcopy
       character*30 dih_rot
 
@@ -30859,12 +30859,170 @@ c parameter initialization
       iprod_geom=0
       iaspace=0
 
+      iadd=1
+      ibreak=1
+      inumbond=1
+      iang=1
+      itor=1
+
 c input data
       open (unit=25,file='./data/ts.dat',status='old')
       open (unit=26,file='./output/gsm_opt.out',status='unknown')
       open (unit=21,file='./data/theory.dat',status='unknown')
 
+cadl NEW level_gsm for level of theory!
+      write (26,*) 'reading LOT..'
+      do while (WORD.NE.'LEVEL_GSM')
+         call LineRead (21)
+         if (WORD.EQ.'END') then
+            write (26,*) 'gaussian level_gsm of theory must be defined'
+            write (26,*) 'in file theory.dat'
+            stop
+         endif
+      enddo
+      if (word2.EQ.'G09') then
+         ilev0code=1
+      else
+         write (26,*) 'level0 of theory must be'
+         write (26,*) 'only g09 in theory.dat'
+         stop
+      endif
+      if (WORD3.EQ.'GSM') then
+         igsm = 1
+      elseif (WORD3.EQ.'SSM') then
+         igsm = 0
+      else
+         write (26,*) 'GSM or SSM must be specified'
+         write (26,*) 'in the level_gsm keyword'
+         stop
+      endif
+
+      if (ilev0code.eq.1) then
+         read (21,'(A300)') comline1
+      endif
+      close (21)
+cadl Quite sure there is a better way to do this but assuming that
+c    the beginning of the gaussian line in theory.dat is 
+c    [blank]theory/basisset if I start from 3rd position I should
+c    get it right. Probably would be easier to split into columns
+c    and get first column. TO IMPROVE!
+c      k=3
+c      do while (comline1(k:k).NE.' ')
+c         k=k+1
+c      enddo
+cadl don't need it anymore since I read level_gsm
+
 cadl Reads info from ts.dat
+c if ssm then read info on bonds broken / added
+c check if info is given to write isomers file ADDED KEYWORDS
+      
+      if (igsm.eq.0) then
+         do while (WORD.NE.'ADD')
+            call LineRead (25)
+            if (WORD.EQ.'END') then
+               write (26,*) 'no add keword found'
+               iadd=0
+               exit
+            endif
+         enddo
+         if (iadd.NE.0) then
+            open (unit=57,file='addedbonds.tmp',status='unknown')
+            read (25,*) iadded
+            do j=1,iadded
+               read (25,*) ct1,ct2 
+               write (57,*) ct1,ct2 
+               write (26,*) 'Bond to be added: ', ct1,ct2 
+            enddo
+            rewind (57)
+            close (57)
+         endif
+         rewind (25)
+         
+         do while (WORD.NE.'BREAK')
+            call LineRead (25)
+            if (WORD.EQ.'END') then
+               write (26,*) 'no break keword found'
+               ibreak=0
+               exit
+            endif
+         enddo
+         if (ibreak.NE.0) then
+            open (unit=58,file='brokenbonds.tmp',status='unknown')
+            read (25,*) ibroken
+            do j=1,ibroken
+               read (25,*) ct1,ct2  
+               write (58,*) ct1,ct2 
+               write (26,*) 'Bond to be broken: ', ct1,ct2 
+            enddo
+            rewind (58)
+            close (58)
+         endif
+         rewind (25)
+
+         do while (WORD.NE.'BOND')
+            call LineRead (25)
+            if (WORD.EQ.'END') then
+               write (26,*) 'no BOND keword found'
+               inumbond=0
+               exit
+            endif
+         enddo
+         if (inumbond.NE.0) then
+            open (unit=58,file='bond.tmp',status='unknown')
+            read (25,*) numbonds
+            do j=1,numbonds
+               read (25,*) ct1,ct2,zbond  
+               write (58,*) ct1,ct2,zbond 
+               write (26,*) 'Bond - goes to: ', ct1,ct2,zbond
+            enddo
+            rewind (58)
+            close (58)
+         endif
+         rewind (25)
+
+         do while (WORD.NE.'ANGLE')
+            call LineRead (25)
+            if (WORD.EQ.'END') then
+               write (26,*) 'no ANGLE keword found'
+               iang=0
+               exit
+            endif
+         enddo
+         if (iang.NE.0) then
+            open (unit=58,file='angle.tmp',status='unknown')
+            read (25,*) nang
+            do j=1,nang
+               read (25,*) ct1,ct2,ct3,zang 
+               write (58,*) ct1,ct2,ct3,zang 
+               write (26,*) 'Angle - goes to: ', ct1,ct2,ct3,zang
+            enddo
+            rewind (58)
+            close (58)
+         endif
+         rewind (25)
+
+         do while (WORD.NE.'TORSION')
+            call LineRead (25)
+            if (WORD.EQ.'END') then
+               write (26,*) 'no TORSION keword found'
+               itor=0
+               exit
+            endif
+         enddo
+         if (itor.NE.0) then
+            open (unit=58,file='torsion.tmp',status='unknown')
+            read (25,*) ntors
+            do j=1,ntors
+               read (25,*) ct1,ct2,ct3,ct4,ztor  
+               write (58,*) ct1,ct2,ct3,ct4,ztor 
+               write (26,*) 'Torsion - goes to: ', ct1,ct2,ct3,ct4,ztor
+            enddo
+            rewind (58)
+            close (58)
+         endif
+         rewind (25)
+      endif
+
 c read charge and spin
       do while (WORD.NE.'CHARGE')
          call LineRead (25)
@@ -30877,51 +31035,60 @@ c read charge and spin
       rewind (25)
       write (26,*) 'Read TS charge and spin: ',icharge,ispin
 c read isite jsite ksite
-      do while (WORD.NE.'ISITE')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'reaction site must be defined'
-            stop
-         endif
-      enddo
-      read (25,*) isite,jsite,ksite
-      rewind (25)
-      write (26,*) 'Read i,j,k sites: ',isite,jsite,ksite
-c reads rmin, just need ireact!
-      do while (WORD.NE.'RMIN1')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'grid coords must be defined'
-            stop
-         endif
-      enddo
-      read (25,*) cjunk,cjunk,cjunk,cjunk,ireact
-      rewind (25)
-      write (26,*) 'Read ireact: ',ireact
+C       do while (WORD.NE.'ISITE')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'reaction site must be defined'
+C             stop
+C          endif
+C       enddo
+C       read (25,*) isite,jsite,ksite
+C       rewind (25)
+C       write (26,*) 'Read i,j,k sites: ',isite,jsite,ksite
+C c reads rmin, just need ireact!
+C       do while (WORD.NE.'RMIN1')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'grid coords must be defined'
+C             stop
+C          endif
+C       enddo
+C       read (25,*) cjunk,cjunk,cjunk,cjunk,ireact
+C       rewind (25)
+C       write (26,*) 'Read ireact: ',ireact
 c checks if user asks to use particular reac_geom ADDED KEYOWORD!
       do while (WORD.NE.'REAC_GEOM')
          call LineRead (25)
          if (WORD.EQ.'END') then
             rewind(25)
+            write (26,*) 'No reac_geom specified'
+            write (26,*) 'Will use reac1_01.xyz by default'
+            ireac_geom=1
             goto 999
          endif
       enddo
       read (25,*) ireac_geom
       write (26,*) 'It is requested to use reac_geom n. ',ireac_geom
  999  continue
-      rewind(25)      
+      rewind(25) 
+cadl NEW for gsm also check product!
+      if (igsm.eq.1) then   
 c checks if user asks to use particular prod_geom ADDED KEYOWORD!
-      do while (WORD.NE.'PROD_GEOM')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            rewind(25)
-            goto 998
-         endif
-      enddo
-      read (25,*) iprod_geom
-      write (26,*) 'It is requested to use prod_geom n. ',iprod_geom
+         do while (WORD.NE.'PROD_GEOM')
+            call LineRead (25)
+            if (WORD.EQ.'END') then
+               rewind(25)
+               write (26,*) 'No prod_geom specified'
+               write (26,*) 'Will use prod1_01.xyz by default'
+               iprod_geom=1
+               goto 998
+            endif
+         enddo
+         read (25,*) iprod_geom
+         write (26,*) 'It is requested to use prod_geom n. ',iprod_geom
  998  continue
-      rewind(25)
+         rewind(25)
+      endif
       close (25)
 
 cadl Get number of atoms from reac1.dat
@@ -30941,56 +31108,56 @@ c for now. Will have to account for it going back to zmat maybe?
       natom=natom1
       natomt=natomt1
 
-cadl Choose reactant structure for calculation
-c first determine how many structures were determined with the rotational scan
-      command1='ls output/reac1_opt_* > temp.log '
-      call commrun(command1)
-      command1='grep -c ^ temp.log > num.log'
-      call commrun(command1)
-      open (unit=99,file='num.log',status='unknown')
-      read (99,*) numstruct_reac
-      close (unit=99,status='keep')
-      write (26,*) 'Read numstruct reac: ',numstruct_reac
-c now open the xyz files and search the one with the minimum distance
-c between the reacting atoms
-      write (26,*) 'Distance between ireact and isite'
-      do j=1,numstruct_reac
-         open (unit=99,status='unknown')
-         write(99,1201)j
-         rewind (99)
-         read (99,'(A40)') filename
-         close (99)
-         write(26,*) 'filename is ',filename
-         open(unit=23,file=filename,status='unknown')
-         read (23,*)
-         read (23,*)
-         do k=1,natom
-            read (23,*)cjunk,coox,cooy,cooz
-            if(k.EQ.ireact)then
-               coox1=coox
-               cooy1=cooy
-               cooz1=cooz
-            endif
-            if(k.EQ.isite)then
-               coox2=coox
-               cooy2=cooy
-               cooz2=cooz
-            endif
-         enddo
-         close(23)
-         drea(j)=sqrt((coox1-coox2)**2+(cooy1-cooy2)**2
-     $           +(cooz1-cooz2)**2)
-         write(26,*)'irea-isite dist for str ',j,' is ',drea(j)
-      enddo
-c now determine the reac structure with the minimum distance
-      iopt_reac=1
-      do j=1,numstruct_reac
-         if(drea(j).LT.drea(iopt_reac))then
-            iopt_reac=j
-c         write(*,*)'updating str ',j,' that has ',drea(j)
-         endif
-      enddo
-      write(26,*) 'the structure with the min dist is',iopt_reac
+C cadl Choose reactant structure for calculation
+C c first determine how many structures were determined with the rotational scan
+C       command1='ls output/reac1_opt_* > temp.log '
+C       call commrun(command1)
+C       command1='grep -c ^ temp.log > num.log'
+C       call commrun(command1)
+C       open (unit=99,file='num.log',status='unknown')
+C       read (99,*) numstruct_reac
+C       close (unit=99,status='keep')
+C       write (26,*) 'Read numstruct reac: ',numstruct_reac
+C c now open the xyz files and search the one with the minimum distance
+C c between the reacting atoms
+C       write (26,*) 'Distance between ireact and isite'
+C       do j=1,numstruct_reac
+C          open (unit=99,status='unknown')
+C          write(99,1201)j
+C          rewind (99)
+C          read (99,'(A40)') filename
+C          close (99)
+C          write(26,*) 'filename is ',filename
+C          open(unit=23,file=filename,status='unknown')
+C          read (23,*)
+C          read (23,*)
+C          do k=1,natom
+C             read (23,*)cjunk,coox,cooy,cooz
+C             if(k.EQ.ireact)then
+C                coox1=coox
+C                cooy1=cooy
+C                cooz1=cooz
+C             endif
+C             if(k.EQ.isite)then
+C                coox2=coox
+C                cooy2=cooy
+C                cooz2=cooz
+C             endif
+C          enddo
+C          close(23)
+C          drea(j)=sqrt((coox1-coox2)**2+(cooy1-cooy2)**2
+C      $           +(cooz1-cooz2)**2)
+C          write(26,*)'irea-isite dist for str ',j,' is ',drea(j)
+C       enddo
+C c now determine the reac structure with the minimum distance
+C       iopt_reac=1
+C       do j=1,numstruct_reac
+C          if(drea(j).LT.drea(iopt_reac))then
+C             iopt_reac=j
+C c         write(*,*)'updating str ',j,' that has ',drea(j)
+C          endif
+C       enddo
+C       write(26,*) 'the structure with the min dist is',iopt_reac
       if (ireac_geom.NE.0)then 
          iopt_reac=ireac_geom
          write(26,*) 'forced from ts.dat the use of geom ',iopt_reac
@@ -30998,105 +31165,68 @@ c         write(*,*)'updating str ',j,' that has ',drea(j)
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c REPEAT FOR PRODUCT c
-c either same structures are required for reac and prod or a newisite and ireac...
+c either structures are required for reac+prod or isite and ireac...
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cadl Choose product structure for calculation
-c first determine how many structures were determined with the rotational scan
-      command1='ls output/prod1_opt_* > temp.log '
-      call commrun(command1)
-      command1='grep -c ^ temp.log > num.log'
-      call commrun(command1)
-      open (unit=99,file='num.log',status='unknown')
-      read (99,*) numstruct_prod
-      close (unit=99,status='keep')
-      write (26,*) 'Read numstruct prod: ',numstruct_prod
-c now open the xyz files and search the one with the minimum distance
-c between the reacting atoms
-      do j=1,numstruct_prod
-         open (unit=99,status='unknown')
-         write(99,1202)j
-         rewind (99)
-         read (99,'(A40)') filename
-         close (99)
-         write(26,*) 'filename is ',filename
-         open(unit=23,file=filename,status='unknown')
-         read (23,*)
-         read (23,*)
-         do k=1,natom
-            read (23,*)cjunk,coox,cooy,cooz
-            if(k.EQ.ireact)then
-               coox1=coox
-               cooy1=cooy
-               cooz1=cooz
-            endif
-            if(k.EQ.isite)then
-               coox2=coox
-               cooy2=cooy
-               cooz2=cooz
-            endif
-         enddo
-         close(23)
-         drea(j)=sqrt((coox1-coox2)**2+(cooy1-cooy2)**2
-     $           +(cooz1-cooz2)**2)
-         write(26,*)'irea-isite dist for str ',j,' is ',drea(j)
-      enddo
-c now determine the structure with the minimum distance
-      iopt_prod=1
-      do j=1,numstruct_prod
-         if(drea(j).LT.drea(iopt_prod))then
-            iopt_prod=j
-c         write(*,*)'updating str ',j,' that has ',drea(j)
-         endif
-      enddo
-      write(26,*) 'the structure with the min dist is',iopt_prod
+C cadl Choose product structure for calculation
+C c first determine how many structures were determined with rot scan
+C       command1='ls output/prod1_opt_* > temp.log '
+C       call commrun(command1)
+C       command1='grep -c ^ temp.log > num.log'
+C       call commrun(command1)
+C       open (unit=99,file='num.log',status='unknown')
+C       read (99,*) numstruct_prod
+C       close (unit=99,status='keep')
+C       write (26,*) 'Read numstruct prod: ',numstruct_prod
+C c now open the xyz files and search the one with the minimum distance
+C c between the reacting atoms
+C       do j=1,numstruct_prod
+C          open (unit=99,status='unknown')
+C          write(99,1202)j
+C          rewind (99)
+C          read (99,'(A40)') filename
+C          close (99)
+C          write(26,*) 'filename is ',filename
+C          open(unit=23,file=filename,status='unknown')
+C          read (23,*)
+C          read (23,*)
+C          do k=1,natom
+C             read (23,*)cjunk,coox,cooy,cooz
+C             if(k.EQ.ireact)then
+C                coox1=coox
+C                cooy1=cooy
+C                cooz1=cooz
+C             endif
+C             if(k.EQ.isite)then
+C                coox2=coox
+C                cooy2=cooy
+C                cooz2=cooz
+C             endif
+C          enddo
+C          close(23)
+C          drea(j)=sqrt((coox1-coox2)**2+(cooy1-cooy2)**2
+C      $           +(cooz1-cooz2)**2)
+C          write(26,*)'irea-isite dist for str ',j,' is ',drea(j)
+C       enddo
+C c now determine the structure with the minimum distance
+C       iopt_prod=1
+C       do j=1,numstruct_prod
+C          if(drea(j).LT.drea(iopt_prod))then
+C             iopt_prod=j
+C c         write(*,*)'updating str ',j,' that has ',drea(j)
+C          endif
+C       enddo
+C       write(26,*) 'the structure with the min dist is',iopt_prod
       if (iprod_geom.NE.0)then 
          iopt_prod=iprod_geom
-         write(26,*) 'forced from ts.dat the use of prod geom ',iopt_prod
+         write(26,*) 'forced from ts.dat to use prod geom ',iopt_prod
       endif
 
-cadl Funzione di restart da valutare e capire se si può fare TO DO
-c Level of theory
-      write (26,*) 'LOT'
-      do while (WORD.NE.'LEVEL0')
-         call LineRead (21)
-         if (WORD.EQ.'END') then
-            write (26,*) 'gaussian level0 of theory must be defined'
-            write (26,*) 'in file theory.dat'
-            stop
-         endif
-      enddo
-      if (word2.EQ.'G09') then
-         ilev0code=1
-      else
-         write (26,*) 'level0 of theory must be'
-         write (26,*) 'only g09 in theory.dat'
-         stop
-      endif
-      ! if(word3.eq.'RESTART') then
-      !    open (unit=99,status='unknown')
-      !    write (99,*) word4
-      !    rewind (99)
-      !    read (99,*) ires
-      !    close (unit=99,status='keep')
-      ! endif
-      if (ilev0code.eq.1) then
-         read (21,'(A300)') comline1
-      endif
-      close (21)
-cadl Quite sure there is a better way to do this but assuming that
-c    the beginning of the gaussian line in theory.dat is 
-c    [blank]theory/basisset if I start from 3rd position I should
-c    get it right. Probably would be easier to split into columns
-c    and get first column. TO IMPROVE!
-      k=3
-      do while (comline1(k:k).NE.' ')
-         k=k+1
-      enddo
-      write (26,*) 'Level of theory: '//comline1(:k)
-
+c write Level of theory
+      write (26,*) 'Level of theory: '//trim(adjustl(comline1))//'end'
 cadl Write gstart file (g09 lot)
       open (unit=59,file='./gstart',status='unknown')
-      write (59,*) '# '//comline1(:k)//' nosymm '//'Force '//'test'
+      write (59,*) '# '//trim(adjustl(comline1))//' nosymm '//
+     $ 'Force '//'test'
       write (59,*)
       write (59,*) 'Title Card Required'
       write (59,*)
@@ -31106,7 +31236,7 @@ cadl Write gstart file (g09 lot)
       write (26,*) 'Written gstart file'
 
 cadl Here ISOMERS is not needed but still I get information on the 
-c    connectivity and 
+c    connectivity 
 c get number of internal coordinates
       ncoord = 3*natom1-6
 c get connectivity of ireact in reac1
@@ -31164,6 +31294,57 @@ c      enddo
      +        ,dname(j)
       enddo
 
+      if (igsm.eq.0) then
+         open (unit=59,file='./ISOMERS0001',status='unknown')
+
+         write (59,*) 'NEW'
+         if (iadd.EQ.0) then
+            write (59,*) 'ADD ',isite,ireact
+         else
+            open (unit=57,file='addedbonds.tmp',status='unknown')
+            do j=1,iadded
+               read(57,*) ct1,ct2
+               write (59,*) 'ADD ',ct1,ct2
+            enddo
+            close (57)
+         endif
+         if (ibreak.EQ.0) then
+         write (59,*) 'BREAK ',ibconn(ireact),ireact
+         else
+            open (unit=58,file='brokenbonds.tmp',status='unknown')
+            do j=1,ibroken
+               read(58,*) ct1,ct2
+               write (59,*) 'BREAK ',ct1,ct2
+            enddo
+            close (58)
+         endif
+         if (inumbond.EQ.1) then
+            open (unit=58,file='bond.tmp',status='unknown')
+            do j=1,numbonds
+               read(58,*) ct1,ct2,zbond
+               write (59,*) 'BOND ',ct1,ct2,zbond
+            enddo
+            close (58)
+         endif
+         if (iang.EQ.1) then
+            open (unit=58,file='angle.tmp',status='unknown')
+            do j=1,nang
+               read(58,*) ct1,ct2,ct3,zang
+               write (59,*) 'ANGLE ',ct1,ct2,ct3,zang
+            enddo
+            close (58)
+         endif
+         if (itor.EQ.1) then
+            open (unit=58,file='torsion.tmp',status='unknown')
+            do j=1,nang
+               read(58,*) ct1,ct2,ct3,ct4,ztor
+               write (59,*) 'ANGLE ',ct1,ct2,ct3,ct4,ztor
+            enddo
+            close (58)
+         endif
+         close (59)
+      endif
+
 cadl write initial.xyz
 c determine optimum strucures' filenames and open files
 c reac
@@ -31175,41 +31356,20 @@ c reac
       write (26,*) 'Filename is ',filename
       close (unit=57)
       open (unit=60,file=filename,status='unknown')
-c prod 
-      write (26,*) 'Getting product structure file name'
-      open (unit=58,status='scratch')
-      write(58,1202)iopt_prod
-      write(26,*)iopt_prod
-      rewind (58)
-      read (58,'(A40)') filename
-      write (26,*) 'Filename is ',filename
-      close (unit=58)
-      open (unit=61,file=filename,status='unknown')
+c prod
+      if (igsm.eq.1) then 
+         write (26,*) 'Getting product structure file name'
+         open (unit=58,status='scratch')
+         write(58,1202)iopt_prod
+         write(26,*)iopt_prod
+         rewind (58)
+         read (58,'(A40)') filename
+         write (26,*) 'Filename is ',filename
+         close (unit=58)
+         open (unit=61,file=filename,status='unknown')
+      endif
 c open file to write xyz
       open (unit=59,file='./initial0001.xyz',status='unknown')
-cadl nice code to write initial but 2nd line must be empty!
-      ! leof = .FALSE.
-      ! do while (leof.eqv..FALSE.)
-      !    read(60,'(A70)') comline1
-      !    if (comline1.EQ.'') then
-      !       leof = .TRUE.
-      !    else
-      !       write(59,*) comline1
-      !    endif
-      ! enddo
-      ! close(60)
-      ! leof = .FALSE.
-      ! do while (leof.eqv..FALSE.)
-      !    read(61,'(A70)') comline1
-      !    if (comline1.EQ.'') then
-      !       leof = .TRUE.
-      !    else
-      !       write(59,*) comline1
-      !    endif
-      ! enddo
-      ! close(61)
-      ! close(59)
-
 cadl Write xyz of reac1
       write(59,*) natom1
       write(59,*) 'blank'
@@ -31217,26 +31377,31 @@ cadl Write xyz of reac1
       read (60,*)
       do iatom = 1, natom1
          read (60,'(A300)') copystuff
-         write(59,*) copystuff
+         write(59,*) trim(adjustl(copystuff))
       enddo
       rewind (60)
       close (60)
 c write xyz of prod1
-      write (59,*) natom1
-      write (59,*) 'blank'
-      read (61,*)
-      read (61,*)
-      do iatom = 1, natom1
-         read (61,'(A300)') copystuff
-         write(59,*) copystuff
-      enddo
-      rewind (61)
-      close (61)
+      if (igsm.eq.1) then 
+         write (59,*) natom1
+         write (59,*) 'blank'
+         read (61,*)
+         read (61,*)
+         do iatom = 1, natom1
+            read (61,'(A300)') copystuff
+            write(59,*) trim(adjustl(copystuff))
+         enddo
+         rewind (61)
+         close (61)
+      endif
       close (unit=59)
       write (26,*) 'Written initial0001.xyz file'
 
 cadl Write input file
 cadl check if inpfileq.dat exist in data, otherwise write default
+      
+      if (igsm.eq.1) gssm=' GSM'
+      if (igsm.eq.0) gssm=' SSM'
       irestt = 0
       imaxopt = 80
       istepopt = 30
@@ -31252,7 +31417,8 @@ cadl check if inpfileq.dat exist in data, otherwise write default
       ifinopt = 150
       zprodlim = 200
       itstype = 1
-      inodes = 11        
+      if (igsm.eq.1) inodes = 11 
+      if (igsm.eq.0) inodes = 27
       inquire(file='data/inpfileq.dat',EXIST=ex)
       if (ex) then
          open (unit=59,file='data/inpfileq.dat',status='unknown')
@@ -31282,7 +31448,7 @@ cadl check if inpfileq.dat exist in data, otherwise write default
       write (59,*) '# FSM/GSM/SSM inpfileq'
       write (59,*)
       write (59,*) '------------ String Info -------------------------'
-      write (59,*) 'SM_TYPE           GSM    # SSM, FSM or GSM'
+      write (59,*) 'SM_TYPE    '//gssm
       write (59,*) 'RESTART    ',irestt      
       write (59,*) 'MAX_OPT_ITERS    ',imaxopt    
       write (59,*) 'STEP_OPT_ITERS   ',istepopt
@@ -31302,43 +31468,149 @@ cadl check if inpfileq.dat exist in data, otherwise write default
       write (59,*) '--------------------------------------------------'
       close (59)
       write (26,*) 'Written inpfileq file'
+      write (26,*) 'Recovery?',irecov     
  
 ccadl check if geoms/ts_gsm.xyz exists. If yes, skip calculation and
 c to postprocessing
-      inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
-      if (.not.ex) then
+cadl NEW get numproc into string and concatenate. Up to 9999 procs
+c      inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
+c      if (.not.ex) then
+      if (irecov.eq.0) then
          command1='mkdir -p ./scratch'
          call commrun(command1)
          command1='cp initial0001.xyz scratch/initial0001.xyz'
          call commrun(command1)
          write(26,*) 'Starting GSM calculation now...'
-         command1='gfstringq.exe 1 16 > stdout_gsm0001.out'
+         write(strproc,'(I4)') numprocll
+         write(26,*) 'gfstringq.exe 1 '//strproc//' > stdout'
+         command1='gfstringq.exe 1 '//strproc//' > stdout_gsm0001.out'
          call commrun(command1)
          command1='rm scratch/*chk'
          call commrun(command1)
-
 coadl copy everything into gsm/ and interesting stuff into output
          command1='mkdir -p ./gsm'
          call commrun(command1)
          command1='mkdir -p ./gsm/scratch'
          call commrun(command1)
-         command1='mv inpfileq gstart initial0001.xyz ./gsm/'
-         call commrun(command1)
-         command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
-         call commrun(command1)
-         command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
-         call commrun(command1)
-         command1='mv ./scratch/* ./gsm/scratch/'
-         call commrun(command1)
-         command1='rm -rf ./scratch'
-         call commrun(command1)
          command1='cp  stdout_gsm0001.out ./output/ts_gsm.out'
          call commrun(command1)
          command1='mv  stdout_gsm0001.out ./gsm/'
          call commrun(command1)
+         command1='mv inpfileq gstart initial0001.xyz ./gsm/'
+         call commrun(command1)
+         command1='cp  stringfile.xyz0001 ./output/traj_gsm.xyz'
+         call commrun(command1)
+         command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
+         if (igsm.eq.0) then
+            command1='mv  ISOMERS0001 ./gsm/'
+            call commrun(command1)
+         endif
+         inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
+         if (.not.ex) then
+            write (26,*) 'Did not find tsq0001.xyz file'
+            open (unit=59,file='gsm/stringfile.xyz0001',
+     $         status='unknown')
+            zen = -99999.99
+            zmaxen = -99999.99
+            inodets = 0
+            do jnode=1,inodes
+c              check for early end of file and throw error in case
+               read (59,*,IOSTAT=ieof) cjunk
+               write (26,*) 'Reading: ',cjunk,ieof
+               if (ieof.ne.0) then
+                  write (26,*) 'GSM incomplete, check stringfile!'
+                  write (*,*) 'GSM appears incomplete, check string!'
+cadl exits if GSM incomplete but I can take the RP found so far anyways
+c                  return
+                   exit
+               endif
+               read (59,*) zen
+               write (26,*) 'Reading energy: ',zen,jnode
+               if (zen.gt.zmaxen) then
+                  zmaxen = zen
+                  inodets = jnode
+                  write (26,*) 'Found node with > en', jnode
+                  open (unit=60,file='temp_ts.xyz',status='unknown')
+                     write(60,*) natom1
+                     write(60,*),zen
+                  do iatom = 1,natom1
+                     read (59,'(A300)') copystuff
+                     write(60,*) copystuff
+                  enddo              
+                  close (60)
+               else
+                  do iatom = 1,natom1
+                  read (59,*)
+                  enddo
+               endif
+            enddo
+            close (59)
+            write (26,*) 'Found max in stringfile, copying in geoms'
+            write (26,*) 'Max is at node', inodets
+            command1='cp  ./temp_ts.xyz ./geoms/ts_gsm.xyz'
+            call commrun(command1)
+         else
+            command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
+            call commrun(command1)
+         endif       
+         command1='mv ./scratch/* ./gsm/scratch/'
+         call commrun(command1)
+         command1='rm -rf ./scratch'
+         call commrun(command1)
          write (26,*) 'Done :)'
       else
-         write (26,*) 'Skipped GSM calculation :)'
+         write (26,*) 'Skipped GSM calculation :) | Recovery now'
+         command1='cp  gsm/stringfile.xyz0001 '// 
+     $    './output/traj_gsm.xyz'
+         call commrun(command1)
+         inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
+         if (.not.ex) then
+            write (26,*) 'Did not find tsq0001.xyz file'
+            open (unit=59,file='gsm/stringfile.xyz0001',
+     $         status='unknown')
+            zen = -99999.99
+            zmaxen = -99999.99
+            inodets = 0
+            do jnode=1,inodes
+c              check for early end of file and throw error in case
+               read (59,*,IOSTAT=ieof) cjunk
+               write (26,*) 'Reading: ',cjunk,ieof
+               if (ieof.ne.0) then
+                  write (26,*) 'GSM incomplete, check stringfile!'
+                  write (*,*) 'GSM appears incomplete, check string!'
+cadl exits if GSM incomplete but I can take the RP found so far anyways
+c                  return
+                   exit
+               endif
+               read (59,*) zen
+               write (26,*) 'Reading energy: ',zen,jnode
+               if (zen.gt.zmaxen) then
+                  zmaxen = zen
+                  inodets = jnode
+                  write (26,*) 'Found node with > en', jnode
+                  open (unit=60,file='temp_ts.xyz',status='unknown')
+                     write(60,*) natom1
+                     write(60,*),zen
+                  do iatom = 1,natom1
+                     read (59,'(A300)') copystuff
+                     write(60,*) copystuff
+                  enddo              
+                  close (60)
+               else
+                  do iatom = 1,natom1
+                  read (59,*)
+                  enddo
+               endif
+            enddo
+            close (59)
+            write (26,*) 'Found max in stringfile, copying in geoms'
+            write (26,*) 'Max is at node', inodets
+            command1='cp  ./temp_ts.xyz ./geoms/ts_gsm.xyz'
+            call commrun(command1)
+         else
+            command1='cp  ./gsm/scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
+            call commrun(command1)
+         endif
       endif
 cadl End of modified part
 
@@ -31362,13 +31634,9 @@ c reac1.dat instead of ts_opt.out since I don't have those yet!
       command1='sed -i s/z-matrix/grid/ output/grid_opt.out'
       call commrun(command1)
 
-cadl End of modified part
-
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cadl Older versions, commented a bit in ssm subroutine
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C coadl Convert xyz into zmatrix for further calculations
-
 C cadl Convert xyz into zmatrix for further calculations
 C c inspiration and usage of xyz_to_zmat
 C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
@@ -31585,8 +31853,12 @@ cadl report info in gsm_opt.out
       do iatom=1,natom1
          write (26,*) atomlabel(iatom)
       enddo
+      write (26,*) 'Original coords from reac1.dat'
+      write (26,*) 'xyz2int does not provide updated coords in output'
       do iint=1,ncoord
-         write (26,*) intcoor(iint),xints(iint)
+cadl x2int aggiorna xint non xints!         
+c         write (26,*) intcoor(iint),xints(iint)
+         write (26,*) intcoor(iint),xint(iint)
       enddo
 
       close (unit=26,status='keep')
@@ -31600,979 +31872,707 @@ cadl report info in gsm_opt.out
 cadl End Modified part
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cadl Call to single ended gsm method
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine ssm_opt_iso
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C cadl Call to single ended gsm method
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C       subroutine ssm_opt_iso
 
-      implicit double precision (a-h,o-z)
-      implicit integer (i-n)
+C       implicit double precision (a-h,o-z)
+C       implicit integer (i-n)
 
-      include 'data_estoktp.fi'
-      include 'param_estoktp.fi'
+C       include 'data_estoktp.fi'
+C       include 'param_estoktp.fi'
 
-      dimension tau(ntaumx),taumn(ntaumx),taumx(ntaumx),freq(nmdmx)
-      dimension coord(natommx,ndim),xint(3*natommx),xinti(3*natommx),
-     $ abcrot(ndim)
-      dimension xints(3*natommx)
-      dimension tauopt(ntaumx)
-      dimension drea(noptmx)
+C       dimension tau(ntaumx),taumn(ntaumx),taumx(ntaumx),freq(nmdmx)
+C       dimension coord(natommx,ndim),xint(3*natommx),xinti(3*natommx),
+C      $ abcrot(ndim)
+C       dimension xints(3*natommx)
+C       dimension tauopt(ntaumx)
+C       dimension drea(noptmx)
 
-      character*300 comline1,comline2,copystuff
-      character*60 atomlabel(natommx)
-      character*60 atomlabel1(natommx)
-      character*30 intcoor(3*natommx)
-      character*30 intcoors(3*natommx)
-      character*20 bislab(ntaumx)
-      character*30 gmem
-      character*70 command1
-      character*40 filename
-      character*4  cjunk
-      character*100 commandcopy
-      character*30 dih_rot
+C       character*300 comline1,comline2,copystuff
+C       character*60 atomlabel(natommx)
+C       character*60 atomlabel1(natommx)
+C       character*30 intcoor(3*natommx)
+C       character*30 intcoors(3*natommx)
+C       character*20 bislab(ntaumx)
+C       character*30 gmem
+C       character*70 command1
+C       character*40 filename
+C       character*4  cjunk
+C       character*100 commandcopy
+C       character*30 dih_rot
 
-      LOGICAL leof,lsec,ltit,ex
+C       LOGICAL leof,lsec,ltit,ex
 
-      CHARACTER*1000 line,string
-      CHARACTER*160 sename,word,word2,word3,title,title1,
-     $ word4,word5,word6,word7
+C       CHARACTER*1000 line,string
+C       CHARACTER*160 sename,word,word2,word3,title,title1,
+C      $ word4,word5,word6,word7
 
-cadl Things necessary to play with zmat_routines
-      dimension ibconn(natommx),iaconn(natommx),idconn(natommx)
-      dimension idummy(natommx)
-c      character*60 atomlabel(natommx)
-c      character*30 intcoor(3*natommx)
-c      character*20 bislab(ntaumx)
-      character*20 bname(natommx),anname(natommx),dname(natommx)
-     $ ,atname(natommx),bconnt(natommx),aconnt(natommx),dconnt(natommx)
-      character*1 xread
-      character*5 ccheck
-c      LOGICAL leof,lsec,ltit
-c      CHARACTER*1000 line,string
-c      CHARACTER*160 sename,word,word2,word3
-c     $ ,title,title1,word4,word5,word6,word7
-      character*6 ct1,ct2,ct3,ct4,ct5,ct6,ct7
-c      include 'filcomm.f'
+C cadl Things necessary to play with zmat_routines
+C       dimension ibconn(natommx),iaconn(natommx),idconn(natommx)
+C       dimension idummy(natommx)
+C c      character*60 atomlabel(natommx)
+C c      character*30 intcoor(3*natommx)
+C c      character*20 bislab(ntaumx)
+C       character*20 bname(natommx),anname(natommx),dname(natommx)
+C      $ ,atname(natommx),bconnt(natommx),aconnt(natommx),dconnt(natommx)
+C       character*1 xread
+C       character*5 ccheck
+C c      LOGICAL leof,lsec,ltit
+C c      CHARACTER*1000 line,string
+C c      CHARACTER*160 sename,word,word2,word3
+C c     $ ,title,title1,word4,word5,word6,word7
+C       character*6 ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C c      include 'filcomm.f'
 
-      include 'filcomm.f'
+C       include 'filcomm.f'
 
-cc parameter initialization
-      ires=1
-      ireac_geom=0
-      iaspace=0
+C cc parameter initialization
+C       ires=1
+C       ireac_geom=0
+C       iaspace=0
 
-c input data
-      open (unit=25,file='./data/ts.dat',status='old')
-      open (unit=26,file='./output/gsm_opt.out',status='unknown')
-      open (unit=21,file='./data/theory.dat',status='unknown')
+C c input data
+C       open (unit=25,file='./data/ts.dat',status='old')
+C       open (unit=26,file='./output/gsm_opt.out',status='unknown')
+C       open (unit=21,file='./data/theory.dat',status='unknown')
 
-cadl Reads info from ts.dat
-c check if info is given to write isomers file ADDED KEYWORDS
-      iadd=1
-      ibreak=1
-      inumbond=1
-      iang=1
-      itor=1
-      do while (WORD.NE.'ADD')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'no add keword found'
-            iadd=0
-            exit
-         endif
-      enddo
-      if (iadd.NE.0) then
-         open (unit=57,file='addedbonds.tmp',status='unknown')
-         read (25,*) iadded
-         do j=1,iadded
-            read (25,*) ct1,ct2 
-            write (57,*) ct1,ct2 
-            write (26,*) 'Bond to be added: ', ct1,ct2 
-         enddo
-         rewind (57)
-         close (57)
-      endif
-      rewind (25)
-      
-      do while (WORD.NE.'BREAK')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'no break keword found'
-            ibreak=0
-            exit
-         endif
-      enddo
-      if (ibreak.NE.0) then
-         open (unit=58,file='brokenbonds.tmp',status='unknown')
-         read (25,*) ibroken
-         do j=1,ibroken
-            read (25,*) ct1,ct2  
-            write (58,*) ct1,ct2 
-            write (26,*) 'Bond to be broken: ', ct1,ct2 
-         enddo
-         rewind (58)
-         close (58)
-      endif
-      rewind (25)
-
-      do while (WORD.NE.'BOND')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'no BOND keword found'
-            inumbond=0
-            exit
-         endif
-      enddo
-      if (inumbond.NE.0) then
-         open (unit=58,file='bond.tmp',status='unknown')
-         read (25,*) numbonds
-         do j=1,numbonds
-            read (25,*) ct1,ct2,zbond  
-            write (58,*) ct1,ct2,zbond 
-            write (26,*) 'Bond - goes to: ', ct1,ct2,zbond
-         enddo
-         rewind (58)
-         close (58)
-      endif
-      rewind (25)
-
-      do while (WORD.NE.'ANGLE')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'no ANGLE keword found'
-            iang=0
-            exit
-         endif
-      enddo
-      if (iang.NE.0) then
-         open (unit=58,file='angle.tmp',status='unknown')
-         read (25,*) nang
-         do j=1,nang
-            read (25,*) ct1,ct2,ct3,zang 
-            write (58,*) ct1,ct2,ct3,zang 
-            write (26,*) 'Angle - goes to: ', ct1,ct2,ct3,zang
-         enddo
-         rewind (58)
-         close (58)
-      endif
-      rewind (25)
-
-      do while (WORD.NE.'TORSION')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'no TORSION keword found'
-            itor=0
-            exit
-         endif
-      enddo
-      if (itor.NE.0) then
-         open (unit=58,file='torsion.tmp',status='unknown')
-         read (25,*) ntors
-         do j=1,ntors
-            read (25,*) ct1,ct2,ct3,ct4,ztor  
-            write (58,*) ct1,ct2,ct3,ct4,ztor 
-            write (26,*) 'Torsion - goes to: ', ct1,ct2,ct3,ct4,ztor
-         enddo
-         rewind (58)
-         close (58)
-      endif
-      rewind (25)
-
-c read charge and spin
-      do while (WORD.NE.'CHARGE')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'charge and spin must be defined'
-            stop
-         endif
-      enddo
-      read (25,*) icharge,ispin
-      rewind (25)
-      write (26,*) 'Read TS charge and spin: ',icharge,ispin
-c read isite jsite ksite
-      do while (WORD.NE.'ISITE')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'reaction site must be defined'
-            stop
-         endif
-      enddo
-      read (25,*) isite,jsite,ksite
-      rewind (25)
-      write (26,*) 'Read i,j,k sites: ',isite,jsite,ksite
-c reads rmin, just need ireact!
-      do while (WORD.NE.'RMIN1')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            write (26,*) 'grid coords must be defined'
-            stop
-         endif
-      enddo
-      read (25,*) cjunk,cjunk,cjunk,cjunk,ireact
-      rewind (25)
-      write (26,*) 'Read ireact: ',ireact
-c checks if user asks to use particular reac_geom ADDED KEYOWORD!
-      do while (WORD.NE.'REAC_GEOM')
-         call LineRead (25)
-         if (WORD.EQ.'END') then
-            rewind(25)
-            goto 999
-         endif
-      enddo
-      read (25,*) ireac_geom
-      write (26,*) 'It is requested to use reac_geom n. ',ireac_geom
- 999  continue
-      rewind(25)
-      close (25)
-
-cadl Get number of atoms from reac1.dat
-      open (unit=15,file='./data/reac1.dat',status='old')
-c get atom number, doesn't care for dummy so natomt1 not used
-c for now. Will have to account for it going back to zmat maybe?      
-      do while (WORD.NE.'NATOM')
-         call LineRead (15)
-         if (WORD.EQ.'END') then
-            write (26,*) 'natom must be defined'
-            stop
-         endif
-      enddo
-      read (15,*) natom1,natomt1
-      rewind (15)
-      close (15)
-      natom=natom1
-      natomt=natomt1
-
-cadl Choose reactant structure for calculation
-c first determine how many structures were determined with the rotational scan
-      command1='ls output/reac1_opt_* > temp.log'
-      call commrun(command1)
-      command1='grep -c ^ temp.log > num.log'
-      call commrun(command1)
-      open (unit=99,file='num.log',status='unknown')
-      read (99,*) numstruct_reac
-      close (unit=99,status='keep')
-      write (26,*) 'Read numstruct reac: ',numstruct_reac
-      write (26,*)
-c now open the xyz files and search the one with the minimum distance
-c between the reacting atoms
-      write (26,*) 'Distance between ireact and isite'
-      do j=1,numstruct_reac
-         open (unit=99,status='unknown')
-         write(99,1201)j
-         rewind (99)
-         read (99,'(A40)') filename
-         close (99)
-         write(26,*) 'filename is ',filename
-         open(unit=23,file=filename,status='unknown')
-         read (23,*)
-         read (23,*)
-         do k=1,natom1
-            read (23,*)cjunk,coox,cooy,cooz
-            if(k.EQ.ireact)then
-               coox1=coox
-               cooy1=cooy
-               cooz1=cooz
-            endif
-            if(k.EQ.isite)then
-               coox2=coox
-               cooy2=cooy
-               cooz2=cooz
-            endif
-         enddo
-         close(23)
-         drea(j)=sqrt((coox1-coox2)**2+(cooy1-cooy2)**2
-     $           +(cooz1-cooz2)**2)
-         write(26,*)'irea-isite dist for str ',j,' is ',drea(j)
-      enddo
-c now determine the reac structure with the minimum distance
-      iopt_reac=1
-      do j=1,numstruct_reac
-         if(drea(j).LT.drea(iopt_reac))then
-            iopt_reac=j
-         endif
-      enddo
-      write(26,*) 'the structure with the min dist is',iopt_reac
-      if (ireac_geom.NE.0)then 
-         iopt_reac=ireac_geom
-         write(26,*) 'forced from ts.dat the use of geom ',iopt_reac
-      endif
-      write (26,*)
-
-cadl Funzione di restart da valutare e capire se si può fare
-c Level of theory
-      write (26,*) 'LOT'
-      do while (WORD.NE.'LEVEL0_TS')
-         call LineRead (21)
-         if (WORD.EQ.'END') then
-            write (26,*) 'gaussian level0 of theory must be defined'
-            write (26,*) 'in file theory.dat'
-            stop
-         endif
-      enddo
-      if (word2.EQ.'G09') then
-         ilev0code=1
-      else
-         write (26,*) 'level0 of theory must be'
-         write (26,*) 'only g09 in theory.dat'
-         stop
-      endif
-      ! if(word3.eq.'RESTART') then
-      !    open (unit=99,status='unknown')
-      !    write (99,*) word4
-      !    rewind (99)
-      !    read (99,*) ires
-      !    close (unit=99,status='keep')
-      ! endif
-      if (ilev0code.eq.1) then
-         read (21,'(A300)') comline1
-      endif
-      close (21)
-      k=3
-      do while (comline1(k:k).NE.' ')
-         k=k+1
-      enddo
-      write (26,*) 'Level of theory: '//comline1(:k)
-
-cadl Write gstart file (g09 lot)
-      open (unit=59,file='./gstart',status='unknown')
-      write (59,*) '# '//comline1(:k)//' nosymm '//'Force '//'test'
-      write (59,*)
-      write (59,*) 'Title Card Required'
-      write (59,*)
-      write (59,*) icharge,ispin
-      close (59)
-      write (26,*)
-      write (26,*) 'Writing input files:'
-      write (26,*) 'Written gstart file'
-
-cadl Write ISOMERS file and get info on zmatrix
-c need to account for scanned dihedrals
-c get number of internal coordinates
-      ncoord = 3*natom1-6
-c get connectivity of ireact in reac1
-      write (26,*) 'natom1, ncoord',natom1,ncoord
-      open (unit=15,file='./data/reac1.dat',status='old')
-c define ntau1
-      do while (WORD.NE.'NTAU')
-         call LineRead (15)
-         if (WORD.EQ.'END') then
-            write (6,*) 'sampling coordinates of reac1 must be defined'
-            stop
-         endif
-      enddo
-      read (15,*) ntau1
-      read (15,*)
-      if (ntau1.NE.0) then
-         do iint=1,ntau1
-            read (15,*) intcoor(ncoord-ntau1+iint),
-     $                  xint(ncoord-ntau1+iint),cjunk
-c            write(26,*) 'What reading?', intcoor(ncoord-ntau1+iint),
-c     $                  xint(ncoord-ntau1+iint)
-         enddo
-      endif
-      rewind (15)
-c  reading z-mat
-      do while (WORD.NE.'CHARGE')
-         call LineRead (15)  
-      enddo
-      call LineRead (15)
-      if (idebug.GE.2) write (26,*) 'reading z-mat input'
-      do iatom = 1 , natomt1
-         read (15,'(A60)') atomlabel(iatom)
-c         write (26,*) atomlabel(iatom)
-      enddo
-c read coordinate names
-      call LineRead (15)
-      do iint = 1 , ncoord-ntau1
-         read (15,*) intcoor(iint),xint(iint)
-      enddo
-c      do iint = 1 , ncoord
-c         write (26,*) 'intcoor, xint ',intcoor(iint),xint(iint)
-c      enddo
-      close (15)
-
-      call read_zmat(atomlabel,natom1,natomt1,intcoor,bislab,ibconn,
-     $ iaconn,idconn,bname,anname,dname,atname,idummy,isited,jsited,
-     $ ksited,bconnt,aconnt,dconnt)
-      write (26,*)
-      write (26,*) 'Reading zmatrix connectivity:'
-      do j=1,natomt1
-         write (26,*)'at ',j,' conn is: ',ibconn(j),iaconn(j),idconn(j)
-      enddo
-      do j=1,natomt1
-         write (26,*)'at ',j,'bond ang dihed are: ',bname(j),anname(j)
-     +        ,dname(j)
-      enddo
-
-      open (unit=59,file='./ISOMERS0001',status='unknown')
-
-      write (59,*) 'NEW'
-      if (iadd.EQ.0) then
-         write (59,*) 'ADD ',isite,ireact
-      else
-         open (unit=57,file='addedbonds.tmp',status='unknown')
-         do j=1,iadded
-            read(57,*) ct1,ct2
-            write (59,*) 'ADD ',ct1,ct2
-         enddo
-         close (57)
-      endif
-      if (ibreak.EQ.0) then
-      write (59,*) 'BREAK ',ibconn(ireact),ireact
-      else
-         open (unit=58,file='brokenbonds.tmp',status='unknown')
-         do j=1,ibroken
-            read(58,*) ct1,ct2
-            write (59,*) 'BREAK ',ct1,ct2
-         enddo
-         close (58)
-      endif
-
-      if (inumbond.EQ.1) then
-         open (unit=58,file='bond.tmp',status='unknown')
-         do j=1,numbonds
-            read(58,*) ct1,ct2,zbond
-            write (59,*) 'BOND ',ct1,ct2,zbond
-         enddo
-         close (58)
-      endif
-
-      if (iang.EQ.1) then
-         open (unit=58,file='angle.tmp',status='unknown')
-         do j=1,nang
-            read(58,*) ct1,ct2,ct3,zang
-            write (59,*) 'ANGLE ',ct1,ct2,ct3,zang
-         enddo
-         close (58)
-      endif
-
-      if (itor.EQ.1) then
-         open (unit=58,file='torsion.tmp',status='unknown')
-         do j=1,nang
-            read(58,*) ct1,ct2,ct3,ct4,ztor
-            write (59,*) 'ANGLE ',ct1,ct2,ct3,ct4,ztor
-         enddo
-         close (58)
-      endif
-
-      close (59)
-
-cadl Write initial.xyz
-c determine optimum reac' filenames and open file
-      write (26,*)
-      write (26,*) 'Getting reactant structure file name:'
-      open (unit=57,status='scratch')
-      write(57,1201)iopt_reac
-      rewind (57)
-      read (57,'(A40)') filename
-      write (26,*) 'Filename is ',filename
-      close (unit=57)
-      open (unit=60,file=filename,status='unknown')
-c open file to write xyz
-      open (unit=59,file='./initial0001.xyz',status='unknown')
-c write xyz of reac1
-      write(59,*) natom1
-      write(59,*) 'blank'
-      read (60,*)
-      read (60,*)
-      do iatom = 1, natom1
-         read (60,'(A300)') copystuff
-         write(59,*) copystuff
-      enddo
-      rewind (60)
-      close (60)
-      close (unit=59)
-      write (26,*) 'Written initial0001.xyz file'
-
-cadl Write input file
-cadl check if inpfileq.dat exist in data, otherwise write default
-      irestt = 0
-      imaxopt = 80
-      istepopt = 30
-      zconv = 0.0005
-      znodetol = 0.1
-      zscal=1.0
-      zssmdqmax=0.8
-      igrowth = 0
-      zintthresh = 2.0
-      zminspace = 5.0
-      ibondfrag = 1
-      initopt = 0
-      ifinopt = 150
-      zprodlim = 200
-      itstype = 1
-      inodes = 27        
-      inquire(file='data/inpfileq.dat',EXIST=ex)
-      if (ex) then
-         open (unit=59,file='data/inpfileq.dat',status='unknown')
-         do while (WORD.NE.'END')
-            call LineRead (59)
-            if (WORD.EQ.'RESTART') then
-               read (59,*) irestt,imaxopt,istepopt
-            elseif (WORD.EQ.'CONV_TOL') then
-               read (59,*) zconv,znodetol,zscal,zssmdqmax
-            elseif (WORD.EQ.'GROWTH_DIRECTION') then
-               read (59,*) igrowth
-            elseif (WORD.EQ.'INT_THRESH') then
-               read (59,*) zintthresh,zminspace,ibondfrag
-            elseif (WORD.EQ.'INITIAL_OPT') then
-               read (59,*) initopt,ifinopt
-            elseif (WORD.EQ.'PRODUCT_LIMIT') then
-               read (59,*) zprodlim
-            elseif (WORD.EQ.'TS_FINAL_TYPE') then
-               read (59,*) itstype
-            elseif (WORD.EQ.'NNODES') then
-               read (59,*) inodes
-            endif
-         enddo
-         close (59) 
-      endif
-      open (unit=59,file='./inpfileq',status='unknown')
-      write (59,*) '# FSM/GSM/SSM inpfileq'
-      write (59,*)
-      write (59,*) '------------ String Info -------------------------'
-      write (59,*) 'SM_TYPE           SSM    # SSM, FSM or GSM'
-      write (59,*) 'RESTART    ',irestt      
-      write (59,*) 'MAX_OPT_ITERS    ',imaxopt    
-      write (59,*) 'STEP_OPT_ITERS   ',istepopt
-      write (59,*) 'CONV_TOL        ',zconv
-      write (59,*) 'ADD_NODE_TOL   ',znodetol
-      write (59,*) 'SCALING     ',zscal
-      write (59,*) 'SSM_DQMAX    ',zssmdqmax
-      write (59,*) 'GROWTH_DIRECTION  ',igrowth
-      write (59,*) 'INT_THRESH     ',zintthresh
-      write (59,*) 'MIN_SPACING   ',zminspace
-      write (59,*) 'BOND_FRAGMENTS   ',ibondfrag
-      write (59,*) 'INITIAL_OPT    ',initopt
-      write (59,*) 'FINAL_OPT    ',ifinopt
-      write (59,*) 'PRODUCT_LIMIT   ',zprodlim
-      write (59,*) 'TS_FINAL_TYPE    ',itstype
-      write (59,*) 'NNODES   ',inodes
-      write (59,*) '--------------------------------------------------'
-      close (59)
-      write (26,*) 'Written inpfileq file'
-
-cadl Start calculation
-cadl check if geoms/ts_gsm.xyz exists. If yes, skip calculation and
-c to postprocessing
-      inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
-      if (.not.ex) then
-        command1='mkdir -p ./scratch'
-        call commrun(command1)
-        command1='cp initial0001.xyz scratch/initial0001.xyz'
-        call commrun(command1)
-        write(26,*) 'Starting SSM calculation now...'
-        command1='gfstringq.exe 1 16 > stdout_gsm0001.out'
-        call commrun(command1)
-        command1='rm scratch/*chk'
-        call commrun(command1)
-        command1='rm addedbonds.tmp brokenbonds.tmp'
-        call commrun(command1)
-
-coadl Copy everything into gsm/ and interesting stuff into output
-        command1='mkdir -p ./gsm'
-        call commrun(command1)
-        command1='mkdir -p ./gsm/scratch'
-        call commrun(command1)
-        command1='mv inpfileq gstart initial0001.xyz ISOMERS0001 ./gsm/'
-        call commrun(command1)
-        command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
-        call commrun(command1)
-        command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
-        call commrun(command1)
-        command1='mv ./scratch/* ./gsm/scratch/'
-        call commrun(command1)
-        command1='rm -rf ./scratch'
-        call commrun(command1)
-        command1='cp  stdout_gsm0001.out ./output/ts_gsm.out'
-        call commrun(command1)
-        command1='mv  stdout_gsm0001.out ./gsm/'
-        call commrun(command1)
-        write (26,*) 'Done :)'
-      else
-         write (26,*) 'Skipped GSM calculation :)'
-      endif
-cadl End of modified part
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c POST PROCESSING
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cadl V3.0 This version is interfaced with xyz_to_zmat subroutine to
-c create a zmatrix with the same connectivity as reac1.dat
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-      command1='cp  geoms/ts_gsm.xyz geom_inp.xyz'
-      call commrun(command1)
-
-      call xyz_to_int(1)
-
-      command1='cp  zmat.com output/grid_opt.out'
-      call commrun(command1)
-      command1='sed -i s/z-matrix/grid/ output/grid_opt.out'
-      call commrun(command1)
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cadl V2.0 This version allows to change connectivity of TS zmatrix 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c following instructions in ts.dat (isite, ireact)
-c Doesn't account for dummies
-C cadl Convert xyz into zmatrix for further calculations
-C c inspiration and usage of xyz_to_zmat
-C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
-C       read (59,*) natom1
-C       read (59,*)
-C c cycle on atoms and call subroutine for each line
-C c need to save xyz coords somewhere, use coord(natommx,ndim)
-C       do k=1,natom1
-C          read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
-C c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
-C       enddo
-C       close (unit=59)
-
-C c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
-C c and run subroutine to convert xyz to zmat for one line
-C       open (unit=59,file='./output/grid_opt.out',status='unknown')
-C       write (59,*) 'grid is the word I am looking for'
-C       do iatom=1,natomt1
-C          if (iatom.EQ.1) then
-C             write (26,*) iatom
-C c            write (59,*) atomlabel(iatom)
-
-C          else if (iatom.EQ.2) then
-C             open (unit=64,status='scratch')
-C             write (64,*) atomlabel(iatom)
-C             rewind(64)
-C             read (64,*) ct1,ct2,ct3
-C             rewind(64)
-C             close (64)
-C             do j=1,ncoord
-C                write (26,*) 'Vediamo che fa: ', intcoor(j), ct3
-C                if (intcoor(j).EQ.ct3) idist=j
-C             enddo
-C             xa=coord(iatom,1)
-C             ya=coord(iatom,2)
-C             za=coord(iatom,3)
-C             xb=coord(ibconn(iatom),1)
-C             yb=coord(ibconn(iatom),2)
-C             zb=coord(ibconn(iatom),3)
-C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C             xints(idist)=dist
-C             write (26,*) iatom,dist
-C c            write (59,*) atomlabel(iatom)
-C             xints(idist)=dist
-         
-C          else if (iatom.EQ.3) then
-C             open (unit=64,status='scratch')
-C             write (64,*) atomlabel(iatom)
-C             rewind(64)
-C             read (64,*) ct1,ct2,ct3,ct4,ct5
-C             rewind(64)
-C             close (64)
-C             do j=1,ncoord
-C                if (intcoor(j).EQ.ct3) idist=j
-C                if (intcoor(j).EQ.ct5) iang=j
-C             enddo
-C             xa=coord(iatom,1)
-C             ya=coord(iatom,2)
-C             za=coord(iatom,3)
-C             xb=coord(ibconn(iatom),1)
-C             yb=coord(ibconn(iatom),2)
-C             zb=coord(ibconn(iatom),3)
-C             xc=coord(iaconn(iatom),1)
-C             yc=coord(iaconn(iatom),2)
-C             zc=coord(iaconn(iatom),3)
-C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C c repeat one atom, only care about planar angle here
-C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-C      $      xc,yc,zc,xc,yc,zc,ang,dihed)
-C             write (26,*) iatom,dist,ang
-C c            write (59,*) atomlabel(iatom) 
-C             xints(idist)=dist
-C             xints(iang)=ang
-
-C          else
-C             open (unit=64,status='scratch')
-C             write (64,*) atomlabel(iatom)
-C             rewind(64)
-C             read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-C             rewind(64)
-C             close (64)
-C             do j=1,ncoord
-C                if (intcoor(j).EQ.ct3) idist=j
-C                if (intcoor(j).EQ.ct5) iang=j
-C                if (intcoor(j).EQ.ct7) idih=j
-C             enddo
-C             xa=coord(iatom,1)
-C             ya=coord(iatom,2)
-C             za=coord(iatom,3)
-C             xb=coord(ibconn(iatom),1)
-C             yb=coord(ibconn(iatom),2)
-C             zb=coord(ibconn(iatom),3)
-C             xc=coord(iaconn(iatom),1)
-C             yc=coord(iaconn(iatom),2)
-C             zc=coord(iaconn(iatom),3)
-C             xd=coord(idconn(iatom),1)
-C             yd=coord(idconn(iatom),2)
-C             zd=coord(idconn(iatom),3)
-C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
-C             write (26,*) iatom,dist,ang,dihed
-C c            write (59,*) atomlabel(iatom)
-C             xints(idist)=dist
-C             xints(iang)=ang
-C             xints(idih)=dihed
+C cadl Reads info from ts.dat
+C c check if info is given to write isomers file ADDED KEYWORDS
+C       iadd=1
+C       ibreak=1
+C       inumbond=1
+C       iang=1
+C       itor=1
+C       do while (WORD.NE.'ADD')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'no add keword found'
+C             iadd=0
+C             exit
 C          endif
 C       enddo
-
-C c funziona ma non modifico connettività di ireact ad ora
-C c modifico la riga di ireact
-C       if (ireact.EQ.3) then
-C          open (unit=64,status='scratch')
-C          write (64,*) atomlabel(ireact)
-C          rewind(64)
-C          read (64,*) ct1,ct2,ct3,ct4,ct5
-C          rewind(64)
-C          close (64)
-C          do j=1,ncoord
-C             if (intcoor(j).EQ.ct3) idist=j
-C             if (intcoor(j).EQ.ct5) iang=j
+C       if (iadd.NE.0) then
+C          open (unit=57,file='addedbonds.tmp',status='unknown')
+C          read (25,*) iadded
+C          do j=1,iadded
+C             read (25,*) ct1,ct2 
+C             write (57,*) ct1,ct2 
+C             write (26,*) 'Bond to be added: ', ct1,ct2 
 C          enddo
-C          intcoor(idist)='RTS'
-C          intcoor(iang)='AABS'
-C          ct3='RTS'
-C          ct5='AABS'
-C          xa=coord(ireact,1)
-C          ya=coord(ireact,2)
-C          za=coord(ireact,3)
-C          xb=coord(isite,1)
-C          yb=coord(isite,2)
-C          zb=coord(isite,3)
-C          xc=coord(jsite,1)
-C          yc=coord(jsite,2)
-C          zc=coord(jsite,3)
-C c repeat one atom, only care about planar angle here    
-C          xd=coord(jsite,1)
-C          yd=coord(jsite,2)
-C          zd=coord(jsite,3)
-C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
-C          xints(idist)=dist
-C          xints(iang)=ang
-C          open (unit=64,status='scratch')
-C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5
-C          rewind(64)
-C          read (64,*) ct1,ct2,ct3,ct4,ct5
-C          close (64)
-C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5
-C          write (26,*) ireact,dist,ang
-C       else
-C          open (unit=64,status='scratch')
-C          write (64,*) atomlabel(ireact)
-C          rewind(64)
-C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-C          rewind(64)
-C          close (64)
-C          do j=1,ncoord
-C             if (intcoor(j).EQ.ct3) idist=j
-C             if (intcoor(j).EQ.ct5) iang=j
-C             if (intcoor(j).EQ.ct7) idih=j
-C          enddo
-C          intcoor(idist)='RTS'
-C          intcoor(iang)='AABS'
-C          intcoor(idih)='BABS'
-C          ct3='RTS'
-C          ct5='AABS'
-C          ct7='BABS'
-C          xa=coord(ireact,1)
-C          ya=coord(ireact,2)
-C          za=coord(ireact,3)
-C          xb=coord(isite,1)
-C          yb=coord(isite,2)
-C          zb=coord(isite,3)
-C          xc=coord(jsite,1)
-C          yc=coord(jsite,2)
-C          zc=coord(jsite,3)
-C          xd=coord(ksite,1)
-C          yd=coord(ksite,2)
-C          zd=coord(ksite,3)
-C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
-C          xints(idist)=dist
-C          xints(iang)=ang
-C          xints(idih)=dihed
-C          open (unit=64,status='scratch')
-C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5,
-C      $      atname(ksite),ct7
-C          rewind(64)
-C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-C          close (64)
-C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
-C          write (26,*) ireact,dist,ang,dihed
+C          rewind (57)
+C          close (57)
 C       endif
-C
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cadl V1.0 - old version
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C This doesn't change connectivity and doesn't account for dummies
-C coadl Convert xyz into zmatrix for further calculations
-C cadl Convert xyz into zmatrix for further calculations
-C c inspiration and usage of xyz_to_zmat
-C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
-C       read (59,*) natom1
-C       read (59,*)
-C c cycle on atoms and call subroutine for each line
-C c need to save xyz coords somewhere, use coord(natommx,ndim)
-C       do k=1,natom1
-C          read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
-C c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
+C       rewind (25)
+      
+C       do while (WORD.NE.'BREAK')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'no break keword found'
+C             ibreak=0
+C             exit
+C          endif
 C       enddo
+C       if (ibreak.NE.0) then
+C          open (unit=58,file='brokenbonds.tmp',status='unknown')
+C          read (25,*) ibroken
+C          do j=1,ibroken
+C             read (25,*) ct1,ct2  
+C             write (58,*) ct1,ct2 
+C             write (26,*) 'Bond to be broken: ', ct1,ct2 
+C          enddo
+C          rewind (58)
+C          close (58)
+C       endif
+C       rewind (25)
+
+C       do while (WORD.NE.'BOND')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'no BOND keword found'
+C             inumbond=0
+C             exit
+C          endif
+C       enddo
+C       if (inumbond.NE.0) then
+C          open (unit=58,file='bond.tmp',status='unknown')
+C          read (25,*) numbonds
+C          do j=1,numbonds
+C             read (25,*) ct1,ct2,zbond  
+C             write (58,*) ct1,ct2,zbond 
+C             write (26,*) 'Bond - goes to: ', ct1,ct2,zbond
+C          enddo
+C          rewind (58)
+C          close (58)
+C       endif
+C       rewind (25)
+
+C       do while (WORD.NE.'ANGLE')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'no ANGLE keword found'
+C             iang=0
+C             exit
+C          endif
+C       enddo
+C       if (iang.NE.0) then
+C          open (unit=58,file='angle.tmp',status='unknown')
+C          read (25,*) nang
+C          do j=1,nang
+C             read (25,*) ct1,ct2,ct3,zang 
+C             write (58,*) ct1,ct2,ct3,zang 
+C             write (26,*) 'Angle - goes to: ', ct1,ct2,ct3,zang
+C          enddo
+C          rewind (58)
+C          close (58)
+C       endif
+C       rewind (25)
+
+C       do while (WORD.NE.'TORSION')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'no TORSION keword found'
+C             itor=0
+C             exit
+C          endif
+C       enddo
+C       if (itor.NE.0) then
+C          open (unit=58,file='torsion.tmp',status='unknown')
+C          read (25,*) ntors
+C          do j=1,ntors
+C             read (25,*) ct1,ct2,ct3,ct4,ztor  
+C             write (58,*) ct1,ct2,ct3,ct4,ztor 
+C             write (26,*) 'Torsion - goes to: ', ct1,ct2,ct3,ct4,ztor
+C          enddo
+C          rewind (58)
+C          close (58)
+C       endif
+C       rewind (25)
+
+C c read charge and spin
+C       do while (WORD.NE.'CHARGE')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'charge and spin must be defined'
+C             stop
+C          endif
+C       enddo
+C       read (25,*) icharge,ispin
+C       rewind (25)
+C       write (26,*) 'Read TS charge and spin: ',icharge,ispin
+C c read isite jsite ksite
+C       do while (WORD.NE.'ISITE')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'reaction site must be defined'
+C             stop
+C          endif
+C       enddo
+C       read (25,*) isite,jsite,ksite
+C       rewind (25)
+C       write (26,*) 'Read i,j,k sites: ',isite,jsite,ksite
+C c reads rmin, just need ireact!
+C       do while (WORD.NE.'RMIN1')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'grid coords must be defined'
+C             stop
+C          endif
+C       enddo
+C       read (25,*) cjunk,cjunk,cjunk,cjunk,ireact
+C       rewind (25)
+C       write (26,*) 'Read ireact: ',ireact
+C c checks if user asks to use particular reac_geom ADDED KEYOWORD!
+C       do while (WORD.NE.'REAC_GEOM')
+C          call LineRead (25)
+C          if (WORD.EQ.'END') then
+C             rewind(25)
+C             goto 999
+C          endif
+C       enddo
+C       read (25,*) ireac_geom
+C       write (26,*) 'It is requested to use reac_geom n. ',ireac_geom
+C  999  continue
+C       rewind(25)
+C       close (25)
+
+C cadl Get number of atoms from reac1.dat
+C       open (unit=15,file='./data/reac1.dat',status='old')
+C c get atom number, doesn't care for dummy so natomt1 not used
+C c for now. Will have to account for it going back to zmat maybe?      
+C       do while (WORD.NE.'NATOM')
+C          call LineRead (15)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'natom must be defined'
+C             stop
+C          endif
+C       enddo
+C       read (15,*) natom1,natomt1
+C       rewind (15)
+C       close (15)
+C       natom=natom1
+C       natomt=natomt1
+
+C cadl Choose reactant structure for calculation
+C c first determine how many structures were determined with the rotational scan
+C       command1='ls output/reac1_opt_* > temp.log'
+C       call commrun(command1)
+C       command1='grep -c ^ temp.log > num.log'
+C       call commrun(command1)
+C       open (unit=99,file='num.log',status='unknown')
+C       read (99,*) numstruct_reac
+C       close (unit=99,status='keep')
+C       write (26,*) 'Read numstruct reac: ',numstruct_reac
+C       write (26,*)
+C c now open the xyz files and search the one with the minimum distance
+C c between the reacting atoms
+C       write (26,*) 'Distance between ireact and isite'
+C       do j=1,numstruct_reac
+C          open (unit=99,status='unknown')
+C          write(99,1201)j
+C          rewind (99)
+C          read (99,'(A40)') filename
+C          close (99)
+C          write(26,*) 'filename is ',filename
+C          open(unit=23,file=filename,status='unknown')
+C          read (23,*)
+C          read (23,*)
+C          do k=1,natom1
+C             read (23,*)cjunk,coox,cooy,cooz
+C             if(k.EQ.ireact)then
+C                coox1=coox
+C                cooy1=cooy
+C                cooz1=cooz
+C             endif
+C             if(k.EQ.isite)then
+C                coox2=coox
+C                cooy2=cooy
+C                cooz2=cooz
+C             endif
+C          enddo
+C          close(23)
+C          drea(j)=sqrt((coox1-coox2)**2+(cooy1-cooy2)**2
+C      $           +(cooz1-cooz2)**2)
+C          write(26,*)'irea-isite dist for str ',j,' is ',drea(j)
+C       enddo
+C c now determine the reac structure with the minimum distance
+C       iopt_reac=1
+C       do j=1,numstruct_reac
+C          if(drea(j).LT.drea(iopt_reac))then
+C             iopt_reac=j
+C          endif
+C       enddo
+C       write(26,*) 'the structure with the min dist is',iopt_reac
+C       if (ireac_geom.NE.0)then 
+C          iopt_reac=ireac_geom
+C          write(26,*) 'forced from ts.dat the use of geom ',iopt_reac
+C       endif
+C       write (26,*)
+
+C cadl Funzione di restart da valutare e capire se si può fare
+C c Level of theory
+C       write (26,*) 'LOT'
+C       do while (WORD.NE.'LEVEL0_TS')
+C          call LineRead (21)
+C          if (WORD.EQ.'END') then
+C             write (26,*) 'gaussian level0 of theory must be defined'
+C             write (26,*) 'in file theory.dat'
+C             stop
+C          endif
+C       enddo
+C       if (word2.EQ.'G09') then
+C          ilev0code=1
+C       else
+C          write (26,*) 'level0 of theory must be'
+C          write (26,*) 'only g09 in theory.dat'
+C          stop
+C       endif
+
+C       if (ilev0code.eq.1) then
+C          read (21,'(A300)') comline1
+C       endif
+C       close (21)
+C       k=3
+C       do while (comline1(k:k).NE.' ')
+C          k=k+1
+C       enddo
+C       write (26,*) 'Level of theory: '//comline1(:k)
+
+C cadl Write gstart file (g09 lot)
+C       open (unit=59,file='./gstart',status='unknown')
+C       write (59,*) '# '//comline1(:k)//' nosymm '//'Force '//'test'
+C       write (59,*)
+C       write (59,*) 'Title Card Required'
+C       write (59,*)
+C       write (59,*) icharge,ispin
+C       close (59)
+C       write (26,*)
+C       write (26,*) 'Writing input files:'
+C       write (26,*) 'Written gstart file'
+
+C cadl Write ISOMERS file and get info on zmatrix
+C c need to account for scanned dihedrals
+C c get number of internal coordinates
+C       ncoord = 3*natom1-6
+C c get connectivity of ireact in reac1
+C       write (26,*) 'natom1, ncoord',natom1,ncoord
+C       open (unit=15,file='./data/reac1.dat',status='old')
+C c define ntau1
+C       do while (WORD.NE.'NTAU')
+C          call LineRead (15)
+C          if (WORD.EQ.'END') then
+C             write (6,*) 'sampling coordinates of reac1 must be defined'
+C             stop
+C          endif
+C       enddo
+C       read (15,*) ntau1
+C       read (15,*)
+C       if (ntau1.NE.0) then
+C          do iint=1,ntau1
+C             read (15,*) intcoor(ncoord-ntau1+iint),
+C      $                  xint(ncoord-ntau1+iint),cjunk
+C c            write(26,*) 'What reading?', intcoor(ncoord-ntau1+iint),
+C c     $                  xint(ncoord-ntau1+iint)
+C          enddo
+C       endif
+C       rewind (15)
+C c  reading z-mat
+C       do while (WORD.NE.'CHARGE')
+C          call LineRead (15)  
+C       enddo
+C       call LineRead (15)
+C       if (idebug.GE.2) write (26,*) 'reading z-mat input'
+C       do iatom = 1 , natomt1
+C          read (15,'(A60)') atomlabel(iatom)
+C c         write (26,*) atomlabel(iatom)
+C       enddo
+C c read coordinate names
+C       call LineRead (15)
+C       do iint = 1 , ncoord-ntau1
+C          read (15,*) intcoor(iint),xint(iint)
+C       enddo
+C c      do iint = 1 , ncoord
+C c         write (26,*) 'intcoor, xint ',intcoor(iint),xint(iint)
+C c      enddo
+C       close (15)
+
+C       call read_zmat(atomlabel,natom1,natomt1,intcoor,bislab,ibconn,
+C      $ iaconn,idconn,bname,anname,dname,atname,idummy,isited,jsited,
+C      $ ksited,bconnt,aconnt,dconnt)
+C       write (26,*)
+C       write (26,*) 'Reading zmatrix connectivity:'
+C       do j=1,natomt1
+C          write (26,*)'at ',j,' conn is: ',ibconn(j),iaconn(j),idconn(j)
+C       enddo
+C       do j=1,natomt1
+C          write (26,*)'at ',j,'bond ang dihed are: ',bname(j),anname(j)
+C      +        ,dname(j)
+C       enddo
+
+C       open (unit=59,file='./ISOMERS0001',status='unknown')
+
+C       write (59,*) 'NEW'
+C       if (iadd.EQ.0) then
+C          write (59,*) 'ADD ',isite,ireact
+C       else
+C          open (unit=57,file='addedbonds.tmp',status='unknown')
+C          do j=1,iadded
+C             read(57,*) ct1,ct2
+C             write (59,*) 'ADD ',ct1,ct2
+C          enddo
+C          close (57)
+C       endif
+C       if (ibreak.EQ.0) then
+C       write (59,*) 'BREAK ',ibconn(ireact),ireact
+C       else
+C          open (unit=58,file='brokenbonds.tmp',status='unknown')
+C          do j=1,ibroken
+C             read(58,*) ct1,ct2
+C             write (59,*) 'BREAK ',ct1,ct2
+C          enddo
+C          close (58)
+C       endif
+
+C       if (inumbond.EQ.1) then
+C          open (unit=58,file='bond.tmp',status='unknown')
+C          do j=1,numbonds
+C             read(58,*) ct1,ct2,zbond
+C             write (59,*) 'BOND ',ct1,ct2,zbond
+C          enddo
+C          close (58)
+C       endif
+
+C       if (iang.EQ.1) then
+C          open (unit=58,file='angle.tmp',status='unknown')
+C          do j=1,nang
+C             read(58,*) ct1,ct2,ct3,zang
+C             write (59,*) 'ANGLE ',ct1,ct2,ct3,zang
+C          enddo
+C          close (58)
+C       endif
+
+C       if (itor.EQ.1) then
+C          open (unit=58,file='torsion.tmp',status='unknown')
+C          do j=1,nang
+C             read(58,*) ct1,ct2,ct3,ct4,ztor
+C             write (59,*) 'ANGLE ',ct1,ct2,ct3,ct4,ztor
+C          enddo
+C          close (58)
+C       endif
+
+C       close (59)
+
+C cadl Write initial.xyz
+C c determine optimum reac' filenames and open file
+C       write (26,*)
+C       write (26,*) 'Getting reactant structure file name:'
+C       open (unit=57,status='scratch')
+C       write(57,1201)iopt_reac
+C       rewind (57)
+C       read (57,'(A40)') filename
+C       write (26,*) 'Filename is ',filename
+C       close (unit=57)
+C       open (unit=60,file=filename,status='unknown')
+C c open file to write xyz
+C       open (unit=59,file='./initial0001.xyz',status='unknown')
+C c write xyz of reac1
+C       write(59,*) natom1
+C       write(59,*) 'blank'
+C       read (60,*)
+C       read (60,*)
+C       do iatom = 1, natom1
+C          read (60,'(A300)') copystuff
+C          write(59,*) copystuff
+C       enddo
+C       rewind (60)
+C       close (60)
 C       close (unit=59)
-C c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
-C c and run subroutine to convert xyz to zmat for one line
-C       open (unit=59,file='./output/grid_opt.out',status='unknown')
-C       write (59,*) 'grid is the word I am looking for'
-C c set up counters to write xints correctly
-C c minus is just a placeholder to know how many dihedrals
-C c are placed at the bottom and helps in correct numbering
-C       k=0
-C       minus=1
-C       do iatom=1,natom1
-C          if (iatom.EQ.1) then
-C             write (26,*) iatom
-C             write (59,*) atomlabel(iatom)
-C          else if (iatom.EQ.2) then
-C             xa=coord(iatom,1)
-C             ya=coord(iatom,2)
-C             za=coord(iatom,3)
-C             xb=coord(ibconn(iatom),1)
-C             yb=coord(ibconn(iatom),2)
-C             zb=coord(ibconn(iatom),3)
-C c            write (26,*) xa,ya,za
-C c            write (26,*) xb,yb,zb
-C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C             write (26,*) iatom,dist
-C             write (59,*) atomlabel(iatom)
-C             xints(1)=dist
-C          else if (iatom.EQ.3) then
-C             if (iatom.EQ.ireact) then
-C                xa=coord(iatom,1)
-C                ya=coord(iatom,2)
-C                za=coord(iatom,3)
-C                xb=coord(isite,1)
-C                yb=coord(isite,2)
-C                zb=coord(isite,3)
-C                xc=coord(jsite,1)
-C                yc=coord(jsite,2)
-C                zc=coord(jsite,3)
-C                open (unit=64,status='scratch')
-C                write (64,*) atomlabel(iatom)
-C                rewind(64)
-C                read (64,*) ct1,ct2,ct3,ct4,ct5
-C                rewind(64)
-C c               write (26,*) 'Prova scrittura'
-C c               write (26,*) ct1,ct2,ct3,ct4,ct5
-C c               write (26,*) ct1,ct4,ct3,ct2,ct5
-C                intcoor(2)='RTS'
-C !               write (26,*) 'RTS sbagliato qui',intcoor(iint),ct3
-C                intcoor(3)='AABS1'
-C                atomlabel(iatom)=ct1//ct4//intcoor(2)
-C      $                          //ct2//intcoor(3)
-C                close (64)
-C             else
-C                xa=coord(iatom,1)
-C                ya=coord(iatom,2)
-C                za=coord(iatom,3)
-C                xb=coord(ibconn(iatom),1)
-C                yb=coord(ibconn(iatom),2)
-C                zb=coord(ibconn(iatom),3)
-C                xc=coord(iaconn(iatom),1)
-C                yc=coord(iaconn(iatom),2)
-C                zc=coord(iaconn(iatom),3)
+C       write (26,*) 'Written initial0001.xyz file'
+
+C cadl Write input file
+C cadl check if inpfileq.dat exist in data, otherwise write default
+C       irestt = 0
+C       imaxopt = 80
+C       istepopt = 30
+C       zconv = 0.0005
+C       znodetol = 0.1
+C       zscal=1.0
+C       zssmdqmax=0.8
+C       igrowth = 0
+C       zintthresh = 2.0
+C       zminspace = 5.0
+C       ibondfrag = 1
+C       initopt = 0
+C       ifinopt = 150
+C       zprodlim = 200
+C       itstype = 1
+C       inodes = 27        
+C       inquire(file='data/inpfileq.dat',EXIST=ex)
+C       if (ex) then
+C          open (unit=59,file='data/inpfileq.dat',status='unknown')
+C          do while (WORD.NE.'END')
+C             call LineRead (59)
+C             if (WORD.EQ.'RESTART') then
+C                read (59,*) irestt,imaxopt,istepopt
+C             elseif (WORD.EQ.'CONV_TOL') then
+C                read (59,*) zconv,znodetol,zscal,zssmdqmax
+C             elseif (WORD.EQ.'GROWTH_DIRECTION') then
+C                read (59,*) igrowth
+C             elseif (WORD.EQ.'INT_THRESH') then
+C                read (59,*) zintthresh,zminspace,ibondfrag
+C             elseif (WORD.EQ.'INITIAL_OPT') then
+C                read (59,*) initopt,ifinopt
+C             elseif (WORD.EQ.'PRODUCT_LIMIT') then
+C                read (59,*) zprodlim
+C             elseif (WORD.EQ.'TS_FINAL_TYPE') then
+C                read (59,*) itstype
+C             elseif (WORD.EQ.'NNODES') then
+C                read (59,*) inodes
 C             endif
-C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C c repeat one atom, only care about planar angle here
-C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-C      $      xc,yc,zc,xc,yc,zc,ang,dihed)
-C             write (26,*) iatom,dist,ang
-C             write (59,*) atomlabel(iatom) 
-C             xints(2)=dist
-C             xints(3)=ang 
-C          else
-C cadl Here I tried to change the connectivity of ireact to connect it to 
-C c    i,j,k sites but some work is required to change the atoms; 
-C c    xints doesn't work well anymore
-C c    RTS and ABS1 also go to atom 3 intcoor...
-C             if (iatom.EQ.ireact) then
-C                xa=coord(iatom,1)
-C                ya=coord(iatom,2)
-C                za=coord(iatom,3)
-C                xb=coord(isite,1)
-C                yb=coord(isite,2)
-C                zb=coord(isite,3)
-C                xc=coord(jsite,1)
-C                yc=coord(jsite,2)
-C                zc=coord(jsite,3)
-C                xd=coord(ksite,1)
-C                yd=coord(ksite,2)
-C                zd=coord(ksite,3)
-C                open (unit=64,status='scratch')
-C                write (64,*) atomlabel(iatom)
-C                rewind(64)
-C                read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-C                rewind(64)
-C                close (64)
-C c               write (26,*) 'Prova scrittura'
-C c               write (26,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-C cadl Maybe to generalize I could write atomlabel(isite) to a scratch
-C c    file, read the first element in ct2, then rewind, write
-C c    atomlabel(jsite) to scratch, read first element in ct4 and so on
-C                do iint=1,ncoord
-C                  if (intcoor(iint).EQ.ct3) then
-C c                  write (26,*) 'RTS',intcoor(iint),ct3
-C                     intcoor(iint)='RTS'
-C                  else if (intcoor(iint).EQ.ct5) then
-C                     intcoor(iint)='AABS1'
-C                  else if (intcoor(iint).EQ.ct7) then
-C                     intcoor(iint)='diBS1'
-C                  else
-C                     continue
-C                  endif
-C                enddo
-C                ct2=atomlabel(isite)(:3)
-C                ct3='RTS'
-C                ct4=atomlabel(jsite)(:3)
-C                ct5='AABS1'
-C                ct6=atomlabel(ksite)(:3)
-C                ct7='diBS1'
-C c               write (26,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
-C                atomlabel(iatom)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
-C             else
-C                xa=coord(iatom,1)
-C                ya=coord(iatom,2)
-C                za=coord(iatom,3)
-C                xb=coord(ibconn(iatom),1)
-C                yb=coord(ibconn(iatom),2)
-C                zb=coord(ibconn(iatom),3)
-C                xc=coord(iaconn(iatom),1)
-C                yc=coord(iaconn(iatom),2)
-C                zc=coord(iaconn(iatom),3)
-C                xd=coord(idconn(iatom),1)
-C                yd=coord(idconn(iatom),2)
-C                zd=coord(idconn(iatom),3)
-C             endif
-C cadl Uncomment for version without redefinition of connectivity
+C          enddo
+C          close (59) 
+C       endif
+C       open (unit=59,file='./inpfileq',status='unknown')
+C       write (59,*) '# FSM/GSM/SSM inpfileq'
+C       write (59,*)
+C       write (59,*) '------------ String Info -------------------------'
+C       write (59,*) 'SM_TYPE           SSM    # SSM, FSM or GSM'
+C       write (59,*) 'RESTART    ',irestt      
+C       write (59,*) 'MAX_OPT_ITERS    ',imaxopt    
+C       write (59,*) 'STEP_OPT_ITERS   ',istepopt
+C       write (59,*) 'CONV_TOL        ',zconv
+C       write (59,*) 'ADD_NODE_TOL   ',znodetol
+C       write (59,*) 'SCALING     ',zscal
+C       write (59,*) 'SSM_DQMAX    ',zssmdqmax
+C       write (59,*) 'GROWTH_DIRECTION  ',igrowth
+C       write (59,*) 'INT_THRESH     ',zintthresh
+C       write (59,*) 'MIN_SPACING   ',zminspace
+C       write (59,*) 'BOND_FRAGMENTS   ',ibondfrag
+C       write (59,*) 'INITIAL_OPT    ',initopt
+C       write (59,*) 'FINAL_OPT    ',ifinopt
+C       write (59,*) 'PRODUCT_LIMIT   ',zprodlim
+C       write (59,*) 'TS_FINAL_TYPE    ',itstype
+C       write (59,*) 'NNODES   ',inodes
+C       write (59,*) '--------------------------------------------------'
+C       close (59)
+C       write (26,*) 'Written inpfileq file'
+
+C cadl Start calculation
+C cadl check if geoms/ts_gsm.xyz exists. If yes, skip calculation and
+C c to postprocessing
+C       inquire(FILE='./geoms/ts_gsm.xyz', EXIST=ex)
+C       if (.not.ex) then
+C         command1='mkdir -p ./scratch'
+C         call commrun(command1)
+C         command1='cp initial0001.xyz scratch/initial0001.xyz'
+C         call commrun(command1)
+C         write(26,*) 'Starting SSM calculation now...'
+C         command1='gfstringq.exe 1 16 > stdout_gsm0001.out'
+C         call commrun(command1)
+C         command1='rm scratch/*chk'
+C         call commrun(command1)
+C         command1='rm addedbonds.tmp brokenbonds.tmp'
+C         call commrun(command1)
+
+C coadl Copy everything into gsm/ and interesting stuff into output
+C         command1='mkdir -p ./gsm'
+C         call commrun(command1)
+C         command1='mkdir -p ./gsm/scratch'
+C         call commrun(command1)
+C         command1='mv inpfileq gstart initial0001.xyz ISOMERS0001 ./gsm/'
+C         call commrun(command1)
+C         command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
+C         call commrun(command1)
+C         command1='cp  ./scratch/tsq0001.xyz ./geoms/ts_gsm.xyz'
+C         call commrun(command1)
+C         command1='mv ./scratch/* ./gsm/scratch/'
+C         call commrun(command1)
+C         command1='rm -rf ./scratch'
+C         call commrun(command1)
+C         command1='cp  stdout_gsm0001.out ./output/ts_gsm.out'
+C         call commrun(command1)
+C         command1='mv  stdout_gsm0001.out ./gsm/'
+C         call commrun(command1)
+C         write (26,*) 'Done :)'
+C       else
+C          write (26,*) 'Skipped GSM calculation :)'
+C       endif
+C cadl End of modified part
+
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C c POST PROCESSING
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C cadl V3.0 This version is interfaced with xyz_to_zmat subroutine to
+C c create a zmatrix with the same connectivity as reac1.dat
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+C       command1='cp  geoms/ts_gsm.xyz geom_inp.xyz'
+C       call commrun(command1)
+
+C       call xyz_to_int(1)
+
+C       command1='cp  zmat.com output/grid_opt.out'
+C       call commrun(command1)
+C       command1='sed -i s/z-matrix/grid/ output/grid_opt.out'
+C       call commrun(command1)
+
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C cadl V2.0 This version allows to change connectivity of TS zmatrix 
+C c this was used in both gsm and ssm before xyz2int utility
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C c following instructions in ts.dat (isite, ireact)
+C c Doesn't account for dummies
+C C cadl Convert xyz into zmatrix for further calculations
+C C c inspiration and usage of xyz_to_zmat
+C C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
+C C       read (59,*) natom1
+C C       read (59,*)
+C C c cycle on atoms and call subroutine for each line
+C C c need to save xyz coords somewhere, use coord(natommx,ndim)
+C C       do k=1,natom1
+C C          read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
+C C c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
+C C       enddo
+C C       close (unit=59)
+
+C C c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
+C C c and run subroutine to convert xyz to zmat for one line
+C C       open (unit=59,file='./output/grid_opt.out',status='unknown')
+C C       write (59,*) 'grid is the word I am looking for'
+C C       do iatom=1,natomt1
+C C          if (iatom.EQ.1) then
+C C             write (26,*) iatom
+C C c            write (59,*) atomlabel(iatom)
+
+C C          else if (iatom.EQ.2) then
+C C             open (unit=64,status='scratch')
+C C             write (64,*) atomlabel(iatom)
+C C             rewind(64)
+C C             read (64,*) ct1,ct2,ct3
+C C             rewind(64)
+C C             close (64)
+C C             do j=1,ncoord
+C C                write (26,*) 'Vediamo che fa: ', intcoor(j), ct3
+C C                if (intcoor(j).EQ.ct3) idist=j
+C C             enddo
+C C             xa=coord(iatom,1)
+C C             ya=coord(iatom,2)
+C C             za=coord(iatom,3)
+C C             xb=coord(ibconn(iatom),1)
+C C             yb=coord(ibconn(iatom),2)
+C C             zb=coord(ibconn(iatom),3)
+C C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C             xints(idist)=dist
+C C             write (26,*) iatom,dist
+C C c            write (59,*) atomlabel(iatom)
+C C             xints(idist)=dist
+         
+C C          else if (iatom.EQ.3) then
+C C             open (unit=64,status='scratch')
+C C             write (64,*) atomlabel(iatom)
+C C             rewind(64)
+C C             read (64,*) ct1,ct2,ct3,ct4,ct5
+C C             rewind(64)
+C C             close (64)
+C C             do j=1,ncoord
+C C                if (intcoor(j).EQ.ct3) idist=j
+C C                if (intcoor(j).EQ.ct5) iang=j
+C C             enddo
+C C             xa=coord(iatom,1)
+C C             ya=coord(iatom,2)
+C C             za=coord(iatom,3)
+C C             xb=coord(ibconn(iatom),1)
+C C             yb=coord(ibconn(iatom),2)
+C C             zb=coord(ibconn(iatom),3)
+C C             xc=coord(iaconn(iatom),1)
+C C             yc=coord(iaconn(iatom),2)
+C C             zc=coord(iaconn(iatom),3)
+C C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C c repeat one atom, only care about planar angle here
+C C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C C      $      xc,yc,zc,xc,yc,zc,ang,dihed)
+C C             write (26,*) iatom,dist,ang
+C C c            write (59,*) atomlabel(iatom) 
+C C             xints(idist)=dist
+C C             xints(iang)=ang
+
+C C          else
+C C             open (unit=64,status='scratch')
+C C             write (64,*) atomlabel(iatom)
+C C             rewind(64)
+C C             read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C C             rewind(64)
+C C             close (64)
+C C             do j=1,ncoord
+C C                if (intcoor(j).EQ.ct3) idist=j
+C C                if (intcoor(j).EQ.ct5) iang=j
+C C                if (intcoor(j).EQ.ct7) idih=j
+C C             enddo
 C C             xa=coord(iatom,1)
 C C             ya=coord(iatom,2)
 C C             za=coord(iatom,3)
@@ -32585,52 +32585,319 @@ C C             zc=coord(iaconn(iatom),3)
 C C             xd=coord(idconn(iatom),1)
 C C             yd=coord(idconn(iatom),2)
 C C             zd=coord(idconn(iatom),3)
-C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
-C      $      (za-zb)*(za-zb))
-C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
-C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
-C             write (26,*) iatom,dist,ang,dihed
-C             write (59,*) atomlabel(iatom)
-C             xints(iatom+k)=dist
-C             xints(iatom+k+1)=ang
-C c            if (diedro non presente) allora
-C c            sbatti il diedro in fondo
-C             if (intcoor(iatom+k+2)(:2).NE.'di') then
-C                xints(ncoord-ntau1+minus)=dihed
-C                k=k+1
-C                minus=minus+1
-C             else
-C                xints(iatom+k+2)=dihed
-C                k=k+2 
-C             endif
-C          endif
-C       enddo
-C
-C cadl Save data in grid_opt.out in order to make it readable to ts_0
+C C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C C             write (26,*) iatom,dist,ang,dihed
+C C c            write (59,*) atomlabel(iatom)
+C C             xints(idist)=dist
+C C             xints(iang)=ang
+C C             xints(idih)=dihed
+C C          endif
+C C       enddo
+
+C C c funziona ma non modifico connettività di ireact ad ora
+C C c modifico la riga di ireact
+C C       if (ireact.EQ.3) then
+C C          open (unit=64,status='scratch')
+C C          write (64,*) atomlabel(ireact)
+C C          rewind(64)
+C C          read (64,*) ct1,ct2,ct3,ct4,ct5
+C C          rewind(64)
+C C          close (64)
+C C          do j=1,ncoord
+C C             if (intcoor(j).EQ.ct3) idist=j
+C C             if (intcoor(j).EQ.ct5) iang=j
+C C          enddo
+C C          intcoor(idist)='RTS'
+C C          intcoor(iang)='AABS'
+C C          ct3='RTS'
+C C          ct5='AABS'
+C C          xa=coord(ireact,1)
+C C          ya=coord(ireact,2)
+C C          za=coord(ireact,3)
+C C          xb=coord(isite,1)
+C C          yb=coord(isite,2)
+C C          zb=coord(isite,3)
+C C          xc=coord(jsite,1)
+C C          yc=coord(jsite,2)
+C C          zc=coord(jsite,3)
+C C c repeat one atom, only care about planar angle here    
+C C          xd=coord(jsite,1)
+C C          yd=coord(jsite,2)
+C C          zd=coord(jsite,3)
+C C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C C          xints(idist)=dist
+C C          xints(iang)=ang
+C C          open (unit=64,status='scratch')
+C C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5
+C C          rewind(64)
+C C          read (64,*) ct1,ct2,ct3,ct4,ct5
+C C          close (64)
+C C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5
+C C          write (26,*) ireact,dist,ang
+C C       else
+C C          open (unit=64,status='scratch')
+C C          write (64,*) atomlabel(ireact)
+C C          rewind(64)
+C C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C C          rewind(64)
+C C          close (64)
+C C          do j=1,ncoord
+C C             if (intcoor(j).EQ.ct3) idist=j
+C C             if (intcoor(j).EQ.ct5) iang=j
+C C             if (intcoor(j).EQ.ct7) idih=j
+C C          enddo
+C C          intcoor(idist)='RTS'
+C C          intcoor(iang)='AABS'
+C C          intcoor(idih)='BABS'
+C C          ct3='RTS'
+C C          ct5='AABS'
+C C          ct7='BABS'
+C C          xa=coord(ireact,1)
+C C          ya=coord(ireact,2)
+C C          za=coord(ireact,3)
+C C          xb=coord(isite,1)
+C C          yb=coord(isite,2)
+C C          zb=coord(isite,3)
+C C          xc=coord(jsite,1)
+C C          yc=coord(jsite,2)
+C C          zc=coord(jsite,3)
+C C          xd=coord(ksite,1)
+C C          yd=coord(ksite,2)
+C C          zd=coord(ksite,3)
+C C          dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C          call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C C          xints(idist)=dist
+C C          xints(iang)=ang
+C C          xints(idih)=dihed
+C C          open (unit=64,status='scratch')
+C C          write (64,*) ct1,atname(isite),ct3,atname(jsite),ct5,
+C C      $      atname(ksite),ct7
+C C          rewind(64)
+C C          read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C C          close (64)
+C C          atomlabel(ireact)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
+C C          write (26,*) ireact,dist,ang,dihed
+C C       endif
+C C
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C cadl V1.0 - old version
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C C This doesn't change connectivity and doesn't account for dummies
+C C coadl Convert xyz into zmatrix for further calculations
+C C cadl Convert xyz into zmatrix for further calculations
+C C c inspiration and usage of xyz_to_zmat
+C C       open (unit=59,file='./geoms/ts_gsm.xyz',status='unknown')
+C C       read (59,*) natom1
+C C       read (59,*)
+C C c cycle on atoms and call subroutine for each line
+C C c need to save xyz coords somewhere, use coord(natommx,ndim)
+C C       do k=1,natom1
+C C          read (59,*)cjunk,coord(k,1),coord(k,2),coord(k,3)
+C C c         write (26,*) cjunk,coord(k,1),coord(k,2),coord(k,3)
+C C       enddo
+C C       close (unit=59)
+C C c cycle on atoms, read connectivity from ibconn,iaconn and idconn 
+C C c and run subroutine to convert xyz to zmat for one line
+C C       open (unit=59,file='./output/grid_opt.out',status='unknown')
+C C       write (59,*) 'grid is the word I am looking for'
+C C c set up counters to write xints correctly
+C C c minus is just a placeholder to know how many dihedrals
+C C c are placed at the bottom and helps in correct numbering
+C C       k=0
+C C       minus=1
+C C       do iatom=1,natom1
+C C          if (iatom.EQ.1) then
+C C             write (26,*) iatom
+C C             write (59,*) atomlabel(iatom)
+C C          else if (iatom.EQ.2) then
+C C             xa=coord(iatom,1)
+C C             ya=coord(iatom,2)
+C C             za=coord(iatom,3)
+C C             xb=coord(ibconn(iatom),1)
+C C             yb=coord(ibconn(iatom),2)
+C C             zb=coord(ibconn(iatom),3)
+C C c            write (26,*) xa,ya,za
+C C c            write (26,*) xb,yb,zb
+C C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C             write (26,*) iatom,dist
+C C             write (59,*) atomlabel(iatom)
+C C             xints(1)=dist
+C C          else if (iatom.EQ.3) then
+C C             if (iatom.EQ.ireact) then
+C C                xa=coord(iatom,1)
+C C                ya=coord(iatom,2)
+C C                za=coord(iatom,3)
+C C                xb=coord(isite,1)
+C C                yb=coord(isite,2)
+C C                zb=coord(isite,3)
+C C                xc=coord(jsite,1)
+C C                yc=coord(jsite,2)
+C C                zc=coord(jsite,3)
+C C                open (unit=64,status='scratch')
+C C                write (64,*) atomlabel(iatom)
+C C                rewind(64)
+C C                read (64,*) ct1,ct2,ct3,ct4,ct5
+C C                rewind(64)
+C C c               write (26,*) 'Prova scrittura'
+C C c               write (26,*) ct1,ct2,ct3,ct4,ct5
+C C c               write (26,*) ct1,ct4,ct3,ct2,ct5
+C C                intcoor(2)='RTS'
+C C !               write (26,*) 'RTS sbagliato qui',intcoor(iint),ct3
+C C                intcoor(3)='AABS1'
+C C                atomlabel(iatom)=ct1//ct4//intcoor(2)
+C C      $                          //ct2//intcoor(3)
+C C                close (64)
+C C             else
+C C                xa=coord(iatom,1)
+C C                ya=coord(iatom,2)
+C C                za=coord(iatom,3)
+C C                xb=coord(ibconn(iatom),1)
+C C                yb=coord(ibconn(iatom),2)
+C C                zb=coord(ibconn(iatom),3)
+C C                xc=coord(iaconn(iatom),1)
+C C                yc=coord(iaconn(iatom),2)
+C C                zc=coord(iaconn(iatom),3)
+C C             endif
+C C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C c repeat one atom, only care about planar angle here
+C C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C C      $      xc,yc,zc,xc,yc,zc,ang,dihed)
+C C             write (26,*) iatom,dist,ang
+C C             write (59,*) atomlabel(iatom) 
+C C             xints(2)=dist
+C C             xints(3)=ang 
+C C          else
+C C cadl Here I tried to change the connectivity of ireact to connect it to 
+C C c    i,j,k sites but some work is required to change the atoms; 
+C C c    xints doesn't work well anymore
+C C c    RTS and ABS1 also go to atom 3 intcoor...
+C C             if (iatom.EQ.ireact) then
+C C                xa=coord(iatom,1)
+C C                ya=coord(iatom,2)
+C C                za=coord(iatom,3)
+C C                xb=coord(isite,1)
+C C                yb=coord(isite,2)
+C C                zb=coord(isite,3)
+C C                xc=coord(jsite,1)
+C C                yc=coord(jsite,2)
+C C                zc=coord(jsite,3)
+C C                xd=coord(ksite,1)
+C C                yd=coord(ksite,2)
+C C                zd=coord(ksite,3)
+C C                open (unit=64,status='scratch')
+C C                write (64,*) atomlabel(iatom)
+C C                rewind(64)
+C C                read (64,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C C                rewind(64)
+C C                close (64)
+C C c               write (26,*) 'Prova scrittura'
+C C c               write (26,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C C cadl Maybe to generalize I could write atomlabel(isite) to a scratch
+C C c    file, read the first element in ct2, then rewind, write
+C C c    atomlabel(jsite) to scratch, read first element in ct4 and so on
+C C                do iint=1,ncoord
+C C                  if (intcoor(iint).EQ.ct3) then
+C C c                  write (26,*) 'RTS',intcoor(iint),ct3
+C C                     intcoor(iint)='RTS'
+C C                  else if (intcoor(iint).EQ.ct5) then
+C C                     intcoor(iint)='AABS1'
+C C                  else if (intcoor(iint).EQ.ct7) then
+C C                     intcoor(iint)='diBS1'
+C C                  else
+C C                     continue
+C C                  endif
+C C                enddo
+C C                ct2=atomlabel(isite)(:3)
+C C                ct3='RTS'
+C C                ct4=atomlabel(jsite)(:3)
+C C                ct5='AABS1'
+C C                ct6=atomlabel(ksite)(:3)
+C C                ct7='diBS1'
+C C c               write (26,*) ct1,ct2,ct3,ct4,ct5,ct6,ct7
+C C                atomlabel(iatom)=ct1//ct2//ct3//ct4//ct5//ct6//ct7
+C C             else
+C C                xa=coord(iatom,1)
+C C                ya=coord(iatom,2)
+C C                za=coord(iatom,3)
+C C                xb=coord(ibconn(iatom),1)
+C C                yb=coord(ibconn(iatom),2)
+C C                zb=coord(ibconn(iatom),3)
+C C                xc=coord(iaconn(iatom),1)
+C C                yc=coord(iaconn(iatom),2)
+C C                zc=coord(iaconn(iatom),3)
+C C                xd=coord(idconn(iatom),1)
+C C                yd=coord(idconn(iatom),2)
+C C                zd=coord(idconn(iatom),3)
+C C             endif
+C C cadl Uncomment for version without redefinition of connectivity
+C C C             xa=coord(iatom,1)
+C C C             ya=coord(iatom,2)
+C C C             za=coord(iatom,3)
+C C C             xb=coord(ibconn(iatom),1)
+C C C             yb=coord(ibconn(iatom),2)
+C C C             zb=coord(ibconn(iatom),3)
+C C C             xc=coord(iaconn(iatom),1)
+C C C             yc=coord(iaconn(iatom),2)
+C C C             zc=coord(iaconn(iatom),3)
+C C C             xd=coord(idconn(iatom),1)
+C C C             yd=coord(idconn(iatom),2)
+C C C             zd=coord(idconn(iatom),3)
+C C             dist=sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb)+
+C C      $      (za-zb)*(za-zb))
+C C             call xyz_to_zmat(xa,ya,za,xb,yb,zb,
+C C      $      xc,yc,zc,xd,yd,zd,ang,dihed)
+C C             write (26,*) iatom,dist,ang,dihed
+C C             write (59,*) atomlabel(iatom)
+C C             xints(iatom+k)=dist
+C C             xints(iatom+k+1)=ang
+C C c            if (diedro non presente) allora
+C C c            sbatti il diedro in fondo
+C C             if (intcoor(iatom+k+2)(:2).NE.'di') then
+C C                xints(ncoord-ntau1+minus)=dihed
+C C                k=k+1
+C C                minus=minus+1
+C C             else
+C C                xints(iatom+k+2)=dihed
+C C                k=k+2 
+C C             endif
+C C          endif
+C C       enddo
+C C
+C C cadl Save data in grid_opt.out in order to make it readable to ts_0
+C C       do iatom=1,natom1
+C C          write (59,*) atomlabel(iatom)
+C C       enddo
+C C       do iint=1,ncoord
+C C          write(59,*) intcoor(iint),xints(iint)
+C C       enddo
+C C       close (unit=59)
+
+C cadl report info in gsm_opt.out
+C       write (26,*)
 C       do iatom=1,natom1
-C          write (59,*) atomlabel(iatom)
+C          write (26,*) atomlabel(iatom)
 C       enddo
 C       do iint=1,ncoord
-C          write(59,*) intcoor(iint),xints(iint)
+C          write (26,*) intcoor(iint),xints(iint)
 C       enddo
-C       close (unit=59)
 
-cadl report info in gsm_opt.out
-      write (26,*)
-      do iatom=1,natom1
-         write (26,*) atomlabel(iatom)
-      enddo
-      do iint=1,ncoord
-         write (26,*) intcoor(iint),xints(iint)
-      enddo
+C       close (unit=26,status='keep')
 
-      close (unit=26,status='keep')
+C  1201 format ("./geoms/reac1_"I0.2".xyz")
 
- 1201 format ("./geoms/reac1_"I0.2".xyz")
-
-      return
-      end
-cadl End Modified part
+C       return
+C       end
+C cadl End Modified part
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       subroutine ModRPHt(specpointer,RPHT_custom_flag)
 c     THIS SUBROUTINE TAKES IN INPUT THE SPEC POINTER THAT IS AN INTEGER

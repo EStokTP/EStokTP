@@ -24510,7 +24510,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       dimension nfrag_pp(npivmax)
       dimension nrat1(npivmax),nrat2(npivmax),nrat3(npivmax)
 
-      LOGICAL leof,lsec,ltit
+      LOGICAL leof,lsec,ltit,ex
       CHARACTER*1000 line,string
       CHARACTER*160 sename,word,word2,word3,title,title1,
      $ word4,word5,word6,word7
@@ -24792,10 +24792,18 @@ c        if the iGOpMod variable is setted to one skips the read
 c        and set the active space variables to meaningless values
 c        since the script moltogau will ignore the multireference
 c        part and will generate a gaussian DFT calculation input
-      open(unit=977,file='GCntrFile.dat',status='old',action='read'
-     $ ,iostat=i_status)
-      read(977,'(I1)') iGOpMod
-      close(977)
+cadl  Check if file exists before opening it!
+c NB I think GCntrFile.dat should be moved to data folder??
+      inquire(file='GCntrFile.dat',EXIST=ex)
+      if (ex) then
+         open(unit=977,file='GCntrFile.dat',status='old',action='read'
+     $     ,iostat=i_status)
+         read(977,'(I1)') iGOpMod
+         close(977)
+      else 
+c I set the variable to zero eventually. Will see if it needs change
+         iGOpMod = 0
+      endif
 c  lc :  The second condition is necessary since
 c        in future hybrid mode are setted for 
 c        different values of iGOpMod 

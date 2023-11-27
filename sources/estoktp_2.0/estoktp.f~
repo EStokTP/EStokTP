@@ -24510,7 +24510,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       dimension nfrag_pp(npivmax)
       dimension nrat1(npivmax),nrat2(npivmax),nrat3(npivmax)
 
-      LOGICAL leof,lsec,ltit,ex
+      LOGICAL leof,lsec,ltit
       CHARACTER*1000 line,string
       CHARACTER*160 sename,word,word2,word3,title,title1,
      $ word4,word5,word6,word7
@@ -24792,18 +24792,10 @@ c        if the iGOpMod variable is setted to one skips the read
 c        and set the active space variables to meaningless values
 c        since the script moltogau will ignore the multireference
 c        part and will generate a gaussian DFT calculation input
-cadl  Check if file exists before opening it!
-c NB I think GCntrFile.dat should be moved to data folder??
-      inquire(file='GCntrFile.dat',EXIST=ex)
-      if (ex) then
-         open(unit=977,file='GCntrFile.dat',status='old',action='read'
-     $     ,iostat=i_status)
-         read(977,'(I1)') iGOpMod
-         close(977)
-      else 
-c I set the variable to zero eventually. Will see if it needs change
-         iGOpMod = 0
-      endif
+      open(unit=977,file='GCntrFile.dat',status='old',action='read'
+     $ ,iostat=i_status)
+      read(977,'(I1)') iGOpMod
+      close(977)
 c  lc :  The second condition is necessary since
 c        in future hybrid mode are setted for 
 c        different values of iGOpMod 
@@ -31506,23 +31498,18 @@ coadl copy everything into gsm/ and interesting stuff into output
          call commrun(command1)
          command1='mv inpfileq gstart initial0001.xyz ./gsm/'
          call commrun(command1)
-         command1='cp  stringfile.xyz0001 ./geoms/traj_gsm.xyz'
+         command1='cp  stringfile.xyz0001 ./output/traj_gsm.xyz'
          call commrun(command1)
          command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
-         call commrun(command1)
          if (igsm.eq.0) then
             command1='mv  ISOMERS0001 ./gsm/'
             call commrun(command1)
          endif
-         inquire(FILE='./scratch/tsq0001.xyz', EXIST=ex)
+         inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
          if (.not.ex) then
             write (26,*) 'Did not find tsq0001.xyz file'
-            inquire(FILE='./stringfile.xyz0001', EXIST=ex)
-            if (.not.ex) then
-               write (26,*) 'Did not find stringfile.xyz0001'
-               stop
-            endif
-            open (unit=59,file='./stringfile.xyz0001',status='unknown')
+            open (unit=59,file='gsm/stringfile.xyz0001',
+     $         status='unknown')
             zen = -99999.99
             zmaxen = -99999.99
             inodets = 0
@@ -31574,15 +31561,11 @@ c                  return
       else
          write (26,*) 'Skipped GSM calculation :) | Recovery now'
          command1='cp  gsm/stringfile.xyz0001 '// 
-     $    './geoms/traj_gsm.xyz'
+     $    './output/traj_gsm.xyz'
          call commrun(command1)
          inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
          if (.not.ex) then
             write (26,*) 'Did not find tsq0001.xyz file'
-            if (.not.ex) then
-               write (26,*) 'Did not find stringfile.xyz0001'
-               stop
-            endif
             open (unit=59,file='gsm/stringfile.xyz0001',
      $         status='unknown')
             zen = -99999.99

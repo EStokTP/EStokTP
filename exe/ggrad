@@ -2,6 +2,8 @@
 
 #####################################################
 #Script adapted from the Github repo of the GSM code
+#https://github.com/ZimmermanGroup/molecularGSM
+#####################################################
 
 # The path to Gaussian should be already in your PATH; check if g16 exists, else calls g09
 # Modified: check if formchk exists, if not calls formchk09
@@ -45,7 +47,12 @@ echo " " >> $gfile
 echo " " >> $gfile
 
 #echo "running: g09 < $gfile >& $gfile.log"
-g09 < $gfile >& $gfile.log
+if [ -x "$(command -v g16)" ]
+then
+  g16 < $gfile >& $gfile.log
+else
+  g09 < $gfile >& $gfile.log
+fi
 
 #check for SCF failure here
 gfail=`grep -c "Convergence failure" $gfile.log`
@@ -55,5 +62,10 @@ then
  #present fix: use previous gradient
 else
   echo "running: formchk $chkfile $fchkfile"
-  formchk09 $chkfile $fchkfile > scratch/fchkout
+  if [ -x "$(command -v formchk)" ]
+  then
+    formchk $chkfile $fchkfile > scratch/fchkout
+  else
+    formchk09 $chkfile $fchkfile > scratch/fchkout
+  fi
 fi

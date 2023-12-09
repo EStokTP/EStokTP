@@ -7479,21 +7479,23 @@ C     4. CONVERT TO KCAL MOL AND STORE IN VARIABLE ZPE
          if (ilev1code .eq. 1 .or. ilev1code .eq. 3) then 
             open(unit=716,file='Anharmonic_frequencies.dat',
      &       iostat=IAnhCheck,status='old')
-            if (IAnhCheck.ne.0) then 
-               write(LongCommand,'(A)') 
-     &         "grep -iA1 'zero-point correction=' "//
-     &         pathtogeoms//" | awk '{print $3}' > tempzpe.dat"
-            else 
+cc            if (IAnhCheck.ne.0) then 
+cc               write(LongCommand,'(A)') 
+cc     &         "grep -iA1 'zero-point correction=' "//
+cc     &         pathtogeoms//" | awk '{print $3}' > tempzpe.dat"
+cc            else 
+cc modified to activate only for anharmonic presence by cc
+            if (IAnhCheck.eq.0) then 
                write(LongCommand,'(A)') 
      &         "grep 'ZPE(anh)' "//
      &         pathtogeoms//" | awk '{print $6}' > tempzpe.dat"
                close(716,status='delete')
-            end if
-            call commrun(LongCommand)
-            open(unit=711,file='tempzpe.dat')
-            read(711,*) zpe
-            if (IAnhCheck .eq. 0) zpe=zpe*0.00038
-            close(711,status='delete')
+               call commrun(LongCommand)
+               open(unit=711,file='tempzpe.dat')
+               read(711,*) zpe
+               if (IAnhCheck .eq. 0) zpe=zpe*0.00038
+               close(711,status='delete')
+            endif
          end if 
          write (20,*) zpe
 c            write (120,*) zpe
@@ -7861,25 +7863,31 @@ C     2. OPEN THE UNIT WITH THE CORRECT SPECIES OF INTEREST
 C     3. GREP THE ZPE CORRECTION
 C     4. CONVERT TO KCAL MOL AND STORE IN VARIABLE ZPE 
          if (ilev1code .eq. 1 .or. ilev1code .eq. 3) then 
+
+cc            open(unit=716,file='Anharmonic_frequencies.dat',
+cc     &       iostat=IAnhCheck,status='old')
+cc            if (IAnhCheck.ne.0) then 
+cc               write(LongCommand,'(A)') 
+cc     &         "grep -iA1 'zero-point correction=' "//
+cc     &         pathtogeoms//" | awk '{print $3}' > tempzpe.dat"
+cc            else 
             open(unit=716,file='Anharmonic_frequencies.dat',
      &       iostat=IAnhCheck,status='old')
-            if (IAnhCheck.ne.0) then 
-               write(LongCommand,'(A)') 
-     &         "grep -iA1 'zero-point correction=' "//
-     &         pathtogeoms//" | awk '{print $3}' > tempzpe.dat"
-            else 
+            if (IAnhCheck.eq.0) then 
                write(LongCommand,'(A)') 
      &         "grep 'ZPE(anh)' "//
      &         pathtogeoms//" | awk '{print $6}' > tempzpe.dat"
                close(716,status='delete')
-            end if
-            call commrun(LongCommand)
-            open(unit=711,file='tempzpe.dat')
-            read(711,*) zpe
-            if (IAnhCheck .eq. 0) zpe=zpe*(1/0.00038087989)
-            close(711,status='delete')
+               call commrun(LongCommand)
+               open(unit=711,file='tempzpe.dat')
+               read(711,*) zpe
+               zpe=zpe*(1/0.00038087989)
+               close(711,status='delete')
+            endif
          end if 
+cc modified to activate only for anharmonic ZPE 
 c        zpe=zpe*29979200000*6.626E-34/2.*6.022E23/4.184/1000/627.503
+
          write (20,*) zpe
 
          if(ispecies.eq.0)then
@@ -21753,7 +21761,16 @@ c      if(ispin.eq.3)write(101,900)neltot,2
             if(ispin.eq.2.and.j.ne.numopentot)nopen=nopen+1
          endif
 c         if(nlps.gt.1.and.j.gt.numopentot)nstatew=nstates
-         if(nlps.gt.0.and.j.gt.numopentot)nstatew=nstates
+c         if(nlps.gt.0.and.j.gt.numopentot)nstatew=nstates
+         if(ispin.eq.1.and.nlps.gt.0.and.j.gt.numopentot)then
+            nstatew=nstates
+         endif
+         if(ispin.eq.3.and.nlps.gt.0.and.j.gt.numopentot)then
+            nstatew=nstates
+         endif
+         if(ispin.eq.2.and.nlps.gt.0.and.j.gt.numopentot-1)then
+            nstatew=nstates
+         endif
          if(ispin.eq.3)nclose=nclose-2
          if(j.eq.1)then
             nclose_ss=nclose
@@ -21772,6 +21789,14 @@ c         if(nlps.gt.1.and.j.gt.numopentot)nstatew=nstates
          write(101,991)nclose_ss,nopen_ss,neltot,mspin+2,1
          write(101,992)neltot,mspin+2
       endif
+
+      if(ispin.eq.2)then
+         write(101,*)'commands for spin splitting'
+         write(101,990)nclose,nopen,neltot,mspin+2,nstatew
+         write(101,991)nclose_ss,nopen_ss,neltot,mspin+2,1
+         write(101,992)neltot,mspin+2
+      endif
+
       close(101)
 
 c      write(7,*)'number of orbitals is ',numorb
@@ -24588,7 +24613,7 @@ cc write third vrc-tst file, structure.inp (of bimol prods/reacs)
             read(13,*)aname,cooxt(j),cooyt(j),coozt(j)
          enddo
          close(13)
-c         stop
+c        stop
 
          if(natom1.ne.1)write(11,*)natom1
          read(12,*)cjunk
@@ -24626,6 +24651,7 @@ c         stop
          endif
 
          call zmat_xyz(41)
+c         stop
          open(unit=13,file='./geomconv.xyz',status='unknown')
          read(13,*)cjunk
          read(13,*)cjunk
@@ -24794,8 +24820,10 @@ c        since the script moltogau will ignore the multireference
 c        part and will generate a gaussian DFT calculation input
       open(unit=977,file='GCntrFile.dat',status='old',action='read'
      $ ,iostat=i_status)
-      read(977,'(I1)') iGOpMod
-      close(977)
+      if(i_status.eq.0)then 
+         read(977,'(I1)') iGOpMod
+         close(977)
+      endif
 c  lc :  The second condition is necessary since
 c        in future hybrid mode are setted for 
 c        different values of iGOpMod 
@@ -28213,7 +28241,7 @@ cc initialize active space determination
          call activespace(nbonds_vrc,nlps_vrc,nstates_vrc,neltot,ispin)
             command1="cp -f activespace.dat ./activespace_vrc.dat"
             call commrun(command1)
-            call activespace(nbonds,nlps,nstates,neltot,ispin)
+c            call activespace(nbonds,nlps,nstates,neltot,ispin)
          else if(ibarr.eq.3)then
             filename='./me_files/reac1_ge.me'
             neltot1=0
@@ -28922,8 +28950,8 @@ c  lc : DEBUG
          call LineRead (13)
          if (WORD.EQ.'END') then
             write(7,*) 'active space and orbitals for VRC'
-            write(7,*) 'mot defined in theory.dat'
-            write(7,*) 'assuminf DFT simulations'
+            write(7,*) 'not defined in theory.dat'
+            write(7,*) 'assuming DFT simulations'
             inoas=1
             goto 1112
 c            stop
@@ -29032,6 +29060,7 @@ c  lc : write iOpMod out
          neltot=neltot1+neltot2
          call activespace(nbonds,nlps,nstates,neltot,ispin)
       endif
+
 
 cc write molpro VRC template using default template
 
@@ -30061,88 +30090,171 @@ cc we can now determine the xyz geometry
          cooz(j)=0.
       enddo
 
+      bd=0.
+c      write(*,*)'bname 1 ',bname(1)
+c      write(*,*)'bname 2 ',bname(2)
+c      write(*,*)'bname 3 ',bname(3)
       if(natom.gt.1)then
+         ibdf=0
          do j=1,nint
-            if(intcoor(j).eq.bname(2).and.idummy(2).ne.1)then
+            if(intcoor(j).eq.bname(2))then
                coox(2)=xint(j)
-            else if(idummy(2).eq.1.and.idummy(3).ne.1.and.
-     $ intcoor(j).eq.bname(3))then
-               coox(2)=xint(j)
+               ibdf=1
             endif
          enddo
+         if(ibdf.eq.0)then
+            read(bname(2),*)bd
+c            coox(2)=bd
+            cooy(2)=bd
+         endif
       endif
+c         do j=1,nint
+c            if(intcoor(j).eq.bname(2).and.idummy(2).ne.1)then
+c               coox(2)=xint(j)
+c            else if(idummy(2).eq.1.and.idummy(3).ne.1.and.
+c     $ intcoor(j).eq.bname(3))then
+c               coox(2)=xint(j)
+c            endif
+c         enddo
+c      endif
+
+c      write(*,*)'coox(2) ',coox(2)
+c      write(*,*)'anname(3)',iaconn(3),anname(3)
 
       if(natom.gt.2)then
 cc determine position of atom 3
-         if(ilin.eq.1)then
-            ithird=0
-            icount=0
-            do j=1,natomt
-               if(idummy(j).eq.1)icount=icount+1
-               if((j-icount).eq.3)ithird=j
-            enddo
-         endif
+c         if(ilin.eq.1)then
+c            ithird=0
+c            icount=0
+c            do j=1,natomt
+c            if(idummy(j).eq.1)icount=icount+1
+c            if((j-icount).eq.3)ithird=j
+c           enddo
+c            if(idummy(3).eq.1)then
+c               icount=0
+c               icount=1
+c               ithird=4
+c            endif
+c         endif
 c         write(*,*)'ithird is ',ithird
 c         write(*,*)'bname(ithird) is ',bname(ithird)
+         ibdf=0
+         iadf=0
          do j=1,nint
-            if(intcoor(j).eq.bname(3).and.ilin.ne.1)then
+c            if(intcoor(j).eq.bname(3).and.ilin.ne.1)then
+c               bdist3=xint(j)
+c            endif
+            if(intcoor(j).eq.bname(3))then
+               ibdf=1
                bdist3=xint(j)
             endif
-            if(intcoor(j).eq.anname(3).and.ilin.ne.1)then
+c            if(intcoor(j).eq.anname(3).and.ilin.ne.1)then
+c               adist3=xint(j)
+c               if(adist3.gt.90)adist3=180.-adist3
+c               adist3=adist3*pigr/180.
+c            endif
+            if(intcoor(j).eq.anname(3))then
+               iadf=1
                adist3=xint(j)
 c               if(adist3.gt.90)adist3=180.-adist3
                adist3=adist3*pigr/180.
             endif
-            if(ilin.eq.1.and.icount.ne.0)then
-               if(intcoor(j).eq.bname(ithird))then
-                  bdist3=xint(j)               
-               endif
-            endif
          enddo
-c         write(*,*)'bdist3 is ',bdist3
-
-         if(ibconn(3).eq.2.and.ilin.ne.1)then
-            coox(3)=coox(2)+bdist3*cos(pigr-adist3)
-            cooy(3)=bdist3*sin(adist3)
-         else if (ibconn(3).eq.1.and.ilin.ne.1)then
-            coox(3)=bdist3*cos(adist3)
-            cooy(3)=bdist3*sin(adist3)
-         else if (ilin.eq.1.and.ibconn(ithird).ne.1)then
-            coox(3)=coox(2)+bdist3
-         else if (ilin.eq.1.and.ibconn(ithird).eq.1)then
-            coox(3)=-bdist3
+         if(ibdf.eq.0)then
+            read(bname(3),*)bdist3
+         endif
+         if(iadf.eq.0)then
+            read(anname(3),*)adist3
+            adist3=adist3*pigr/180.
          endif
 
+c            if(ilin.eq.1.and.icount.ne.0)then
+c               if(intcoor(j).eq.bname(ithird))then
+c                  bdist3=xint(j)               
+c               endif
+c            endif
+c            if(idummy(3).eq.1)then
+c               read(bname(3),*)bdist3
+c               read(anname(3),*)adist3
+c               adist3=adist3*pigr/180.
+c            endif
+c        enddo
+c         stop
+c         if(ilin.ne.1.and.i)then
+         if(ibconn(3).eq.2)then
+            coox(3)=coox(2)+bdist3*cos(pigr-adist3)
+            cooy(3)=bdist3*sin(adist3)
+         else if (ibconn(3).eq.1)then
+            if(idummy(2).eq.0)then
+               coox(3)=bdist3*cos(adist3)
+               cooy(3)=bdist3*sin(adist3)
+            else
+               coox(3)=bdist3*sin(adist3)
+               cooy(3)=bdist3*cos(adist3)
+            endif
+         endif
+
+c         if(ibconn(3).eq.2.and.ilin.ne.1)then
+c            coox(3)=coox(2)+bdist3*cos(pigr-adist3)
+c            cooy(3)=bdist3*sin(adist3)
+c         else if (ibconn(3).eq.1.and.ilin.ne.1)then
+c            coox(3)=bdist3*cos(adist3)
+c            cooy(3)=bdist3*sin(adist3)
+c         else if (ilin.eq.1.and.ibconn(ithird).ne.1)then
+c            coox(3)=coox(2)+bdist3
+c         else if (ilin.eq.1.and.ibconn(ithird).eq.1)then
+c            coox(3)=-bdist3
+c         endif
       endif
-      if(natom.gt.3)then
+c      write(*,*)'bdist3 is',bdist3
+c      write(*,*)'adist3 is',adist3
+
+c      if(ispecies.eq.41)stop
+
+      if(natomt.gt.3)then
          do j=4,natomt
+            ibdf=0
+            iadf=0
+            iddf=0
             do k=1,nint
-               if(idummy(j).eq.0)then
-                  if(intcoor(k).eq.bname(j))then
-                     bd=xint(k)
-                  endif
-                  if(intcoor(k).eq.anname(j))then
-                     ang=xint(k)
-                  endif
-                  if(intcoor(k).eq.dname(j))then
-                     dihed=xint(k)
-                  endif
-               else if(idummy(j).eq.1)then
-c                  write(*,*)'found dummy atom in sub zmat to xyz'
-c                  write(*,*)'idummy is ',j
-c                  write(*,*)'bd is ',bname(j)
-c                  write(*,*)'ang is ',anname(j)
-c                  write(*,*)'dihed is ',dname(j)
-                  read(bname(j),111)bd
-                  read(anname(j),111)ang
-                  read(dname(j),111)dihed
-c                  write(*,*)' bd now is ',bd
-c                  write(*,*)' ang now is ',ang
-c                  write(*,*)' dihed now is ',dihed
- 111              format(f7.4)
-c                  stop
+c               if(idummy(j).eq.0)then
+               if(intcoor(k).eq.bname(j))then
+                  bd=xint(k)
+                  ibdf=1
                endif
+               if(intcoor(k).eq.anname(j))then
+                  ang=xint(k)
+                  iadf=1
+               endif
+               if(intcoor(k).eq.dname(j))then
+                  dihed=xint(k)
+                  iddf=1
+               endif
+c               endif
             enddo
+            if(ibdf.eq.0)then
+               read(bname(j),*)bd
+            endif
+            if(iadf.eq.0)then
+               read(anname(j),*)ang
+            endif
+            if(iddf.eq.0)then
+               read(dname(j),*)dihed
+            endif
+c            if(idummy(j).eq.1)then
+c                  read(bname(j),111)bd
+c                  read(anname(j),111)ang
+c                  read(dname(j),111)dihed
+c               read(bname(j),*)bd
+c               read(anname(j),*)ang
+c               read(dname(j),*)dihed
+c     write(*,*)' bd now is ',bd
+c     write(*,*)' ang now is ',ang
+c     write(*,*)' dihed now is ',dihed
+ 111           format(f7.4)
+c                  stop
+c            endif
+c            enddo
             call zmat_to_xyz(xa,ya,za,coox(ibconn(j)),cooy(ibconn(j)),
      $ cooz(ibconn(j)),coox(iaconn(j)),cooy(iaconn(j)),
      $ cooz(iaconn(j)),
@@ -30151,10 +30263,11 @@ c                  stop
             coox(j)=xa
             cooy(j)=ya
             cooz(j)=za
-c            write(7,*)'b a d',bd,ang,dihed
-c            write(7,*)'x y z',xa,ya,za
-c            write(7,*)'ibconn',ibconn(j)
-c            write(7,*)'iaconn',iaconn(j)
+c            write(*,*)'b a d',j,bd,ang,dihed
+c            write(*,*)'x y z',j,xa,ya,za
+c            write(*,*)'ibconn',j,ibconn(j)
+c            write(*,*)'iaconn',j,iaconn(j)
+c            write(*,*)'idconn',j,idconn(j)
 c            do ik=1,nint
 c               write(7,*)'intocoor',ik,intcoor(ik)
 c            enddo
@@ -30169,6 +30282,8 @@ c            close(7)
 c            stop
          enddo
       endif
+
+c      if(ispecies.eq.41)stop
 
       open(unit=15,file='geomconv.xyz',status='unknown')
       write(15,*)natom

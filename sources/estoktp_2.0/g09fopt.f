@@ -152,9 +152,9 @@ c  lc Check for skip geom corr file and chk. If one does not find
 c  lc potocorrgeom and also is chk file it assumes that a normal
 c  lc procedure must be performed
 
-       open(unit=127,file='skipgeominf.dat',iostat=iEoFfl,
+      open(unit=127,file='skipgeominf.dat',iostat=iEoFfl,
      & status='old')
-       if (iEoFfl.eq.0) then
+      if (iEoFfl.eq.0) then
          read(127,*) iSkipGeo
          if (iSkipGeo.eq.6) then 
             open(unit=128,file='geoms/potcorr_geom.log',iostat=iEoFfl,
@@ -187,8 +187,10 @@ c  lc procedure must be performed
             close(129,status='keep')
          end if 
          close(127,status='delete')
-       end if  
+      end if  
 
+      command1="rm -f temp_route.dat"
+      call commrun(command1)
 
 cccccccccccccc print out gaussian com file  ccccccccccccc
 c initialize word, word2, word3, word4, word5
@@ -210,6 +212,8 @@ cc determine igkey and gkeyword
       write(*,*)'igkey is ',igkey
       write(*,*)'ired is ',ired
 
+c      stop
+
 cc if using redundant coordinates then read z-matrix
 
 c disable redundant coord if using dummy atoms in reactants
@@ -224,8 +228,26 @@ c               ired=0
          endif
       endif
 c
+cc determine of the optimization is to be done in internal coords
+      ired_check1=0
+      ired_check2=0
+      iredadd=0
+      call int_key_g09(comline1,ired_check1)
+      call int_key_g09(comline2,ired_check2)
+
+      if( ired_check1.eq.1.or.ired_check2.eq.1)then
+         ired=1
+         iredadd=1
+      endif
+
+c      write(*,*)'ok up to here 1'
+c      write(*,*)'ired is',ired
+c      write(*,*)'ired_check1 is',ired_check1
+c      write(*,*)'ired_check2 is',ired_check2
+c
       if(ired.eq.1)then
-         call read_zmat(atomlabel,natom,natomt,intcoor,bislab,ibconn,
+c         write(*,*)'ok up to here 2' 
+        call read_zmat(atomlabel,natom,natomt,intcoor,bislab,ibconn,
      $ iaconn,idconn,bname,anname,dname,atname,idummy,isited,jsited,
      $ ksited,bconnt,aconnt,dconnt)
          open (unit=99,file='command.dat',status='unknown')
@@ -319,10 +341,14 @@ cc         write(*,*)'pass from here'
          ired=1
       endif
 
+      write(*,*)'ok up to here 2'
+      command1='echo $PWD'
+      call commrun(command1)         
+
       OPEN(UNIT=10,STATUS='unknown',FILE='geom.com')
       REWIND (10)
 c  lc mod: open file to write route section 
-      open(999,file='temp_route.dat')
+      open(999,file='temp_route.dat',status='unknown')
       write(999,*) comline1,comline2 
       close(999)
 c  lc : Mods, introduce a control section to handle opt+freq gaussian bug
@@ -353,7 +379,6 @@ c   3) Check if the route contains freq and opt togheter
        write(*,*) 'Eigenvalue algorithm checked'
       end if
 
-
 c  lc : Input gaussian 
       write (10,*) '%mem=',gmemo
       write (10,*) '%chk=tmp'
@@ -363,7 +388,6 @@ cc      write (10,*) '#',comline2
 cc modified to cut length
       write (10,*) '#',comline1(1:len_trim(comline1))
       write (10,*) '#',comline2(1:len_trim(comline2))
-
 
 c  lc mod:  search in command.dat file the presence of gen keyword
 c           to handle custom basis set 
@@ -450,6 +474,8 @@ c        in geom.com file
          open(977,file='BSSE_flag.dat') 
             read(977,*) BSSE_flag
          close(977)
+         command1="rm -f BSSE_flag.dat"
+         call commrun(command1)
       command1="grep -ic 'fragment' temp_route.dat > FragmentGuess.dat"
       call commrun(command1)
          open(977,file='FragmentGuess.dat') 
@@ -606,7 +632,7 @@ c            endif
          endif
       endif
 
-      if(ired.eq.1.and.icheckdummy.eq.0)then
+      if(ired.eq.1.and.icheckdummy.eq.0.and.iredadd.ne.1)then
          if(ibeta.eq.1.or.iiso.eq.1)then
             if(ireact.ne.0)then
                if(isite.ne.1)then
@@ -2058,6 +2084,56 @@ C     *****************************
          gkeyword='E(B2PLYPD3)'
          igkey='4'
       endif
+
+      return
+      end
+
+
+C     *****************************
+
+      subroutine int_key_g09(comline1,ired_check)
+
+      implicit double precision (a-h,o-z)
+      implicit integer (i-n)
+
+c      character*30 gkeyword,igkey
+      character*(*) comline1
+c      character*300 comline1
+      character*300 comline1_up
+c     character*120 command1
+c      LOGICAL leof,lsec,ltit
+
+c      CHARACTER*1000 line,string
+c      CHARACTER*160 sename,word,word2,word3
+c     $ ,title,title1,word4,word5,word6,word7
+
+c      include 'filcomm.f'
+
+      ired_check=0
+
+c      command1="sed -ie 's/,/ /g' temp.tmp"
+c      call commrun(command1)
+c      command1="sed -ie 's/(/ /g' temp.tmp"
+c      call commrun(command1)
+c      open(unit=99,file='temp.tmp',status='unknown')
+c      call LineRead(99)
+
+c   1) Convert to upper case, case insensitive research
+      comline1_up=comline1
+      call upcase2(comline1_up)
+
+c   2) Check if the route contains intern and opt togheter
+      if (
+     &    (index(comline1_up,'INTERN') .eq. 0)
+     &     .and.
+     &    (index(comline1_up,'GEOM=CHECK') .eq. 0)
+     &     .and.
+     &    (index(comline1_up,'OPT') .gt. 0)) then
+         ired_check=1
+      endif
+
+c      write(*,*)'ired is ',ired_check
+c      stop
 
       return
       end

@@ -572,7 +572,7 @@ c     keyword common block
 
       logical leof,lsec,ltit
       character*1000 line,string
-      character*1000 convline
+      character*(*) convline
       character*160 sename,word,word2,word3,title,title1,
      #word4,word5,word6,word7
       common /keyword/ leof,lsec,ltit

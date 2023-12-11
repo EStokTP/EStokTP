@@ -130,12 +130,12 @@ c      write(*,*)'comline1 is',comline1
 c      write(*,*)'isk is',iskgeo
 c      if(iskgeo.eq.1)stop
       if (comline1.eq.'End1'.or.comline1.eq.' End1') then
-         if(ilev.eq.2) write(98,*) comline1
+         if(ilev.eq.2) write(98,*) comline1(1:len_trim(comline1))
          go to 200
       endif
       if(iskgeo.ne.1)then
          write (10,*) comline1
-         if(iaspace.eq.1)write(98,*) comline1
+         if(iaspace.eq.1)write(98,*) comline1(1:len_trim(comline1))
       endif
       goto 100
  200  continue
@@ -175,14 +175,14 @@ c      if(iskgeo.eq.1)stop
             open(unit=99,file='hrcondcoord.dat',status='unknown')
             read(99,'(A)')comline1
             close(99)
-            write(10,*)comline1
+            write(10,*)comline1(1:len_trim(comline1))
             if(ispin.eq.1)then
                open(unit=15,file='activespace.dat',status='unknown')
                read(15,*)nlines
                do j=1,nlines
                   read(15,'(A)')comline1
                enddo
-               write (10,*) comline1
+               write (10,*) comline1(1:len_trim(comline1))
                write(10,*)'gthresh,step=5.d-3'
                close(15)
             endif
@@ -226,13 +226,13 @@ c      write(7,*)comline1
             read(15,*)nlines
             do j=1,nlines
                read(15,'(A100)')comline1
-               write (10,*) comline1
-               write (98,*) comline1
+               write (10,*) comline1(1:len_trim(comline1))
+               write (98,*) comline1(1:len_trim(comline1))
             enddo
             close(15)
             write(98,*)'End1'
             write(98,*)
-            write (98,*) comline1
+            write (98,*) comline1(1:len_trim(comline1))
          endif
          goto 101
       else
@@ -250,8 +250,8 @@ c      write(7,*)comline1
             enddo
             write (10,*) 'SET,SPIN=',ispin-1
             write (98,*) 'SET,SPIN=',ispin-1
-            write (10,*) comline1
-            write (98,*) comline1
+            write (10,*) comline1(1:len_trim(comline1))
+            write (98,*) comline1(1:len_trim(comline1))
             close(15)
          endif
          goto 101
@@ -266,9 +266,9 @@ c        if(ispin.eq.1)then
             read(15,'(A100)')
             read(15,'(A200)')comline1
             write (10,*) 'SET,SPIN=',ispin+1
-            write (10,*) comline1
+            write (10,*) comline1(1:len_trim(comline1))
             write (98,*) 'SET,SPIN=',ispin+1
-            write (98,*) comline1
+            write (98,*) comline1(1:len_trim(comline1))
             close(15)
 c         endif
          goto 101
@@ -286,21 +286,21 @@ c        if(ispin.eq.1)then
             read(15,'(A200)')comline1
             write (10,*) 'SET,SPIN=2'
             write (98,*) 'SET,SPIN=2'
-            write (10,*) comline1
-            write (98,*) comline1
+            write (10,*) comline1(1:len_trim(comline1))
+            write (98,*) comline1(1:len_trim(comline1))
             read(15,'(A200)')comline1
-            write (10,*) comline1
+            write (10,*) comline1(1:len_trim(comline1))
 c            write (10,*) comline1(1:len_trim(comline1))
-            write (98,*) comline1
+            write (98,*) comline1(1:len_trim(comline1))
             close(15)
 c         endif
          goto 101
       endif
 
       if (comline1.EQ.'End2'.or.comline1.eq.' End2') go to 201
-      if (ispin.eq.1) write (10,*) comline1
+      if (ispin.eq.1) write (10,*) comline1(1:len_trim(comline1))
       if (ispin.eq.1)then 
-         write (98,*) comline1
+         write (98,*) comline1(1:len_trim(comline1))
       endif
       goto 101
  201  continue
@@ -329,15 +329,15 @@ c         if(ispin.eq.1)then
             read(15,*)nlines
             do j=1,nlines
                read(15,'(A100)')comline1
-               write (10,*) comline1
-               write (98,*) comline1
+               write (10,*) comline1(1:len_trim(comline1))
+               write (98,*) comline1(1:len_trim(comline1))
             enddo
             close(15)
             write(98,*)'Skip'
             write(98,*)'End1'
             write(98,*)'End2'
             write(98,*)
-            write (98,*) comline1
+            write (98,*) comline1(1:len_trim(comline1))
 c         endif
          goto 301
       endif
@@ -348,8 +348,8 @@ c        if(ispin.eq.1)then
             do j=1,nlines
                read(15,'(A100)')comline1
             enddo
-            write (10,*) comline1
-            write (98,*) comline1
+            write (10,*) comline1(1:len_trim(comline1))
+            write (98,*) comline1(1:len_trim(comline1))
             close(15)
 c         endif
          goto 301
@@ -364,8 +364,8 @@ c        if(ispin.eq.1)then
             enddo
             read(15,'(A100)')
             read(15,'(A100)')comline1
-            write (10,*) comline1
-            write (98,*) comline1
+            write (10,*) comline1(1:len_trim(comline1))
+            write (98,*) comline1(1:len_trim(comline1))
             close(15)
 c         endif
          goto 301
@@ -381,8 +381,8 @@ c        if(ispin.eq.1)then
             read(15,'(A100)')
             read(15,'(A100)')
             read(15,'(A100)')comline1
-            write (10,*) comline1
-            write (98,*) comline1
+            write (10,*) comline1(1:len_trim(comline1))
+            write (98,*) comline1(1:len_trim(comline1))
             close(15)
 c         endif
          goto 301
@@ -390,10 +390,10 @@ c         endif
 
 
       if (ispin.gt.1)then 
-         write (98,*) comline1
+         write (98,*) comline1(1:len_trim(comline1))
       endif
       if (comline1.EQ.'End3'.or.comline1.eq.' End3') go to 401
-      write (10,*) comline1
+      write (10,*) comline1(1:len_trim(comline1))
       goto 301
  401  continue
  

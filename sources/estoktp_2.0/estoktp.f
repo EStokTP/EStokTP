@@ -31751,8 +31751,33 @@ c reac1.dat instead of ts_opt.out since I don't have those yet!
       command1='cp  geoms/ts_gsm.xyz geom_inp.xyz'
       call commrun(command1)
 
-      call xyz_to_int(1)
+      command1='cp  data/reac1.dat es2k_ut.dat'
+      call commrun(command1)
 
+      open (unit=59,file='./es2k_ut.dat',status='unknown')
+cadl Write input for util from reac1
+      write(59,*) 'natom'
+      write(59,*) natom,natomt,ilin
+      write(59,*)
+      write(59,*) 'charge'
+      write(59,*) icharge,ispin
+      do iatom=1,natom1
+         write (59,*) atomlabel(iatom)
+      enddo
+      write(59,*) 
+      write(59,*) 'intcoor'
+      do iint=1,ncoord
+         write (59,*) intcoor(iint),xint(iint)
+      enddo
+      write(59,*)
+      write(59,*) 'End'
+      write(59,*)
+      close(59)
+
+      call xyz_to_int(666)
+
+      command1='rm es2k_ut.dat'
+      call commrun(command1)
       command1='cp  zmat.com output/grid_opt.out'
       call commrun(command1)
       command1='sed -i s/z-matrix/grid/ output/grid_opt.out'
@@ -31977,8 +32002,8 @@ cadl report info in gsm_opt.out
       do iatom=1,natom1
          write (26,*) atomlabel(iatom)
       enddo
-      write (26,*) 'Original coords from reac1.dat'
-      write (26,*) 'xyz2int does not provide updated coords in output'
+c      write (26,*) 'Original coords from reac1.dat'
+c      write (26,*) 'xyz2int does not provide updated coords in output'
       do iint=1,ncoord
 cadl x2int aggiorna xint non xints!         
 c         write (26,*) intcoor(iint),xints(iint)

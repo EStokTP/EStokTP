@@ -210,7 +210,14 @@ cadl end modified part
       ivrctst=0
       inatst=0
       iguessna=0
-
+cmdt start thermo
+      ithermo_reac1=0
+      ithermo_reac2=0
+      ithermo_prod1=0
+      ithermo_prod2=0
+      ithermo_ts=0
+      iprintall=0
+cmdt end thermo
 
 
   100 continue
@@ -671,6 +678,33 @@ c  lc:   TolNum implicitly defined in double precision
       if (WORD.EQ.'MODARR') then
          imodarr=1
       endif
+cmdt thermo start_
+      if (WORD.EQ.'THERMO_REAC1') then
+         ithermo_reac1=1
+         itotcalc=itotcalc+1
+         if(WORD2.eq.'PRINTALL')iprintall=1
+      endif
+      if (WORD.EQ.'THERMO_REAC2') then
+         ithermo_reac2=1
+         itotcalc=itotcalc+1
+         if(WORD2.eq.'PRINTALL')iprintall=1
+      endif
+      if (WORD.EQ.'THERMO_PROD1') then
+         ithermo_prod1=1
+         itotcalc=itotcalc+1
+         if(WORD2.eq.'PRINTALL')iprintall=1
+      endif
+      if (WORD.EQ.'THERMO_PROD2') then
+         ithermo_prod2=1
+         itotcalc=itotcalc+1
+         if(WORD2.eq.'PRINTALL')iprintall=1
+      endif
+      if (WORD.EQ.'THERMO_TS') then
+         ithermo_ts=1
+         itotcalc=itotcalc+1
+         if(WORD2.eq.'PRINTALL')iprintall=1
+      endif
+cmdt thermo end 
       if (WORD.EQ.'END') go to 200
       goto 100
   200 continue
@@ -1193,6 +1227,33 @@ c evaluate rate constant
          if (idebug.ge.1) write (6,*) 'starting ktp'
          call ktp
       endif
+cmdt
+      if (ithermo_reac1.eq.1) then
+         if (idebug.ge.1) write (6,*) 'starting thermo_reac1'
+         ispecies=1
+         call thermo(ispecies,iprintall)
+      endif
+      if (ithermo_reac2.eq.1) then
+         if (idebug.ge.1) write (6,*) 'starting thermo_reac2'
+         ispecies=2
+         call thermo(ispecies,iprintall)
+      endif
+      if (ithermo_prod1.eq.1) then
+         if (idebug.ge.1) write (6,*) 'starting thermo_prod1'
+         ispecies=3
+         call thermo(ispecies,iprintall)
+      endif
+      if (ithermo_prod2.eq.1) then
+         if (idebug.ge.1) write (6,*) 'starting thermo_prod2'
+         ispecies=4
+         call thermo(ispecies,iprintall)
+      endif
+      if (ithermo_ts.eq.1) then
+         if (idebug.ge.1) write (6,*) 'starting thermo_ts'
+         ispecies=0
+         call thermo(ispecies,iprintall)
+      endif
+cmdt
 c produced modified Arrhenius fit and output for CHEMKIN
       if (imodarr.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting modarr'
@@ -31652,7 +31713,7 @@ c                  return
                   write (26,*) 'Found node with > en', jnode
                   open (unit=60,file='temp_ts.xyz',status='unknown')
                      write(60,*) natom1
-                     write(60,*),zen
+                     write(60,*)zen
                   do iatom = 1,natom1
                      read (59,'(A300)') copystuff
                      write(60,*) copystuff
@@ -31714,7 +31775,7 @@ c                  return
                   write (26,*) 'Found node with > en', jnode
                   open (unit=60,file='temp_ts.xyz',status='unknown')
                      write(60,*) natom1
-                     write(60,*),zen
+                     write(60,*)zen
                   do iatom = 1,natom1
                      read (59,'(A300)') copystuff
                      write(60,*) copystuff
@@ -33869,3 +33930,1004 @@ c         endif
       END
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+cmdt thermo 
+      subroutine thermo(ispecies,iprintall)
+
+      implicit double precision (a-h,o-z)
+      implicit integer (i-n)
+
+      include 'data_estoktp.fi'
+      include 'param_estoktp.fi'
+
+      dimension tau(ntaumx),taumn(ntaumx),taumx(ntaumx),freq(nmdmx)
+      dimension coord(natommx,ndim),xint(3*natommx),xinti(3*natommx),
+     $ abcrot(ndim),eps_r(1000000),deg_r(1000000)
+      dimension xints(3*natommx)
+      dimension tauopt(ntaumx)
+      dimension drea(noptmx)
+
+      character*300 comline1,comline2,copystuff
+      character*60 atomlabel(natommx)
+      character*60 atomlabel1(natommx)
+      character*30 intcoor(3*natommx)
+      character*30 intcoors(3*natommx)
+      character*20 bislab(ntaumx)
+      character*30 gmem
+      character*70 command1
+      character*40 filename
+      character*4  cjunk
+      character*100 commandcopy
+      character*30 dih_rot
+
+      LOGICAL leof,lsec,ltit,ex
+
+      CHARACTER*1000 line,string
+      CHARACTER*160 sename,word,word2,word3,title,title1,
+     $ word4,word5,word6,word7
+
+      include 'filcomm.f'
+
+c data to be later substitued by variables
+      dimension rot_inertia(ndim),hr_mom_in(nmdmx)
+c the number of frequencies has to be assigned
+      dimension T(100),freq_vib(nmdmx)
+c       vib_temp(nmdmx)
+      dimension q_tot(100),s_tot(100),e_tot(100),cv_tot(100),el_zpe(100)
+      dimension q_trasl(100),q_rot(100),q_vib_tot(100),q_hr_tot(100)
+      dimension el_ther_ener(100),el_ther_ent(100),el_ther_free(100)
+      dimension atom_m(natommx),n_eig(nmdmx),symm_hr(nmdmx)
+      dimension atoms_num(nmdmx),q_hr_dh(nmdmx),ihrsym_out(nmdmx)
+      dimension elem_en(100),elem_dh(100),elem_essc(100)
+      CHARACTER*2 atoms(natommx),types_atoms(natommx),elem(100)
+      character*2 aname
+      character*30 kwfreq1,kwsymm,kwunpfreq1,kwspin
+      real e_vib(nmdmx,100),q_vib(nmdmx,100)
+      real eig(nmdmx,10000),q_hr(nmdmx,100),geig(nmdmx,10000)
+      character*40 kwhr1,kwhr2
+      logical cond
+
+      if(ispecies.eq.1)then
+         open(unit=20,file='./me_files/reac1_fr.me',status='unknown')
+         open(unit=25,file='./output/reac1_thermo.out',status='unknown')
+         open(unit=30,file='./geoms/reac1_l1.xyz',status='old')
+         open(unit=40,file='./me_files/reac1_zpe.me',status='old')
+         open(unit=45,file='./me_files/reac1_en.me',status='unknown')
+         open(unit=55,file='./me_files/reac1_unpfr.me',status='unknown')
+         open(unit=65,file='./output/reac1_sym.out',status='unknown')
+         open(unit=70,file='./me_files/reac1_hr.me',status='unknown')
+      endif
+
+      if(ispecies.eq.2)then
+         open(unit=20,file='./me_files/reac2_fr.me',status='unknown')
+         open(unit=25,file='./output/reac2_thermo.out',status='unknown')
+         open(unit=30,file='./geoms/reac2_l1.xyz',status='old')
+         open(unit=40,file='./me_files/reac2_zpe.me',status='old')
+         open(unit=45,file='./me_files/reac2_en.me',status='unknown')
+         open(unit=55,file='./me_files/reac2_unpfr.me',status='unknown')
+         open(unit=65,file='./output/reac2_sym.out',status='unknown')
+         open(unit=70,file='./me_files/reac2_hr.me',status='unknown')
+      endif
+
+      if(ispecies.eq.3)then
+         open(unit=20,file='./me_files/prod1_fr.me',status='unknown')
+         open(unit=25,file='./output/prod1_thermo.out',status='unknown')
+         open(unit=30,file='./geoms/prod1_l1.xyz',status='old')
+         open(unit=40,file='./me_files/prod1_zpe.me',status='old')
+         open(unit=45,file='./me_files/prod1_en.me',status='unknown')
+         open(unit=55,file='./me_files/prod1_unpfr.me',status='unknown')
+         open(unit=65,file='./output/prod1_sym.out',status='unknown')
+         open(unit=70,file='./me_files/prod1_hr.me',status='unknown')
+      endif
+
+      if(ispecies.eq.4)then
+         open(unit=20,file='./me_files/prod2_fr.me',status='unknown')
+         open(unit=25,file='./output/prod2_thermo.out',status='unknown')
+         open(unit=30,file='./geoms/prod2_l1.xyz',status='old')
+         open(unit=40,file='./me_files/prod2_zpe.me',status='old')
+         open(unit=45,file='./me_files/prod2_en.me',status='unknown')
+         open(unit=55,file='./me_files/prod2_unpfr.me',status='unknown')
+         open(unit=65,file='./output/prod2_sym.out',status='unknown')
+         open(unit=70,file='./me_files/prod2_hr.me',status='unknown')
+      endif
+
+      if(ispecies.eq.0)then
+         open(unit=20,file='./me_files/ts_fr.me',status='unknown')
+         open(unit=25,file='./output/ts_thermo.out',status='unknown')
+         open(unit=30,file='./geoms/tsgta_l1.xyz',status='old')
+         open(unit=40,file='./me_files/ts_zpe.me',status='old')
+         open(unit=45,file='./me_files/ts_en.me',status='unknown')
+         open(unit=55,file='./me_files/ts_unpfr.me',status='unknown')
+         open(unit=65,file='./output/ts_sym.out',status='unknown')
+         open(unit=70,file='./me_files/ts_hr.me',status='unknown')
+      endif
+c some data
+      printfreq_max=400.
+      pressure = 101325.
+c     in GHz rot_inertia
+      r_gas = DKBLTZ*1e-7*DNAV
+      r_gas_cal = 1.987
+      conv_cal = 2.86
+      amu=1.66054e-27
+
+c if the file thermo.dat is empty, take 300:100:3000K, otherwise read it
+      open(unit=35,file='./data/thermo.dat',status='unknown')
+      inquire(35,size=isize)
+      if(isize.EQ.0) then
+         write(35,*)'end'
+      endif
+      rewind(35)
+      do while (WORD.NE.'TEMP')
+          call LineRead (35)
+          if (WORD.EQ.'END') then
+             write (6,*) 'temperature values 300K-3000K are used'
+c             ireadT=0
+             nT=28
+             do i=1,nT
+                T(i)=200.+100.*float(i)
+             enddo
+             goto 400
+          endif
+      enddo
+      read (35,*) nT
+         do i=1,nT
+            read (35,*)T(i)
+         enddo
+ 400  continue
+      rewind(35)
+
+c reading the coordinates and en_l1
+      read(30,*)natom
+      read(30,*)en_l1
+      do i=1,natom
+         read(30,*)aname,xcoor,ycoor,zcoor
+            atoms(i)=aname
+            call atom_mass(aname,ianumb,iamass)
+               call atom_num_mass(ianumb,amass)
+                  atom_m(i)=amass
+      enddo
+      rewind(30)
+
+c if no hl protocol energy is present, stops
+c if allen level1 is required, use en level1
+      ien_level1=0
+      iwarn_enl1=0
+      open(unit=99,file='./data/estoktp.dat',status='unknown')
+ 410  continue
+      call LineRead (99)
+      if(word.eq.'ALLEN'.and.word2.eq.'LEVEL1')then
+         ien_level1=1
+      endif
+      if (WORD.EQ.'END') go to 420
+      goto 410
+ 420  continue
+      rewind(99)
+      close(99)
+
+      inquire(45,size=isize)
+      if ((isize.NE.0).AND.(ien_level1.EQ.0)) then
+         read(45,*)energy
+         atomiz_calc=1
+      elseif (ien_level1.EQ.1) then
+         iwarn_enl1=1
+         energy=en_l1
+         write(6,*)'thermo module used level1 energy as asked'
+      else
+         write(6,*)'HL energy is missing and energy at l1 is not asked
+     $for, add "allen level1" is estok.dat to ask it or find HL energy'
+         stop
+      endif
+
+c identifying the types and the num per type of atoms
+      do i=1,size(atoms_num)
+         atoms_num(i)=0
+      enddo
+      types_atoms(1)=atoms(1)
+      num_types=1
+      atoms_num(1)=1
+      do i=2,natom
+         if (atoms(1).EQ.atoms(i)) then
+            atoms_num(num_types)=atoms_num(num_types)+1
+         endif
+      enddo
+      do i=2,natom
+         counter=0
+         do j=1,num_types
+            if (atoms(i).NE.types_atoms(j)) then
+               counter=counter+1
+            endif
+         enddo
+         if (counter.EQ.num_types) then
+            num_types=num_types+1
+            types_atoms(num_types)=atoms(i)
+            do k=i,natom
+               if (atoms(i).EQ.atoms(k)) then
+                  atoms_num(num_types)=atoms_num(num_types)+1
+               endif
+            enddo
+         endif
+      enddo
+
+c reading the info for atomization energy calculation
+      open(unit=21,file='./data/theory.dat',status='old')
+
+      iwarn_atom=0
+      ii=0
+      do while (WORD.NE.'ATOMIZATION_END')
+          ii=ii+1
+          call LineRead (21)
+          if (WORD.EQ.'END') then
+             write(6,*)'atomization calculation impossible because data 
+     $                  are missing'
+             write_dhf=0.
+             goto 425
+          endif
+      enddo
+      rewind(21)
+      jj=0
+      do while (WORD.NE.'ATOMIZATION_START')
+          jj=jj+1
+          call LineRead (21)
+          if (WORD.EQ.'END') then
+             iwarn_atom=1
+             write(6,*)'atomization calculation impossible because data
+     $                  are missing'
+             write_dhf=0.
+             goto 425
+          endif
+      enddo
+      iatoms=ii-jj-2
+      read(21,*)
+      do i=1,iatoms
+         read(21,*)elem(i),elem_en(i),elem_dh(i),elem_essc(i)
+      enddo
+      if (natom.GT.1)then
+         write_dhf=1.
+      endif
+425   continue
+      rewind(21)
+
+c calculating the atomization energy
+      dhatoms=0.
+      Dat=0.
+      cp_atom=5./2.*r_gas_cal
+      dh_0298=298*cp_atom/1000
+      do i=1,num_types
+         ind_elem=0
+         j=0
+         do while ((ind_elem.EQ.0).AND.(j.LE.iatoms))
+            if (types_atoms(i).EQ.elem(j)) then
+               ind_elem=j
+            endif
+            cond=(types_atoms(i).EQ.elem(j))
+            j=j+1
+         enddo
+         if (j.GT.iatoms) then
+            iwarn_atom=1
+            write(6,*)'atomization calculation impossible because data
+     $                  are missing'
+            write_dhf=0.
+            goto 435
+         endif
+         dhatoms=dhatoms+atoms_num(i)*(elem_dh(ind_elem)-dh_0298)
+         Dat=Dat+atoms_num(i)*(elem_en(ind_elem)-elem_essc(ind_elem))
+      enddo
+435   continue
+
+CCC case of polyatomic species
+      if(natom.GT.1)then
+
+c reading the frequencies
+         read(20,"(A30,I10)")kwfreq1,ifreq2
+         num_freq=ifreq2
+         read(20,*)(freq_vib(j),j=1,num_freq)
+c reading ispin from the me_files fr.me
+         read(20,*)
+         read(20,*)
+         read(20,*)charge,spin
+         ispin=int(spin)
+
+c calculate num of hr as number of frequencies not projected 
+         inquire(55,size=isize)
+         if(isize.NE.0) then
+            read(55,"(A30,I10)")kwunpfreq1,iunpfreq2
+            num_unpfreq=iunpfreq2
+            num_hr=num_unpfreq-num_freq
+         else
+            num_hr=0
+         endif
+
+c calculate the num of freq<freq_max for printing, specified in data
+         iprint=0
+         do i=1,num_freq
+             if (freq_vib(i).LT.printfreq_max .or. i.LT.10) then
+                iprint=iprint+1
+             endif
+         enddo
+
+c read the zpe
+         read(40,*)zpe
+
+c reading rotational symmetry number
+         iwarn_symrot=0
+         inquire(65,size=isize)
+         if(isize.NE.0) then
+            ind_hr=0
+            do while (WORD.NE.'FINAL')
+               call LineRead (65)
+               ind_hr=ind_hr+1
+            enddo
+            read(65,"(A32,I20)")kwsymm,irot_symm
+         else
+            iwarn_symrot=1
+            write(6,*)'the rotational symmetry was not read, 
+     $   but imposed equal to one'
+            irot_symm=1
+         endif
+         rot_symm=float(irot_symm)
+         rewind(65)
+
+c reading hindered rotors symmetry
+         iwarn_symhr=0
+         if(num_hr.ne.0)then
+            inquire(70,size=isize)
+            if(isize.NE.0) then
+               do while (WORD.NE.'AXIS')
+                  call LineRead (70)
+               enddo
+               read(70,*)kwsymm,isymm_hr
+               symm_hr(1)=float(isymm_hr)
+               do i=1,num_hr-1
+                  do j=1,6
+                     read(70,*)
+                  enddo
+                  read(70,*)kwsymm,isymm_hr
+                  symm_hr(i+1)=float(isymm_hr)
+               enddo
+            else
+               write(6,*)'hindered rotors potentials are missing'
+               stop
+            endif
+            inquire(65,size=isize)
+            if(isize.NE.0) then
+               do i=1,ind_hr-(num_hr-1)
+                  read(65,*)
+               enddo
+               do i=1,num_hr
+                  read(65,'(A37,2(I10))')kwhr1,ihrind_num,ihrsym_out(i)
+               enddo
+               do i=1,num_hr
+                  symm_hr(i)=symm_hr(i)*float(ihrsym_out(i))
+               enddo
+            else
+               iwarn_symhr=1
+               write(6,*)'hindered rotors simmetry was not checked'
+            endif
+         endif
+         rewind(65)
+         do i=1,num_hr
+            write(6,*)'hr num',i,' has symm ',symm_hr(i)
+         enddo
+
+c calculate moleculare weight
+         tot_mass=0.
+         do i=1,natom
+            tot_mass=tot_mass+atom_m(i)
+         enddo
+
+c calculate moments of inertia with respect to principal axes
+         call inertia_matrix(ispecies,rixx,riyy,rizz)
+
+C case of linear molecule
+         if(ilin.eq.1)then
+c        in kgm2
+            if(rixx.NE.0.)then
+c            rot_inertia_lin = cplanck/(rot_inertia(1)*1e9*8.*pigr**2.)
+               rot_inertia_lin=rixx
+            else
+               rot_inertia_lin=riyy
+            endif
+            rot_temp=cplanck**2/(8*pigr**2*DKBLTZ*1e-7*rot_inertia_lin)
+            rot_const=rot_temp*1e-9*DKBLTZ*1e-7/cplanck
+         else
+            rot_inertia_x=rixx
+            rot_inertia_y=riyy
+            rot_inertia_z=rizz
+            rot_temp_x=cplanck**2/(8*pigr**2*DKBLTZ*1e-7*rot_inertia_x)
+            rot_temp_y=cplanck**2/(8*pigr**2*DKBLTZ*1e-7*rot_inertia_y)
+            rot_temp_z=cplanck**2/(8*pigr**2*DKBLTZ*1e-7*rot_inertia_z)
+            rot_const_x=rot_temp_x*1e-9*DKBLTZ*1e-7/cplanck
+            rot_const_y=rot_temp_y*1e-9*DKBLTZ*1e-7/cplanck
+            rot_const_z=rot_temp_z*1e-9*DKBLTZ*1e-7/cplanck
+         endif
+c        call onedhr
+         iwarn_hr_inertia=0
+         if(num_hr.ne.0)then
+         command1='mkdir -p onedhr'
+         call commrun(command1)
+         if(ispecies.eq.1)then
+               command1='cat me_files/reac1_ge.me me_files/reac1_hr.me >
+     $         onedhr.dat'
+            else if(ispecies.eq.2)then
+               command1='cat me_files/reac2_ge.me me_files/reac2_hr.me >
+     $         onedhr.dat'
+            else if(ispecies.eq.3)then
+               command1='cat me_files/prod1_ge.me me_files/prod1_hr.me >
+     $         onedhr.dat'
+            else if(ispecies.eq.4)then
+               command1='cat me_files/prod2_ge.me me_files/prod2_hr.me >
+     $         onedhr.dat'
+            else if(ispecies.eq.0)then
+               command1='cat me_files/ts_ge.me me_files/reac2_hr.me >
+     $         onedhr.dat'
+            endif
+            call commrun(command1)
+            command1='onedhr.x'
+            call commrun(command1)
+            command1='mv onedhr.dat onedhr/.'
+            call commrun(command1)
+            command1='mv hr*.dat onedhr/.'
+            call commrun(command1)
+            command1='mv hrj_100.res onedhr/.'
+            call commrun(command1)
+            command1="mv hrj_conv.res onedhr/."
+            call commrun(command1)
+            command1="cat hrj*.res > hrjall.res"
+            call commrun(command1)
+            command1='mv *.res onedhr/.'
+            call commrun(command1)
+            open(unit=60,file='./onedhr/hrjall.res',status='unknown')
+            do i=1,num_hr
+               read(60,*)n_eig(i)
+               do j=1,n_eig(i)
+                  read(60,*)eig(i,j),geig(i,j)
+               enddo
+            enddo
+            close(60)
+            i=0
+            open(unit=75,file='./onedhr/onedhr.res',status='unknown')
+ 430        continue
+            call LineRead (75)
+            if(word.eq.'SUMMARY')then
+               i=i+1
+               read(75,*)
+               read(75,'(A13,F25.10)')kwhr2,hr_mom_in(i*2-1)
+               read(75,'(A13,F25.10)')kwhr2,hr_mom_in(i*2)
+            endif
+            if (WORD.EQ.'IZZ') then
+               go to 440
+            endif
+            goto 430
+ 440        continue
+            rewind(75)
+            close(75)
+            do i =1,num_hr
+               test_methods=ABS(hr_mom_in(i*2-1)-hr_mom_in(i*2))
+               if (test_methods.GT.1.0) then
+                  iwarn_hr_inertia=iwarn_hr_inertia+1
+               endif
+            enddo
+         endif
+
+c calculate the thermochemical properties         
+         write(6,*)'calculating the thermochemical properties'
+
+         do j=1,nT
+         temp=T(j)
+
+         q_trasl(j) = (2*pigr*tot_mass*1e-3/DNAV*DKBLTZ*1e-7*temp/
+     $          cplanck**2.)**1.5*DKBLTZ*1e-7*temp/pressure
+         s_trasl = r_gas*(log(q_trasl(j))+5./2.)
+         e_trasl = r_gas*3./2.*temp
+         cv_trasl = r_gas*3./2.
+
+         q_el = float(ispin)
+         s_el = r_gas*log(q_el)
+
+         if (ilin.eq.1)then
+            q_rot(j) = temp/rot_temp/rot_symm
+            s_rot = r_gas*(log(q_rot(j)+1.))
+            e_rot = r_gas*temp
+            cv_rot = r_gas
+         else
+            q_rot(j) = (pigr/rot_temp_x/rot_temp_y/rot_temp_z)**0.5
+     $     *temp**1.5/rot_symm
+            s_rot = r_gas*(log(q_rot(j))+3./2.)
+            e_rot = r_gas*3./2.*temp
+            cv_rot = r_gas*3./2.
+         endif
+
+         q_vib_tot(j) = 1.
+         s_vib = 0.
+         e_vib_tot = 0.
+         cv_vib = 0.
+
+         do i=1,num_freq
+            vib_temp=cplanck*freq_vib(i)*clight_cms/(DKBLTZ*1e-7)
+            q_vib(i,j)=1./(1.-exp(-vib_temp/temp))
+            q_vib_tot(j)=q_vib_tot(j)*q_vib(i,j)
+            s_vib=s_vib+r_gas*(vib_temp/temp/(exp(vib_temp/temp)
+     $           -1.)-log(1.-exp(-vib_temp/temp)))
+            cv_vib=cv_vib+r_gas*(vib_temp**2*exp(vib_temp/temp)/
+     $            (temp**2*(exp(vib_temp/temp)-1.)**2.))
+            e_vib(i,j)=r_gas*vib_temp*(0.5+1./
+     $           (exp(vib_temp/temp)-1.))
+            e_vib_tot=e_vib_tot+e_vib(i,j)
+         enddo
+
+c ref: Pfaendtner, J., Yu, X., Broadbelt, L.J., 2007. The 1-D hindered
+c rotor approximation. Theor Chem Account 118, 881–898.
+
+         q_hr_tot(j)=1.
+         e_hr=0.
+         cv_hr=0.
+         s_hr=0.
+         if(num_hr.GT.0) then
+            do i=1,num_hr
+               A=0.
+               B=0.
+               C=0.
+               do k=1,n_eig(i)
+                   eig_exp=exp(-eig(i,k)*conv_cal/r_gas_cal/temp)
+                   A=A+geig(i,k)*eig_exp
+                   eig_exp_eig=eig_exp*(eig(i,k)*conv_cal)
+                   B=B+geig(i,k)*eig_exp_eig
+                   eig_exp_eig2=eig_exp*(eig(i,k)*conv_cal)**2
+                   C=C+geig(i,k)*eig_exp_eig2
+               enddo
+               q_hr(i,j)=A/symm_hr(i)
+               e_hr=e_hr+B/symm_hr(i)/q_hr(i,j)
+               cv_hr=cv_hr+1/(r_gas_cal*temp**2)*(C/q_hr(i,j)/symm_hr(i)
+     $                  -(B/symm_hr(i)/q_hr(i,j))**2)
+               s_hr=s_hr+B/symm_hr(i)/temp/q_hr(i,j)+
+     $               r_gas_cal*log(q_hr(i,j))
+               q_hr_tot(j)=q_hr_tot(j)*q_hr(i,j)
+            enddo
+         endif
+
+         q_tot(j)=q_trasl(j)*q_rot(j)*q_vib_tot(j)*q_el*q_hr_tot(j)
+         s_tot(j)=s_hr+(s_trasl+s_rot+s_vib+s_el)/4.184
+         e_tot(j)=e_hr+(e_trasl+e_rot+e_vib_tot)/4.184
+         cv_tot(j)=cv_hr+(cv_trasl+cv_vib+cv_rot)/4.184
+         e_corr=e_tot(j)/1000./CAUTOKCAL
+         h_corr=(e_tot(j)+r_gas/4.184*temp)/1000./CAUTOKCAL
+         g_corr=h_corr-temp*s_tot(j)/1000./CAUTOKCAL
+         el_zpe(j)=energy+zpe
+         el_ther_ener(j)=energy+e_corr
+         el_ther_ent(j)=energy+h_corr
+         el_ther_free(j)=energy+g_corr
+         enddo
+
+c calculating the enthalpy of formation at 298K         
+         dh_298=0.
+         do j=20,298
+            temp=j
+            cv_vib_dh=0.
+            do i=1,num_freq
+            vib_temp_dh = cplanck*freq_vib(i)*clight_cms/(DKBLTZ*1e-7)
+            cv_vib_dh=cv_vib_dh+r_gas*(vib_temp_dh**2*exp(vib_temp_dh
+     $            /temp)/(temp**2*(exp(vib_temp_dh/temp)-1.)**2.))
+            enddo
+            cv_hr_dh=0.
+            if(num_hr.GT.0) then
+               do i=1,num_hr
+                  A=0.
+                  B=0.
+                  C=0.
+                  do k=1,n_eig(i)
+                      eig_exp=exp(-eig(i,k)*conv_cal/r_gas_cal/temp)
+                      A=A+eig_exp
+                      eig_exp_eig=eig_exp*(eig(i,k)*conv_cal)
+                      B=B+eig_exp_eig
+                      eig_exp_eig2=eig_exp*(eig(i,k)*conv_cal)**2
+                      C=C+eig_exp_eig2
+                  enddo
+                  q_hr_dh(i)=A/symm_hr(i)
+                  cv_hr_dh=cv_hr_dh+1/(r_gas_cal*temp**2)*(C/q_hr_dh(i)/
+     $                      symm_hr(i)-(B/symm_hr(i)/q_hr_dh(i))**2)
+               enddo
+            endif
+            cv_trasl_dh = r_gas*3./2.
+            if (ilin.eq.1)then
+               cv_rot_dh = r_gas
+            else
+               cv_rot_dh = r_gas*3./2.
+            endif
+            cv_tot_dh=(cv_trasl_dh+cv_vib_dh+cv_rot_dh+cv_hr_dh)/4.184
+            cp_dh=cv_tot_dh+r_gas_cal
+            dh_298=dh_298+cp_dh/1000
+         enddo
+
+      cp_dh_lowT=(cv_trasl_dh+cv_rot_dh)/4.184+r_gas_cal
+      dh_298=dh_298+20*cp_dh_lowT/1000
+      dh_f=dh_298+dhatoms-(Dat-(energy+zpe))*627.503
+      D0=(Dat-(energy+zpe))*627.503
+      endif
+
+CCC case of nomoatomic species
+      if(natom.EQ.1) then
+
+c reading the spin from fr.me
+         read(20,*)
+         read(20,*)charge,spin
+         ispin=int(spin)
+
+         tot_mass = atom_m(1)
+
+c calculating thermochemical properties      
+         write(6,*)'calculating the thermochemical properties'
+
+         do j=1,nT
+         temp=T(j)
+
+         q_trasl(j) = (2*pigr*tot_mass*0.001/DNAV*DKBLTZ*1e-7*temp/
+     $          cplanck**2.)**1.5*DKBLTZ*1e-7*temp/pressure
+c in cal/mol/K NOTE: CONVERSION FACTOR EXPLICIT
+         s_trasl = r_gas*(log(q_trasl(j))+5./2.)
+         e_trasl = r_gas*3./2.*temp
+         cv_trasl = r_gas*3./2.
+
+         q_el = float(ispin)
+         s_el = r_gas*log(q_el)
+
+         q_tot(j)=q_trasl(j)*q_el
+         s_tot(j)=(s_trasl+s_el)/4.184
+         e_tot(j)=e_trasl/4.184
+         cv_tot(j)=cv_trasl
+         e_corr=e_tot(j)/1000./CAUTOKCAL
+         h_corr=(e_tot(j)+r_gas*temp)/1000./CAUTOKCAL
+         g_corr=h_corr-temp*s_tot(j)/1000./CAUTOKCAL
+         el_zpe(j)=energy
+         el_ther_ener(j)=energy+e_corr
+         el_ther_ent(j)=energy+h_corr
+         el_ther_free(j)=energy+g_corr
+         enddo
+
+      endif
+
+      iwarn=iwarn_symrot+iwarn_atom+iwarn_enl1+iwarn_symhr
+     $       +iwarn_hr_inertia
+      if (iprintall.EQ.0) then
+         if (write_dhf.EQ.1) then
+            write(25,'(A75,f8.2)')'deltaH of formation at 298K, computed
+     $ from atomization energy [kcal/mol]: ',dh_f
+         write(25,*)' '
+         endif
+         write(25,'(A10,A11,2(A14),A15)')'T[K]','Q[-]','S[cal/mol/K]',
+     $      'Cv[cal/mol/K]','E_g[Hartree]'
+         do i=1,nT
+            write(25,'(f10.2,ES11.3,2(f14.2),ES15.6)')T(i),q_tot(i),
+     $         s_tot(i),cv_tot(i),el_ther_free(i)
+         enddo
+         write(25,*)'E_g: sum of electronic and thermal free energies'
+         write(25,*)' '
+      else
+         if (write_dhf.EQ.1) then
+            write(25,'(A75,f8.2)')'deltaH of formation at 298K, computed
+     $ from atomization energy [kcal/mol]: ',dh_f
+         write(25,*)' '
+         endif
+         write(25,'(A10,A11,2(A14),2(A15))')'T[K]','Q[-]','S[cal/mol/K]'
+     $       ,'Cv[cal/mol/K]','E_g[Hartree]','E_h[Hartree]'
+         do i=1,nT
+            write(25,'(f10.2,ES11.3,2(f14.2),2(ES15.6))')
+     $         T(i),q_tot(i),s_tot(i),cv_tot(i),el_ther_free(i),
+     $         el_ther_ent(i)
+         enddo
+         write(25,*)'E_g: sum of electronic and thermal free energies'
+         write(25,*)'E_h: sum of electronic and thermal enthalpies'
+         write(25,*)' '
+         write(25,'(A10,5(A13))')'T[K]',
+     $      'Qtr[-]','Qrot[-]','Qel[-]','Qhr[-]','Qvib[-]'
+         do i=1,nT
+            write(25,'(f10.2,5(ES13.3))')T(i),
+     $      q_trasl(i),q_rot(i),q_el,q_hr_tot(i),q_vib_tot(i)
+         enddo
+         write(25,*)' '
+         if (num_hr.NE.0) then
+            write(25,'(A8,A7,300(I11))')'T[K]','Qhr_n',(n,n=1,num_hr)
+            do i=1,nT
+               write(25,'(f8.2,A7,300(ES11.3))')T(i),' ',
+     $              (q_hr(n,i),n=1,num_hr)
+            enddo
+            write(25,*)' '
+         endif
+         write(25,'(A8,A7,300(I11))')'T[K]','Qvib_n',(n,n=1,iprint)
+         do i=1,nT
+            write(25,'(f8.2,A7,300(ES11.3))')T(i),' ',
+     $           (q_vib(n,i),n=1,iprint)
+         enddo
+         write(25,*)'first vibrational energy level: zero of the energy'
+         write(25,*)' '
+      endif
+      if (ilin.NE.1) then
+         write(25,*)'Rotational temperatures [K]'
+         write(25,'(3(f10.4))')rot_temp_x,rot_temp_y,rot_temp_z
+         write(25,*)'Rotational constants [GHz]'
+         write(25,'(3(f10.4))')rot_const_x,rot_const_y,rot_const_z
+      else
+         write(25,*)'Rotational temperatures [K]'
+         write(25,'(f10.4)')rot_temp
+         write(25,*)'Rotational constants [GHz]'
+         write(25,'(f10.4)')rot_const
+      endif
+      if (num_hr.NE.0) then
+         do i=1,num_hr
+            write(25,*)' '
+            write(25,*)'Moment of inertia of hindered rotor ',i
+            write(25,*)'Expressed in AMU*ANGSTROM**2, method 23 and 33'
+            write(25,'(2(F10.4))')hr_mom_in(i*2-1), hr_mom_in(i*2)
+            write(25,*)'Expressed in 1/cm, method 23 and 33'
+            c1=cplanck/(hr_mom_in(i*2-1)*amu*1e-20*8*pigr**2*clight_cms)
+            c2=cplanck/(hr_mom_in(i*2)*amu*1e-20*8*pigr**2*clight_cms)
+            write(25,'(2(F10.4))')c1,c2
+         enddo
+         write(25,*)' '
+         write(25,*)'Computations are carried out with method 23 of East
+     $ and Radom, J. Chem. Phys. 106 (16), 22 April 1997'
+      endif
+      if (iwarn.NE.0) then
+         write(25,*)' '
+         write(25,'(A9)')'WARNINGS'
+         if (iwarn_atom.EQ.1) then
+            write(25,'(A60)')'Atomization calculation impossible because
+     $ data are missing'
+         endif
+         if (iwarn_symrot.EQ.1) then
+            write(25,'(A63)')'The rotational symmetry was not read, but
+     $imposed equal to one'
+         endif
+         if (iwarn_enl1.EQ.1) then
+            write(25,'(A40)')'Energy at level1 was used, as asked for'
+         endif
+         if (iwarn_symhr.EQ.1) then
+            write(25,'(A41)')'Hindered rotors simmetry was not checked'
+         endif
+         if (iwarn_hr_inertia.GT.0) then
+            write(25,'(A54)')'Hindered rotots inertia constants could be
+     $ inaccurate'
+         endif
+      endif
+      if (ispecies.eq.1) then
+         write (6,*) 'end of thermo_reac1'
+      endif
+      if (ispecies.eq.2) then
+         write (6,*) 'end of thermo_reac2'
+      endif
+      if (ispecies.eq.3) then
+         write (6,*) 'end of thermo_prod1'
+      endif
+      if (ispecies.eq.4) then
+         write (6,*) 'end of thermo_prod2'
+      endif
+      if (ispecies.eq.0) then
+         write (6,*) 'end of thermo_ts'
+      endif
+
+      close(20)
+      close(25)
+      close(30)
+      close(35)
+      close(40)
+      close(45)
+      close(55)
+      close(65)
+      close(70)
+
+      END
+cmdt thermo 
+
+cmdm ineria matrix calculation
+      subroutine inertia_matrix(ispecies,rixx,riyy,rizz)
+
+      implicit double precision (a-h,o-z)
+      implicit integer (i-n)
+
+      include 'data_estoktp.fi'
+      include 'param_estoktp.fi'
+
+      dimension xcoor(200),ycoor(200),zcoor(200),atom_m(200)
+      character*2 aname
+      REAL rmatrix(3,3),d(10),v(10,10)
+
+
+      if(ispecies.eq.1)then
+         open(unit=30,file='./geoms/reac1_l1.xyz',status='old')
+      endif
+
+      if(ispecies.eq.2)then
+         open(unit=30,file='./geoms/reac2_l1.xyz',status='old')
+      endif
+
+      if(ispecies.eq.3)then
+         open(unit=30,file='./geoms/prod1_l1.xyz',status='old')
+      endif
+
+      if(ispecies.eq.4)then
+         open(unit=30,file='./geoms/prod2_l1.xyz',status='old')
+      endif
+
+      if(ispecies.eq.0)then
+         open(unit=30,file='./geoms/tsgta_l1.xyz',status='old')
+      endif
+
+      read(30,*)num_atom
+      read(30,*)
+      do i=1,num_atom
+         read(30,*)aname,xcoor(i),ycoor(i),zcoor(i)
+            xcoor(i)=xcoor(i)
+            ycoor(i)=ycoor(i)
+            zcoor(i)=zcoor(i)
+            call atom_mass(aname,ianumb,iamass)
+               call atom_num_mass(ianumb,amass)
+                  atom_m(i)=amass
+      enddo
+
+c calculation of the center of mass
+      x_sum=0.
+      y_sum=0.
+      z_sum=0.
+      m_sum=0.
+      do i=1,num_atom
+         x_sum=x_sum+atom_m(i)*xcoor(i)
+         y_sum=y_sum+atom_m(i)*ycoor(i)
+         z_sum=z_sum+atom_m(i)*zcoor(i)
+         m_sum=m_sum+atom_m(i)
+      enddo
+      x_cmass=x_sum/m_sum
+      y_cmass=y_sum/m_sum
+      z_cmass=z_sum/m_sum
+
+      riner_xx=0.
+      riner_yy=0.
+      riner_zz=0.
+      riner_xy=0.
+      riner_xz=0.
+      riner_yz=0.
+      do i=1,num_atom
+         x_new=xcoor(i)-x_cmass
+         y_new=ycoor(i)-y_cmass
+         z_new=zcoor(i)-z_cmass
+         riner_xx=riner_xx+(y_new**2+z_new**2)*atom_m(i)
+         riner_yy=riner_yy+(x_new**2+z_new**2)*atom_m(i)
+         riner_zz=riner_zz+(x_new**2+y_new**2)*atom_m(i)
+         riner_xy=riner_xy-x_new*y_new*atom_m(i)
+         riner_xz=riner_xz-x_new*z_new*atom_m(i)
+         riner_yz=riner_yz-y_new*z_new*atom_m(i)
+      enddo
+
+      n=3
+      np=3
+
+      rmatrix(1,1)=riner_xx
+      rmatrix(1,2)=riner_xy
+      rmatrix(2,1)=riner_xy
+      rmatrix(2,2)=riner_yy
+      rmatrix(2,3)=riner_yz
+      rmatrix(3,2)=riner_yz
+      rmatrix(3,3)=riner_zz
+      rmatrix(1,3)=riner_xz
+      rmatrix(3,1)=riner_xz
+
+      write(6,*)'Calculating the principal moments of inertia'
+
+      call jacobi(rmatrix,n,np,d,v,nrot)
+
+
+      rixx=d(1)/DNAV*1e-3*1e-20
+      riyy=d(2)/DNAV*1e-3*1e-20
+      rizz=d(3)/DNAV*1e-3*1e-20
+
+      END
+
+cmdt ineria matrix calculation
+
+cmdt  diagonalization
+c from Numerical Recepies in F77 page 460
+
+      SUBROUTINE jacobi(a,n,np,d,v,nrot)
+
+      INTEGER n,np,nrot,NMAX
+      REAL a(np,np),d(np),v(np,np)
+      PARAMETER (NMAX=500)
+Computes all eigenvalues and eigenvectors of a real symmetric matrix a,
+Cwhich is of size n by n, stored in a physical np by np array. On
+Coutput, elements of a above the diagonal are destroyed. d returns the
+Ceigenvalues of a in its first n elements. v is a matrix with the same
+Clogical and physical dimensions as a, whose columns contain, on output,
+Cthe normalized eigenvectors of a. nrot returns the number of Jacobi
+Crotations that were required.
+      INTEGER i,ip,iq,j
+      REAL c,g,h,s,sm,t,tau,theta,tresh,b(NMAX),z(NMAX)
+
+      do ip=1,n
+         do iq=1,n
+            v(ip,iq)=0.
+         enddo
+         v(ip,ip)=1.
+      enddo
+      do ip=1,n
+         b(ip)=a(ip,ip)
+         d(ip)=b(ip)
+         z(ip)=0.
+      enddo
+      nrot=0
+      do i=1,50
+         sm=0.
+         do ip=1,n-1
+            do iq=ip+1,n
+               sm=sm+abs(a(ip,iq))
+            enddo
+         enddo
+         if(sm.eq.0.)return
+         if(i.lt.4)then
+            tresh=0.2*sm/n**2
+         else
+            tresh=0.
+         endif
+         do ip=1,n-1
+            do iq=ip+1,n
+               g=100.*abs(a(ip,iq))
+               if((i.gt.4).and.(abs(d(ip))+g.eq.abs(d(ip)))
+     $         .and.(abs(d(iq))+g.eq.abs(d(iq))))then
+                  a(ip,iq)=0.
+               else if(abs(a(ip,iq)).gt.tresh)then
+                  h=d(iq)-d(ip)
+                  if(abs(h)+g.eq.abs(h))then
+                     t=a(ip,iq)/h
+                  else
+                     theta=0.5*h/a(ip,iq)
+                     t=1./(abs(theta)+sqrt(1.+theta**2))
+                     if(theta.lt.0.)t=-t
+                  endif
+                  c=1./sqrt(1+t**2)
+                  s=t*c
+                  tau=s/(1.+c)
+                  h=t*a(ip,iq)
+                  z(ip)=z(ip)-h
+                  z(iq)=z(iq)+h
+                  d(ip)=d(ip)-h
+                  d(iq)=d(iq)+h
+                  a(ip,iq)=0.
+                  do j=1,ip-1
+                     g=a(j,ip)
+                     h=a(j,iq)
+                     a(j,ip)=g-s*(h+g*tau)
+                     a(j,iq)=h+s*(g-h*tau)
+                  enddo
+                  do j=ip+1,iq-1
+                     g=a(ip,j)
+                     h=a(j,iq)
+                     a(ip,j)=g-s*(h+g*tau)
+                     a(j,iq)=h+s*(g-h*tau)
+                  enddo
+                  do j=iq+1,n
+                     g=a(ip,j)
+                     h=a(iq,j)
+                     a(ip,j)=g-s*(h+g*tau)
+                     a(iq,j)=h+s*(g-h*tau)
+                  enddo
+                  do j=1,n
+                     g=v(j,ip)
+                     h=v(j,iq)
+                     v(j,ip)=g-s*(h+g*tau)
+                     v(j,iq)=h+s*(g-h*tau)
+                  enddo
+                  nrot=nrot+1
+               endif
+            enddo
+         enddo
+         do ip=1,n
+            b(ip)=b(ip)+z(ip)
+            d(ip)=b(ip)
+            z(ip)=0.
+         enddo
+      enddo
+      write(*,*)'too many iterations in jacobi'
+      stop
+      return
+      END
+
+cmdt
+
+

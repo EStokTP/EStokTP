@@ -74,8 +74,8 @@ c
       enddo
 
       do k=1,natomt
-c         do j=1,natommx
-         do j=1,19
+         do j=1,natommx
+c         do j=1,19
             if(j.lt.10)write(ccheck,"(I1)")j
             if(j.lt.100.and.j.gt.9)write(ccheck,"(I2)")j
             if(j.lt.1000.and.j.gt.99)write(ccheck,"(I3)")j
@@ -682,7 +682,8 @@ c         write(*,*)'nprog is ',nprog
                tauopt(j)=sqrt((cooxt(i)-cooxt(ibconn(i)))**2+
      $       (cooyt(i)-cooyt(ibconn(i)))**2+(coozt(i)-coozt(ibconn(i))))      
             endif
-            if(intcoor(j).eq.anname(i)) then
+cc            if(intcoor(j).eq.anname(i)) then
+            if(bislab(j).eq.anname(i)) then
 c               open (unit=99,file='dihed.dat',status='unknown')
 c               write(99,*)cooxt(i),cooyt(i),coozt(i)
 c               ianum=ibconn(i)
@@ -704,7 +705,8 @@ c               close(23)
      +              cooxt(id),cooyt(id),coozt(id),ang,dihed) 
                tauopt(j)=ang
             endif
-            if(intcoor(j).eq.dname(i)) then
+cc            if(intcoor(j).eq.dname(i)) then
+            if(bislab(j).eq.dname(i)) then
 c               open (unit=99,file='dihed.dat',status='unknown')
 c               write(99,*)cooxt(i),cooyt(i),coozt(i)
 c               ianum=ibconn(i)
@@ -734,10 +736,16 @@ c               close(23)
 c      write(*,*)'ok 4'
 
 
-         if (tauopt(itau).gt.360.0d0) tauopt(itau) = 
-     $        tauopt(itau) - 360.0d0
-         if (tauopt(itau).lt.0.0d0) tauopt(itau) = 
-     $        tauopt(itau) + 360.0d0
+c         if (tauopt(itau).gt.360.0d0) tauopt(itau) = 
+c     $        tauopt(itau) - 360.0d0
+c         if (tauopt(itau).lt.0.0d0) tauopt(itau) = 
+c     $        tauopt(itau) + 360.0d0
+
+         if (tauopt(j).gt.360.0d0) tauopt(j) = 
+     $        tauopt(j) - 360.0d0
+         if (tauopt(j).lt.0.0d0) tauopt(j) = 
+     $        tauopt(j) + 360.0d0
+
          write(*,*)'tauopt is',j,tauopt(j)
       enddo
 cc now update atomlabel if iangindex not equal to zero (dummy atom at position

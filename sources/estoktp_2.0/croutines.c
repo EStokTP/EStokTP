@@ -102,4 +102,12 @@ int commrun_(char *command, int ll)
   return system(command);
 }
 
+int commruns_(char *command, int ll)
+{
+  command[ll--]='\0';
+  //  printf("command is %s \n",command);
+  vlimit(LIM_CORE,0);
+  return system(command);
+}
+
 

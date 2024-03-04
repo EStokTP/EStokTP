@@ -133,7 +133,7 @@ cc now check for dummy atoms
          else
             idummy(j)=0
          endif
-         write(*,*)'idummy is j: ',j, idummy(j)
+c         write(*,*)'idummy is j: ',j, idummy(j)
       enddo
       isited=0
       jsited=0
@@ -152,7 +152,7 @@ c      write(*,*)'isite isited ',isite,isited
 c      write(*,*)'jsite jsited ',jsite,jsited
 c      write(*,*)'ksite ksited ',ksite,ksited
 
-      write(*,*)'out of read_zmat'
+c      write(*,*)'out of read_zmat'
 
       return
       end
@@ -586,10 +586,11 @@ c      ifilu=0
          write(99,*)'xyz zmat from update z.mat with dummies'
          do j=1,natomt
             aname1(j)=atname(j)
-            write(99,*)aname1(j),cooxt(j),cooyt(j),coozt(j)
+            write(99,101)aname1(j),cooxt(j),cooyt(j),coozt(j)
          enddo
          close(99)
       endif
+ 101  format(1x,A1,1X,F9.5,1X,F9.5,1X,F9.5,1x' ')
 c      stop
 
 

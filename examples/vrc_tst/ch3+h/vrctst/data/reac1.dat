@@ -1,0 +1,42 @@
+nosmp deth dtth
+5 1.0  0.00001
+
+ntau
+0
+-->taumn,taumx sampling interval
+
+ nhind
+0
+-->namehind,hindmn,hindmx,nhindsteps
+
+
+natom natomt ilin
+5 5 0
+
+charge spin atomlabel
+0  1
+C1
+H2   C1   R1
+H3   C1   R2   H2   A2
+H4   C1   R3   H2   A3   H3   D3
+H21 C1 BB H2 ANG1 H3 DH1
+
+intcoor
+R1    1.0782000000000000
+R2    1.0782000000000000
+R3    1.0782000000000000
+A2    119.97210000000000
+A3    120.02070000000001
+D3    179.80760000000001
+BB    1.4
+ANG1    118.0
+DH1    92.0
+
+SymmetryFactor
+1.
+
+nelec
+1
+0. 1
+
+end

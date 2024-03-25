@@ -1,0 +1,24 @@
+ memory,         400 ,m
+
+symmetry, nosym; orient, noorient
+angstrom
+geomtyp=xyz
+geometry={
+5
+rotational dynamics
+C, 0.0490253, -0.0480238, -0.239878
+H, -0.982466, -0.209954, -0.5088
+H, 0.806358, -0.01251, -1.0065
+H, 0.322783, 0.0814444, 0.794925
+H, -0.730411, 0.71283, 3.57656
+}
+
+ basis=cc-pvdz                                                         
+ {multi;closed, 4;occ, 6;wf, 10,1,0,;state,1;maxiter,40}               
+ if (iterations.ge.0) then                                             
+    {rs2,shift=0.2;orbital,IGNORE_ERROR;state,1}                       
+    molpro_energy = energy +   40.192865169999997     
+ else                                                                  
+    molpro_energy = 10.0                                               
+ endif                                                                 
+ ---                                                                   

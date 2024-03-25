@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<molpro xmlns="http://www.molpro.net/schema/molpro-output"
+  xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+  xmlns:cml="http://www.xml-cml.org/schema"
+  xmlns:stm="http://www.xml-cml.org/schema"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+ <job>
+  <jobstep command="MULTI" commandset="MULTI">
+   <cml:molecule>
+    <cml:symmetry pointGroup="C1">
+    </cml:symmetry>
+    <cml:atomArray>
+     <cml:atom id="a1" elementType="C" x3="-0.401740217923969E-05" y3="-0.510315328436914E-06"
+       z3="-0.907482613666724E-01"/>
+     <cml:atom id="a2" elementType="H" x3="-0.610740893286959" y3="0.870145334226002"
+       z3="-0.275960268704084"/>
+     <cml:atom id="a3" elementType="H" x3="1.05894578467288" y3="0.93935215016299E-01"
+       z3="-0.275837986072344"/>
+     <cml:atom id="a4" elementType="H" x3="-0.448080884319529" y3="-0.964024688494463"
+       z3="-0.276062360181563"/>
+     <cml:atom id="a5" elementType="H" x3="-0.761341596923746E-04" y3="-0.497796344679511E-04"
+       z3="1.90925173672625"/>
+    </cml:atomArray>
+    <cml:bondArray>
+     <cml:bond atomRefs2="a1 a2"/>
+     <cml:bond atomRefs2="a1 a3"/>
+     <cml:bond atomRefs2="a1 a4"/>
+    </cml:bondArray>
+   </cml:molecule>
+   <property name="Energy" method="MCSCF" principal="true" stateSymmetry="1" stateNumber="1"
+     value="-40.1073351981752"/>
+   <property name="Dipole moment" method="MCSCF" principal="true" stateSymmetry="1"
+     stateNumber="1"
+     value="0.369564713419485E-04 0.204156262209405E-04 -0.375435446021985"/>
+   <time start="08:59:35" end="08:59:36" cpu="0.67" system="0.3" real="1.42"/>
+   <storage units="megabyte" memory="0.0" sf="1.04" df="117.67" eaf="16.84" ga="0.0"/>
+   <summary overall_method="MULTI/cc-pVDZ"/>
+  </jobstep>
+  <jobstep command="RS2" commandset="CIPRO">
+   <property name="Energy" method="RSPT2" principal="true" stateSymmetry="1" stateNumber="1"
+     value="-40.2446619538997"/>
+   <property name="Dipole moment" method="RSPT2" principal="true" stateSymmetry="1"
+     stateNumber="1"
+     value="0.380105311394998E-04 0.209033702496764E-04 -0.379284366636156"/>
+   <time start="08:59:36" end="08:59:37" cpu="0.07" system="0.03" real="0.2"/>
+   <storage units="megabyte" memory="0.0" sf="1.23" df="117.67" eaf="16.84" ga="0.0"/>
+   <summary overall_method="RS2/cc-pVDZ"/>
+  </jobstep>
+  <stm:metadataList>
+   <stm:metadata name="dc:date" content="2023-06-03T08:59:37+02:00"/>
+   <stm:metadata name="dc:creator" content="cavallotti"/>
+   <stm:metadata name="cmlm:insilico" content="Molpro"/>
+  </stm:metadataList>
+  <platform>
+   <version major="2022" minor="2" SHA="51306cdc306ce2a111a2867affebcb289530e0a7"
+     integer_bits="64" parallelism="mpp">
+    2022.2
+    <date year="2023" month="6" day="3" hour="8" minute="59" second="35">
+     2023-06-03T08:59:35
+    </date>
+   </version>
+   <licence id="polimi"/>
+   <parallel processes="4" nodes="1" all_processes="4" openmp="1"/>
+   <dimensions natom="400" nvalence="500" nvalence_pno="1000" nbasis="12000" nstate="100"
+     nsymm="16" nrec="512" nprim="2" ncol="100"/>
+  </platform>
+  <input>
+   <p> memory,         400 ,m</p>
+   <p>  nosym</p>
+   <p> geometry={angstrom</p>
+   <p>  C1</p>
+   <p>  H2   C1   R1</p>
+   <p>  H3   C1   R2   H2   A2</p>
+   <p>  H4   C1   R3   H2   A3   H3   D3</p>
+   <p>  H21 C1 BB H2 ANG1 H3 DH1</p>
+   <p> }</p>
+   <p> R1                             =    1.0790999999999999</p>
+   <p> R2                             =    1.0790999999999999</p>
+   <p> R3                             =    1.0790999999999999</p>
+   <p> A2                             =    117.11430000000000</p>
+   <p> A3                             =    117.12210000000000</p>
+   <p> D3                             =    213.11189999999999</p>
+   <p> DH1                            =    106.55010000000000</p>
+   <p> ANG1                           =    99.882900000000006</p>
+   <p> BB                             =    2.0000000000000000</p>
+   <p>  basis=cc-pvdz</p>
+   <p>  {multi;closed, 4;occ, 6;wf, 10,1,0,;state,1;maxiter,40}</p>
+   <p>  {RS2,SHIFT=0.2;ORBITAL,IGNORE_ERROR;STATE,1}</p>
+   <p>  CBSen = energy</p>
+   <p> put,molden,molpro.molden</p>
+   <p> ===</p>
+  </input>
+  <diagnostics warnings="0"/>
+ </job>
+</molpro>

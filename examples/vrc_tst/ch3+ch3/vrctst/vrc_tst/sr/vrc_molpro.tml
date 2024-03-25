@@ -1,0 +1,13 @@
+ memory,         400 ,m
+
+ GEOMETRY_HERE
+
+ basis=cc-pvdz                                                         
+ {multi;closed, 8;occ,10;wf, 18,1,0,;state,1;maxiter,40}               
+ if (iterations.ge.0) then                                             
+    {rs2,shift=0.2;orbital,IGNORE_ERROR;state,1}                       
+    molpro_energy = energy +   79.387159740000001     
+ else                                                                  
+    molpro_energy = 10.0                                               
+ endif                                                                 
+ ---                                                                   

@@ -1,0 +1,97 @@
+command is mkdir -p output                                                                                      
+command is mkdir -p geoms                                                                                       
+command is mkdir -p irc_files                                                                                   
+command is mkdir -p me_files                                                                                    
+command is mkdir -p me_blocks                                                                                   
+command is mkdir -p hl_logs                                                                                     
+command is mkdir -p hr_geoms                                                                                    
+command is mkdir -p md_tunn                                                                                     
+command is rm -f ./finished                                                                                     
+command is pwd > temp.log                                                                   
+command is date > temp.log                                                                  
+command is hostname > temp.log                                                              
+command is egrep End ./me_files/prod1_fr.me > tmp.log                                                                                                                                                                                                                                                                   
+command is wc tmp.log > tmp1.log                                                                                                                                                                                                                                                                                        
+command is egrep End ./me_files/prod2_fr.me > tmp.log                                                                                                                                                                                                                                                                   
+command is wc tmp.log > tmp1.log                                                                                                                                                                                                                                                                                        
+command is  sed -ie 's/Species/Fragment Prod2/g'                      me_files/prod2_ge.me                                                                                                                                                                                                                              
+command is  sed -ie 's/Well/Bimolecular/g'                            me_files/prod1_ge.me                                                                                                                                                                                                                              
+command is  sed -ie 's/Species/Fragment PROD1/g'                      me_files/prod1_ge.me                                                                                                                                                                                                                              
+command is cp -f ./me_files/*dhr*.dat ./me_blocks                                                                                                                                                                                                                                                                       
+command is cp -f ./me_files/variational.me ./temp1.me                                                                                                                                                                                                                                                                   
+command is  sed -e 's/\$wdepfor/   32.36 /' ./temp1.me > temp2.me                                                                                                                                                                                                                                                       
+command is  sed -e 's/\$wdepback/  -54.05 /' ./temp2.me > temp21.me                                                                                                                                                                                                                                                     
+command is echo End > temp211.me                                                                                                                                                                                                                                                                                        
+command is cat temp21.me temp211.me > temp21a.me                                                                                                                                                                                                                                                                        
+command is  sed -ie 's/Barrier TS REACS WR/Barrier VARIATIONAL/g'     temp21a.me                                                                                                                                                                                                                                        
+command is cp -f temp21a.me ./me_blocks/variational.me                                                                                                                                                                                                                                                                  
+command is echo End > temp211.me                                                                                                                                                                                                                                                                                        
+command is echo End > temp212.me                                                                                                                                                                                                                                                                                        
+command is cat temp211.me temp212.me > temp213.me                                                                                                                                                                                                                                                                       
+command is cat temp21.me temp213.me > temp3.me                                                                                                                                                                                                                                                                          
+command is cat ./me_files/reac1_ge.me                                 ./me_files/reac1_hr.me ./me_files/reac1_fr.me                     > reactants.me                                                                                                                                                                  
+command is cp -f reactants.me reac1_barr.me                                                                                                                                                                                                                                                                             
+command is sed -ie 's/REACS/REAC1/g' reac1_barr.me                                                                                                                                                                                                                                                                      
+command is cp -f reac1_barr.me ./me_blocks                                                                                                                                                                                                                                                                              
+command is cat ./me_files/prod1_ge.me                              ./me_files/prod1_hr.me ./me_files/prod1_fr.me                     ./me_files/prod2_ge.me ./me_files/prod2_hr.me                     ./me_files/prod2_fr.me > products0.me                                                                            
+command is  sed -e 's/\$proden/   86.41 /' products0.me > products.me                                                                                                                                                                                                                                                   
+command is cp -f products.me bimol2.me                                                                                                                                                                                                                                                                                  
+command is sed -ie 's/PRODS/BIMOL2/g' bimol2.me                                                                                                                                                                                                                                                                         
+command is cp -f bimol2.me ./me_blocks                                                                                                                                                                                                                                                                                  
+command is cat ./me_files/wellr_fake.me                                > wellr.me                                                                                                                                                                                                                                       
+command is cat ./me_files/wellp_fake.me                                > wellp.me                                                                                                                                                                                                                                       
+command is cat wellr.me > wells.me                                                                                                                                                                                                                                                                                      
+command is cat ./data/me_head.dat ./reactants.me                      ./products.me                                                     ./temp3.me > me_ktp.inp                                                                                                                                                         
+command is mess me_ktp.inp                                                                                                                                                                                                                                                                                              
+command is  egrep 'rate calculation done' me_ktp.log                > temp.log                                                                                                                                                                                                                                          
+command is cat temp.log temp1.log > temp2.log                                                                                                                                                                                                                                                                           
+command is cp -f me_ktp.inp output                                                                                                                                                                                                                                                                                      
+command is cp -f rate.out output                                                                                                                                                                                                                                                                                        
+command is rm -f temp0.dat                                                                  
+command is rm -f temp1.dat*                                                                 
+command is rm -f temp1.log                                                                  
+command is rm -f temp1.xyz                                                                  
+command is rm -f temp.dat                                                                   
+command is rm -f temp.log*                                                                  
+command is rm -f temp2.log*                                                                 
+command is rm -f temp.tmp*                                                                  
+command is rm -f testcc.log*                                                                
+command is rm -f fort.*                                                                     
+command is rm -f *.me                                                                       
+command is rm -f optgeom.tmp                                                                
+command is rm -f tmp1.dat                                                                   
+command is rm -f tmp2.dat                                                                   
+command is rm -f tmp3.dat                                                                   
+command is rm -f tmp.dat                                                                    
+command is rm -f temp21a.me*                                                                
+command is rm -f temp3.me*                                                                  
+command is rm -f tmp1.log                                                                   
+command is rm -f tmp.log                                                                    
+command is rm -f tsgeom.tmp                                                                 
+command is rm -f temp.xyz                                                                   
+command is rm -f geom1.xyz                                                                  
+command is rm -f geom.xyz                                                                   
+command is rm -f geom_temp.out                                                              
+command is rm -f headgeom.tmp                                                               
+command is rm -f num.log                                                                    
+command is rm -f temp.out                                                                   
+command is rm -f stoich.dat*                                                                
+command is rm -f stoich.res                                                                 
+command is rm -f anim_freq.xyz                                                              
+command is rm -f Cart_displ.txt                                                             
+command is rm -f freqs1.txt                                                                 
+command is rm -f freqs_orig.txt                                                             
+command is rm -f freqs.txt                                                                  
+command is rm -f Km_res.txt                                                                 
+command is rm -f L_orig_save.txt                                                            
+command is rm -f Lderiv.txt                                                                 
+command is rm -f L_save.txt                                                                 
+command is rm -f dthetaE.txt                                                                
+command is rm -f mueff.txt                                                                  
+command is rm -f VaG.txt                                                                    
+command is rm -f Transmission_coefficient.txt                                               
+command is rm -f energy1a.tmp                                                               
+command is rm -f energy1b.tmp                                                               
+command is rm -f energy1.tmp                                                                
+command is rm -f fresub.dat                                                                 
+command is rm -f rotmass.dat                                                                

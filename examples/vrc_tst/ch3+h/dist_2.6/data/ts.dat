@@ -1,0 +1,56 @@
+nosmp deth dtth
+1 1.0  0.00001
+
+ntau
+0
+-->taumn,taumx sampling interval
+DH2 0 360
+
+ nhind
+0
+-->namehind,hindmn,hindmx,nhindsteps
+
+DH2 0. 360. 12 1
+
+natom natomt ilin
+5 5 0
+
+charge spin atomlabel
+0  1
+
+intcoor
+
+isite jsite ksite
+1 2 3
+
+ibond nang dih
+5  2.6
+---> abs babs abs babs abs
+1 2 3 4 5
+
+jkbond
+6 7
+
+multireference
+hlevel
+
+vrc_info
+pivrefgeom dist_2.6
+pivpoints 2 1
+addpivpoints 0 !fragment,atom,refat1,refat2
+
+vrc_dyn_corr
+0.9
+
+vrc_symm
+frag1 2
+frag2 1
+
+SymmetryFactor
+1.
+
+nelec
+1
+0. 1
+
+end

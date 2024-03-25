@@ -1,0 +1,86 @@
+reac1 reac2 prod1 prod2 reacs prods grid
+
+ level0 g09 restart 2
+ uwb97xd/6-311+g(d,p)  opt(internal,maxcycle=100) 
+ int=ultrafine nosym 
+
+ level1 g09 restart 2
+ uwb97xd/aug-cc-pvtz opt(internal,maxcycle=100)
+ int=ultrafine nosym freq 
+
+ level1_31 g09 restart 2
+ uwb97xd/aug-cc-pvtz opt(internal,maxcycle=100)
+ int=ultrafine nosym freq guess(mix,always) 
+ level1_41 g09 restart 2
+ uwb97xd/aug-cc-pvtz opt(internal,maxcycle=100)
+ int=ultrafine nosym freq guess(mix,always)
+
+ hind_rotor g09
+ uwb97xd/6-311+g(d,p) opt=internal 
+ int=ultrafine nosym
+
+!transition state level of theory
+
+ level0_ts g09
+ uwb97xd/6-311+g(d,p) opt=(noeig,intern,maxcyc=50) 
+ int=ultrafine  nosym guess(mix,always)
+
+ level1_ts g09
+ uwb97xd/aug-cc-pvtz opt=(noeig,intern,maxcyc=50) 
+ int=ultrafine nosym freq iop(7/33=1) guess=(mix,always)
+
+ as_level1
+ num_bonds 1
+ num_lps 0
+ num_states 1
+
+ hind_rotor_ts g09
+ uwb97xd/6-311+g(d,p) opt=(noeig,intern,maxcyc=50)
+ int=ultrafine nosym guess=(mix,always)
+ um062x/6-311+g(d,p) opt=(noeig,intern,maxcyc=50)
+ int=ultrafine nosym guess=(mix,always)
+
+ symmetry g09
+ uwb97xd/6-311+g(d,p) opt=(noeig,intern,maxcyc=50)
+ int=ultrafine nosym
+
+ symmetry_ts g09
+ uwb97xd/6-311+g(d,p) opt=(noeig,intern,maxcyc=50)
+ int=ultrafine nosym guess=(mix,always)
+
+ as_hindrot
+ num_bonds 1
+ num_lps 0
+ num_states 1
+
+! if the word after irc is skip, the IRC ES calculations are skipped
+! but the energy is upgraded using the HL data.
+! the last word tells how to rescale the HR potentials
+ irc g09 skip !level of theory and energy gkeyword. 
+ m062x/aug-cc-pvtz irc(forward,calcall,stepsize=3,maxpoints=10)
+ int=ultrafine  nosym  iop(7/33=1)
+ m062x/aug-cc-pvtz irc(reverse,calcall,stepsize=3,maxpoints=10)
+ int=ultrafine  nosym  iop(7/33=1)
+ E(UM062X) 3
+ noHRcc 3
+
+! choice of code is between molpro or g09
+! il molpro is used, it is possible to specify a specific input 
+! for reac1, reac2, prod1 or prod2i or ts. this is for example useful for H
+! in some cases, the keyword reac1 reac2 prod1 prod2 must be added after
+! the molpro request
+ hlevel molpro  
+ hlevel_ts molpro  
+
+ as_hlevel
+num_bonds 1
+num_lps 0
+num_states 1
+
+ as_vrc
+num_bonds 1
+num_lps 0
+num_states 1
+
+End
+

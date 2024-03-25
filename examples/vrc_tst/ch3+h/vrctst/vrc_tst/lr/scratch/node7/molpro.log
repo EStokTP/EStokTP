@@ -1,0 +1,1921 @@
+
+(0,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.109905, -0.608205, -0.246269
+H, 0.363377, -0.0793446, 0.658482
+H, -0.115633, -0.0587876, -1.14615
+H, 0.0849726, -1.6861, -0.252067
+H, -1.64134, 9.06603, 3.67202
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  10.6  9.84  10.4  11.6
+
+Molpro::pot: 1-th molpro energy = 2.89303e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -1.83739e-07 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = 2.87466e-05 kcal/mol
+molpro_pot: 1-th energy = 2.89303e-05 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.136461, 0.587978, 0.280285
+H, -0.804127, 1.10249, 0.394703
+H, 0.723407, 0.338849, 1.14974
+H, 0.488585, 0.319905, -0.702906
+H, -2.03268, -8.7622, -4.17885
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  10.6  10.9  10.9    10
+
+Molpro::pot: 1-th molpro energy = -6.56381e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -1.83668e-07 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -6.58217e-05 kcal/mol
+molpro_pot: 1-th energy = -6.56381e-05 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.477343, -0.0562122, 0.459883
+H, -0.421339, 0.871176, 1.00699
+H, -0.791794, -0.958333, 0.9597
+H, -0.222007, -0.0809793, -0.587356
+H, 7.11879, 0.837446, -6.85509
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  10.6  10.9  11.3   9.7
+
+Molpro::pot: 1-th molpro energy = -9.70726e-06 kcal/mole
+
+Molpro::pot: 0-th energy correction = -1.83775e-07 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -9.89104e-06 kcal/mol
+molpro_pot: 1-th energy = -9.70726e-06 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.467207, 0.344239, -0.325381
+H, 0.711944, 1.39198, -0.255672
+H, -0.460655, -0.0206424, 0.0850489
+H, 1.14854, -0.337922, -0.808036
+H, -6.96278, -5.13221, 4.85291
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  10.6  11.3  9.55    11
+
+Molpro::pot: 1-th molpro energy = -1.55981e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -1.83735e-07 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -1.57818e-05 kcal/mol
+molpro_pot: 1-th energy = -1.55981e-05 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.573783, 0.285469, 0.178135
+H, -0.812242, -0.0550305, -0.816707
+H, 0.161492, 1.06117, 0.320181
+H, -1.07257, -0.147299, 1.03045
+H, 8.55525, -4.25788, -2.65495
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  10.6  10.4  10.4  11.1
+
+Molpro::pot: 1-th molpro energy = -3.88188e-06 kcal/mole
+
+Molpro::pot: 0-th energy correction = -1.83791e-07 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -4.06568e-06 kcal/mol
+molpro_pot: 1-th energy = -3.88188e-06 kcal/mol
+
+(1,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.0436156, 0.407345, -0.389927
+H, -0.62643, -0.404366, -0.623765
+H, 0.58196, 0.409327, 0.544256
+H, 0.177704, 1.21524, -1.09125
+H, -0.652557, -6.07038, 5.81356
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  8.58  8.44  10.1
+
+Molpro::pot: 1-th molpro energy = -0.0001371 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39573e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000141496 kcal/mol
+molpro_pot: 1-th energy = -0.0001371 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.376874, -0.0820302, -0.413853
+H, 1.09406, -0.870647, -0.251877
+H, -0.677313, -0.30771, -0.43049
+H, 0.713446, 0.932375, -0.556056
+H, -5.61757, 1.2227, 6.16609
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  9.52  8.38  9.24
+
+Molpro::pot: 1-th molpro energy = -6.6202e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39448e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -7.05964e-05 kcal/mol
+molpro_pot: 1-th energy = -6.6202e-05 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.188533, -0.511676, -0.150541
+H, -0.677129, 0.409522, 0.123655
+H, 0.104671, -0.68197, -1.17404
+H, 0.00961981, -1.26104, 0.598934
+H, 2.80767, 7.62592, 2.24392
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  8.29  9.38  9.46
+
+Molpro::pot: 1-th molpro energy = -0.000120192 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39462e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000124587 kcal/mol
+molpro_pot: 1-th energy = -0.000120192 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.404112, -0.383383, -0.0979274
+H, 0.00787665, 0.388638, -0.727819
+H, -0.943125, -1.20702, -0.537937
+H, -0.274541, -0.333525, 0.9713
+H, 6.02148, 5.71679, 1.46046
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  8.33    10  8.75
+
+Molpro::pot: 1-th molpro energy = -0.00012319 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39571e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000127586 kcal/mol
+molpro_pot: 1-th energy = -0.00012319 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.441976, 0.136458, -0.325153
+H, -0.281468, 0.822767, 0.490772
+H, -0.529202, -0.92048, -0.130755
+H, -0.518339, 0.507125, -1.33475
+H, 6.59154, -2.0342, 4.84628
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  8.62  8.76  9.76
+
+Molpro::pot: 1-th molpro energy = -5.34777e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39719e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -5.78749e-05 kcal/mol
+molpro_pot: 1-th energy = -5.34777e-05 kcal/mol
+
+(1,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.529245, -0.18305, 0.0790163
+H, 1.36868, -0.326992, -0.582158
+H, 0.677761, -0.187473, 1.14693
+H, -0.457849, -0.0316459, -0.327483
+H, -7.89022, 2.72566, -1.17812
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  9.77  9.34  7.97
+
+Molpro::pot: 1-th molpro energy = -0.000134344 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39592e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00013874 kcal/mol
+molpro_pot: 1-th energy = -0.000134344 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.179853, 0.362366, 0.395215
+H, 0.109025, 1.08338, 1.14301
+H, -1.19872, 0.329313, 0.0440363
+H, 0.550449, -0.323308, -0.00357136
+H, 2.68073, -5.40401, -5.88924
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  9.91  9.12  8.06
+
+Molpro::pot: 1-th molpro energy = -3.82685e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39592e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -4.26644e-05 kcal/mol
+molpro_pot: 1-th energy = -3.82685e-05 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.433148, 0.106294, 0.347713
+H, -1.3926, -0.330559, 0.121611
+H, -0.300826, 0.676469, 1.2532
+H, 0.394544, -0.029506, -0.329786
+H, 6.45631, -1.58203, -5.18518
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  9.56   9.6  7.92
+
+Molpro::pot: 1-th molpro energy = -8.54232e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39616e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -8.98193e-05 kcal/mol
+molpro_pot: 1-th energy = -8.54232e-05 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.112333, 0.354328, -0.426366
+H, -0.809015, -0.0189233, -0.843877
+H, 0.30631, 0.250784, 0.629177
+H, 0.840839, 0.828172, -1.06454
+H, -1.67567, -5.27896, 6.3559
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  8.96   8.2  9.93
+
+Molpro::pot: 1-th molpro energy = -8.26064e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39512e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -8.70016e-05 kcal/mol
+molpro_pot: 1-th energy = -8.26064e-05 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.445507, -0.274135, 0.21497
+H, 1.28745, -0.824192, 0.603662
+H, 0.307024, -0.183111, -0.85042
+H, -0.25944, 0.182133, 0.891276
+H, -6.63961, 4.08924, -3.20412
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5     9  10.1  8.49  8.53
+
+Molpro::pot: 1-th molpro energy = -9.36076e-05 kcal/mole
+
+Molpro::pot: 0-th energy correction = -4.39602e-06 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -9.80037e-05 kcal/mol
+molpro_pot: 1-th energy = -9.36076e-05 kcal/mol
+
+(2,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, -0.489416, 0.160705, -0.0273622
+H, -0.720133, -0.573748, -0.782255
+H, -0.643077, -0.070999, 1.01438
+H, -0.102272, 1.12539, -0.313774
+H, 7.29287, -2.39413, 0.407449
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   8.2   8.3  8.29  8.22
+
+Molpro::pot: 1-th molpro energy = -0.000241727 kcal/mole
+
+Molpro::pot: 0-th energy correction = -2.14941e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000263221 kcal/mol
+molpro_pot: 1-th energy = -0.000241727 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.252691, -0.401838, 0.201419
+H, -0.537793, 0.544529, -0.22942
+H, -1.00482, -1.1432, 0.418686
+H, 0.784424, -0.60808, 0.412078
+H, 3.76694, 5.99136, -2.9996
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   8.2  7.47  9.24  8.01
+
+Molpro::pot: 1-th molpro energy = -0.000212632 kcal/mole
+
+Molpro::pot: 0-th energy correction = -2.15028e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000234134 kcal/mol
+molpro_pot: 1-th energy = -0.000212632 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.00972785, 0.409072, -0.313714
+H, 0.568351, 0.0343626, -1.15636
+H, -0.340866, 1.42868, -0.310311
+H, -0.200946, -0.236362, 0.523873
+H, -0.142367, -6.09743, 4.67814
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   8.2  8.49  9.03  7.18
+
+Molpro::pot: 1-th molpro energy = -0.000284547 kcal/mole
+
+Molpro::pot: 0-th energy correction = -2.15046e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000306052 kcal/mol
+molpro_pot: 1-th energy = -0.000284547 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.0910255, 0.494576, -0.113661
+H, 0.565315, 1.34409, -0.213972
+H, 0.122445, -0.267548, 0.618538
+H, -0.962198, 0.408669, -0.743105
+H, 1.35826, -7.37405, 1.69188
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   8.2  8.96  7.29  8.48
+
+Molpro::pot: 1-th molpro energy = -0.000227548 kcal/mole
+
+Molpro::pot: 0-th energy correction = -2.15064e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000249055 kcal/mol
+molpro_pot: 1-th energy = -0.000227548 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.506806, 0.0224329, -0.09203
+H, -0.277198, 0.709843, 0.182414
+H, 0.295747, -0.795783, -0.761728
+H, 1.50223, 0.154887, 0.300545
+H, -7.55523, -0.336052, 1.37455
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   8.2  7.45  8.15  9.13
+
+Molpro::pot: 1-th molpro energy = -0.000231051 kcal/mole
+
+Molpro::pot: 0-th energy correction = -2.15057e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000252557 kcal/mol
+molpro_pot: 1-th energy = -0.000231051 kcal/mol
+
+(3,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, -0.318377, 0.348484, 0.0184173
+H, 0.609486, -0.00730626, -0.399912
+H, -0.71148, -0.100301, 0.916516
+H, -0.851431, 1.15479, -0.459326
+H, 4.74428, -5.19653, -0.27657
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  7.51  6.64  7.56  8.47
+
+Molpro::pot: 1-th molpro energy = -0.000344516 kcal/mole
+
+Molpro::pot: 0-th energy correction = -8.51198e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000429636 kcal/mol
+molpro_pot: 1-th energy = -0.000344516 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.293631, 0.310721, -0.200661
+H, -0.476486, 0.999036, 0.608846
+H, -1.058, 0.133635, -0.940186
+H, 0.654291, -0.19801, -0.272463
+H, 4.37641, -4.63437, 2.99304
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  7.51  7.81  8.23  6.65
+
+Molpro::pot: 1-th molpro energy = -0.000341396 kcal/mole
+
+Molpro::pot: 0-th energy correction = -8.51401e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000426536 kcal/mol
+molpro_pot: 1-th energy = -0.000341396 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.256724, 0.115182, 0.379273
+H, 0.912867, 0.94408, 0.591216
+H, 0.611273, -0.89623, 0.496993
+H, -0.754535, 0.297494, 0.0527181
+H, -3.82637, -1.7168, -5.65687
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  7.51  8.28  7.63  6.79
+
+Molpro::pot: 1-th molpro energy = -0.000333699 kcal/mole
+
+Molpro::pot: 0-th energy correction = -8.51419e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000418841 kcal/mol
+molpro_pot: 1-th energy = -0.000333699 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.0381981, -0.467116, 0.059652
+H, -0.0872045, 0.587622, 0.277922
+H, -0.29699, -0.826324, -0.923463
+H, 0.272435, -1.16213, 0.823185
+H, 0.566578, 6.9627, -0.88791
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  7.51  6.51  7.84  8.31
+
+Molpro::pot: 1-th molpro energy = -0.000388902 kcal/mole
+
+Molpro::pot: 0-th energy correction = -8.51071e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000474009 kcal/mol
+molpro_pot: 1-th energy = -0.000388902 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.0915447, -0.105055, 0.451475
+H, 0.595935, 0.558599, -0.047974
+H, -0.643786, 0.238943, 1.31125
+H, -0.229123, -1.11133, 0.0895248
+H, 1.36698, 1.56466, -6.72844
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  7.51   6.8  8.39   7.5
+
+Molpro::pot: 1-th molpro energy = -0.000356894 kcal/mole
+
+Molpro::pot: 0-th energy correction = -8.51014e-05 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000441996 kcal/mol
+molpro_pot: 1-th energy = -0.000356894 kcal/mol
+
+(4,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, -0.379152, -0.0874814, -0.18915
+H, -0.976605, -0.923119, 0.138378
+H, -0.519865, 0.883433, 0.258112
+H, 0.360886, -0.223258, -0.961438
+H, 5.65009, 1.30457, 2.81713
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.49  6.69  6.68
+
+Molpro::pot: 1-th molpro energy = -0.000529478 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000302984 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000832462 kcal/mol
+molpro_pot: 1-th energy = -0.000529478 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.15012, 0.204378, 0.3504
+H, -0.118522, -0.503769, 1.16283
+H, -0.0945923, 1.26156, 0.554862
+H, -0.234089, -0.144502, -0.666336
+H, 2.23466, -3.04678, -5.22351
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.27  7.57  5.94
+
+Molpro::pot: 1-th molpro energy = -0.000715936 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000303055 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00101899 kcal/mol
+molpro_pot: 1-th energy = -0.000715936 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.4236, 0.0378894, 0.0778138
+H, 0.188279, 0.408118, 0.88469
+H, -1.38254, -0.407256, 0.289478
+H, -0.0781599, 0.115523, -0.940599
+H, 6.31615, -0.567527, -1.16009
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  6.53  7.84  6.43
+
+Molpro::pot: 1-th molpro energy = -0.000589766 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000303166 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000892932 kcal/mol
+molpro_pot: 1-th energy = -0.000589766 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0579041, -0.351305, -0.245667
+H, 0.494646, 0.554169, 0.144062
+H, -0.513697, -0.995998, 0.402531
+H, 0.190029, -0.610516, -1.28387
+H, -0.860431, 5.23527, 3.6624
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  6.01  7.04  7.73
+
+Molpro::pot: 1-th molpro energy = -0.000633573 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000303031 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000936604 kcal/mol
+molpro_pot: 1-th energy = -0.000633573 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.277231, 0.318167, -0.0940298
+H, -0.406543, 0.415223, -1.16004
+H, 0.712015, 0.209873, 0.32092
+H, -1.13649, 0.332497, 0.557117
+H, 4.13195, -4.74596, 1.4016
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.33  6.12  7.37
+
+Molpro::pot: 1-th molpro energy = -0.000654627 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000303165 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000957792 kcal/mol
+molpro_pot: 1-th energy = -0.000654627 kcal/mol
+
+(4,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.159643, 0.305757, -0.261078
+H, 1.07953, 0.788447, -0.549741
+H, 0.0270495, -0.749756, -0.43666
+H, -0.62619, 0.877609, 0.205799
+H, -2.38123, -4.5569, 3.88922
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.76  6.25   6.8
+
+Molpro::pot: 1-th molpro energy = -0.000564705 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00030302 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000867725 kcal/mol
+molpro_pot: 1-th energy = -0.000564705 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.429307, 0.0253446, -0.0475439
+H, 0.597817, -0.132496, -1.10073
+H, -0.0347351, 0.937048, 0.293015
+H, 0.721851, -0.729465, 0.664637
+H, -6.39661, -0.376862, 0.709178
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.23  6.51  7.13
+
+Molpro::pot: 1-th molpro energy = -0.000513326 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00030297 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000816296 kcal/mol
+molpro_pot: 1-th energy = -0.000513326 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.219955, -0.246989, 0.278836
+H, -1.20005, -0.558082, 0.603118
+H, 0.294074, -0.801086, -0.490105
+H, 0.244718, 0.619644, 0.721044
+H, 3.28022, 3.68038, -4.15411
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.79  6.51  6.51
+
+Molpro::pot: 1-th molpro energy = -0.00062095 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000303022 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000923972 kcal/mol
+molpro_pot: 1-th energy = -0.00062095 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.274536, -0.32867, 0.0588848
+H, 0.322227, -0.48625, 1.12444
+H, 0.905293, 0.412758, -0.404741
+H, -0.401357, -0.914364, -0.543322
+H, -4.09501, 4.90127, -0.87751
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.25  6.74   6.9
+
+Molpro::pot: 1-th molpro energy = -0.000520714 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000303212 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000823926 kcal/mol
+molpro_pot: 1-th energy = -0.000520714 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.101408, 0.0899375, 0.410502
+H, 0.0638517, 1.10763, 0.725949
+H, 0.350003, -0.723146, 0.956067
+H, -0.720321, -0.114879, -0.448286
+H, 1.51391, -1.34047, -6.1215
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  6.88  7.42   7.2  6.22
+
+Molpro::pot: 1-th molpro energy = -0.000583583 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000303196 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.000886779 kcal/mol
+molpro_pot: 1-th energy = -0.000583583 kcal/mol
+
+(5,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.0857487, -0.345874, -0.187031
+H, -0.849847, -0.573411, 0.298152
+H, 0.791728, 0.316368, 0.287888
+H, 0.316722, -0.782776, -1.14531
+H, -1.2796, 5.15808, 2.78622
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   6.4  6.26  5.83   7.3
+
+Molpro::pot: 1-th molpro energy = -0.00102455 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000785807 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00181036 kcal/mol
+molpro_pot: 1-th energy = -0.00102455 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.122618, 0.381527, 0.0370284
+H, 0.117681, -0.673981, 0.257016
+H, -0.367661, 1.07294, 0.70343
+H, 0.620249, 0.745918, -0.847337
+H, -1.83026, -5.68765, -0.553999
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   6.4  5.44  7.03  6.89
+
+Molpro::pot: 1-th molpro energy = -0.00139829 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000785794 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00218408 kcal/mol
+molpro_pot: 1-th energy = -0.00139829 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.321008, 0.242418, -0.0100965
+H, -0.8433, -0.296112, -0.784507
+H, -0.38418, 1.31784, 0.0346086
+H, 0.261729, -0.294354, 0.721213
+H, 4.78794, -3.61381, 0.148904
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   6.4   6.6  7.15  5.64
+
+Molpro::pot: 1-th molpro energy = -0.00111728 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0007859 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00190318 kcal/mol
+molpro_pot: 1-th energy = -0.00111728 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0654381, 0.397011, -0.000961227
+H, -0.695152, -0.133564, -0.550969
+H, 0.99279, 0.661929, -0.482994
+H, -0.102379, 0.665337, 1.02975
+H, -0.974419, -5.92084, 0.0156607
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   6.4  5.82  6.89  6.72
+
+Molpro::pot: 1-th molpro energy = -0.000993979 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.000785927 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00177991 kcal/mol
+molpro_pot: 1-th energy = -0.000993979 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.353151, -0.137402, 0.13539
+H, -0.47191, 0.780129, -0.418279
+H, -0.974501, -0.332239, 0.994739
+H, 0.384497, -0.861258, -0.171904
+H, 5.26682, 2.04939, -2.01662
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   6.4  6.09  7.33  5.98
+
+Molpro::pot: 1-th molpro energy = -0.000942783 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00078588 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00172866 kcal/mol
+molpro_pot: 1-th energy = -0.000942783 kcal/mol
+
+(6,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.328365, 0.171221, -0.0637184
+H, -0.681586, 0.544165, -0.122265
+H, 0.792454, -0.265777, -0.9333
+H, 0.87519, 0.238004, 0.863127
+H, -4.89584, -2.5551, 0.951122
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.98  5.34  6.41  6.41
+
+Molpro::pot: 1-th molpro energy = -0.00184779 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00183263 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00368043 kcal/mol
+molpro_pot: 1-th energy = -0.00184779 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.116437, -0.0758993, -0.349508
+H, -0.924463, 0.0763764, -0.585844
+H, 0.748364, 0.769789, -0.130427
+H, 0.524633, -1.07364, -0.329193
+H, -1.73492, 1.13119, 5.207
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.98  5.94   5.9  6.37
+
+Molpro::pot: 1-th molpro energy = -0.00150882 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0018313 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00334011 kcal/mol
+molpro_pot: 1-th energy = -0.00150882 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.369079, 0.024038, -0.0673716
+H, -1.42697, 0.0460011, 0.139762
+H, 0.0351413, 0.619864, -0.86994
+H, 0.284859, -0.591071, 0.529727
+H, 5.50152, -0.36101, 1.00263
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.98  6.99  5.86  5.24
+
+Molpro::pot: 1-th molpro energy = -0.00201265 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00183197 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00384462 kcal/mol
+molpro_pot: 1-th energy = -0.00201265 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0606258, -0.231173, -0.290342
+H, 0.915411, -0.878971, -0.400859
+H, -0.932488, -0.649995, -0.261518
+H, 0.198965, 0.834752, -0.205561
+H, -0.903749, 3.44675, 4.32499
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.98  6.66  6.15  5.34
+
+Molpro::pot: 1-th molpro energy = -0.00182647 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00183159 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00365806 kcal/mol
+molpro_pot: 1-th energy = -0.00182647 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.251448, 0.0530912, -0.27453
+H, 0.273583, -0.805677, 0.111959
+H, -0.703304, 0.758574, 0.404174
+H, -0.322004, 0.208076, -1.3392
+H, 3.74567, -0.793121, 4.09185
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.98  5.28  5.98  6.86
+
+Molpro::pot: 1-th molpro energy = -0.00192028 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0018316 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00375189 kcal/mol
+molpro_pot: 1-th energy = -0.00192028 kcal/mol
+
+(7,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, -0.142184, -0.201377, 0.252329
+H, -0.0103437, -1.18414, 0.675781
+H, 0.66017, 0.517347, 0.299043
+H, -1.07485, 0.0616367, -0.22041
+H, 2.11798, 3.00291, -3.75886
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  6.46  4.98   5.6
+
+Molpro::pot: 1-th molpro energy = -0.00339367 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384213 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0072358 kcal/mol
+molpro_pot: 1-th energy = -0.00339367 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.114478, 0.320837, -0.0903647
+H, -0.852489, 0.764214, -0.266168
+H, 0.805288, 0.19323, -0.908299
+H, 0.391836, 0.00799298, 0.903478
+H, -1.70771, -4.78558, 1.34695
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  5.84  6.02  5.25
+
+Molpro::pot: 1-th molpro energy = -0.00320442 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384466 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00704908 kcal/mol
+molpro_pot: 1-th energy = -0.00320442 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.228737, 0.0810924, 0.256085
+H, -0.351831, -0.934698, -0.0838151
+H, 0.198352, 0.276314, 1.22665
+H, -0.529707, 0.901484, -0.375496
+H, 3.40672, -1.20865, -3.81651
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61   5.3  6.16  5.64
+
+Molpro::pot: 1-th molpro energy = -0.00307982 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384172 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00692154 kcal/mol
+molpro_pot: 1-th energy = -0.00307982 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.271086, 0.118128, -0.192301
+H, 0.516436, -0.233473, 0.796989
+H, 0.929524, -0.0960912, -1.01879
+H, -0.633853, 0.681066, -0.355719
+H, -4.03989, -1.75803, 2.86722
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  5.23  6.52  5.29
+
+Molpro::pot: 1-th molpro energy = -0.00291376 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384232 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00675608 kcal/mol
+molpro_pot: 1-th energy = -0.00291376 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.349056, 0.0447066, 0.0230502
+H, 0.362943, -0.593003, 0.521948
+H, -0.0140178, 0.741774, -0.728192
+H, -1.39609, -0.0167121, 0.272991
+H, 5.20332, -0.664373, -0.341203
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  4.92  5.42  6.66
+
+Molpro::pot: 1-th molpro energy = -0.00331633 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384288 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00715921 kcal/mol
+molpro_pot: 1-th energy = -0.00331633 kcal/mol
+
+(7,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, -0.0170087, 0.0677702, -0.345753
+H, 0.530799, 0.297757, -1.24549
+H, -0.241284, -0.957551, -0.0989005
+H, -0.33777, 0.862472, 0.308527
+H, 0.250775, -1.00961, 5.15268
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  6.54  5.27  5.23
+
+Molpro::pot: 1-th molpro energy = -0.00293715 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384226 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00677941 kcal/mol
+molpro_pot: 1-th energy = -0.00293715 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.35187, 0.0209667, -0.00621737
+H, 0.539683, -0.437762, 0.390288
+H, -1.17224, -0.594693, -0.338588
+H, -0.424377, 1.09498, -0.067502
+H, 5.2466, -0.312175, 0.0898314
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  4.72  6.44  5.85
+
+Molpro::pot: 1-th molpro energy = -0.0044824 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384374 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00832614 kcal/mol
+molpro_pot: 1-th energy = -0.0044824 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.097697, -0.338637, -0.00466548
+H, 0.332917, -0.274764, -0.991077
+H, -0.998322, -0.909804, 0.153959
+H, 0.37374, 0.165849, 0.823442
+H, 1.45493, 5.05081, 0.069227
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  5.54  6.45  5.06
+
+Molpro::pot: 1-th molpro energy = -0.00319969 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384428 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00704398 kcal/mol
+molpro_pot: 1-th energy = -0.00319969 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0602719, -0.338326, -0.0795832
+H, -0.466098, -1.18697, 0.326941
+H, -0.466405, 0.584143, -0.264458
+H, 1.11355, -0.411031, -0.298284
+H, -0.898699, 5.04225, 1.18338
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61   6.3  4.71     6
+
+Molpro::pot: 1-th molpro energy = -0.00467001 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384222 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00851223 kcal/mol
+molpro_pot: 1-th energy = -0.00467001 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.161653, -0.31315, 0.0026202
+H, -0.560433, -0.647405, 0.730206
+H, 1.16138, -0.0565771, 0.314442
+H, -0.114845, -0.238419, -1.03684
+H, -2.41087, 4.67103, -0.0390028
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.61  5.68  5.94  5.51
+
+Molpro::pot: 1-th molpro energy = -0.00308332 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00384472 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.00692804 kcal/mol
+molpro_pot: 1-th energy = -0.00308332 kcal/mol
+
+(8,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, -0.00123868, -0.316117, 0.103939
+H, -0.697553, 0.506507, 0.0730977
+H, -0.309565, -1.29544, -0.225262
+H, 1.00394, -0.158928, 0.460901
+H, 0.0179234, 4.71182, -1.54632
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.29  4.56  6.16  5.36
+
+Molpro::pot: 1-th molpro energy = -0.00625236 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00725063 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.013503 kcal/mol
+molpro_pot: 1-th energy = -0.00625236 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0569247, -0.326558, -0.0302269
+H, -0.947869, -0.271447, -0.417355
+H, 0.825876, 0.311732, -0.434972
+H, 0.292097, -1.01744, 0.763437
+H, -0.847897, 4.86542, 0.448796
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.29  5.21  4.93     6
+
+Molpro::pot: 1-th molpro energy = -0.00623925 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00724934 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0134886 kcal/mol
+molpro_pot: 1-th energy = -0.00623925 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.0686118, 0.11121, 0.305787
+H, -0.797126, -0.0328741, -0.475892
+H, 0.733084, 0.819481, 0.171045
+H, -0.143433, -0.450425, 1.22311
+H, 1.02442, -1.66034, -4.55922
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.29  4.76  5.35  6.02
+
+Molpro::pot: 1-th molpro energy = -0.00629307 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00725399 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0135471 kcal/mol
+molpro_pot: 1-th energy = -0.00629307 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.196626, 0.000754167, 0.268186
+H, -0.539949, 0.356347, -0.690041
+H, 0.69109, 0.421642, 0.712406
+H, -0.742446, -0.773226, 0.783507
+H, 2.9325, -0.0137431, -3.99911
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.29  4.81  5.24  6.08
+
+Molpro::pot: 1-th molpro energy = -0.00604491 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00725387 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0132988 kcal/mol
+molpro_pot: 1-th energy = -0.00604491 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.0752701, 0.319086, -0.0553913
+H, -0.639476, -0.399804, -0.627566
+H, 0.891642, 0.645225, -0.403577
+H, -0.479055, 0.714079, 0.86301
+H, 1.12312, -4.75881, 0.827667
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.29  4.92  5.55   5.7
+
+Molpro::pot: 1-th molpro energy = -0.00681751 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.00725466 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0140722 kcal/mol
+molpro_pot: 1-th energy = -0.00681751 kcal/mol
+
+(9,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.10933, 0.145811, -0.257959
+H, 0.0154941, 1.21928, -0.220855
+H, -0.65938, -0.446153, -0.728259
+H, 0.972964, -0.335385, 0.172282
+H, -1.63085, -2.17389, 3.8483
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.03  5.55  4.99  4.87
+
+Molpro::pot: 1-th molpro energy = -0.0134904 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0123153 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0258057 kcal/mol
+molpro_pot: 1-th energy = -0.0134904 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0763903, -0.144906, -0.270086
+H, -0.881923, -0.426909, 0.135655
+H, 0.980871, -0.395622, 0.260549
+H, 0.130483, 0.38487, -1.2076
+H, -1.139, 2.16303, 4.02726
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.03  4.68  5.02  5.67
+
+Molpro::pot: 1-th molpro energy = -0.0124535 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0123144 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0247679 kcal/mol
+molpro_pot: 1-th energy = -0.0124535 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.0982971, 0.282488, -0.101673
+H, -0.694245, -0.597078, -0.285317
+H, -0.0268641, 1.05147, -0.854055
+H, 0.42355, 0.394577, 0.835148
+H, 1.46797, -4.21251, 1.51483
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.03  4.58  5.96  4.77
+
+Molpro::pot: 1-th molpro energy = -0.00908626 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0123136 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0213999 kcal/mol
+molpro_pot: 1-th energy = -0.00908626 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.271139, 0.0903946, 0.135265
+H, -0.385729, 0.670436, 0.76343
+H, 0.930701, -0.640346, 0.575168
+H, 0.266322, 0.23875, -0.932672
+H, -4.0397, -1.34515, -2.0165
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.03  5.01  5.65  4.71
+
+Molpro::pot: 1-th molpro energy = -0.012654 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0123064 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0249604 kcal/mol
+molpro_pot: 1-th energy = -0.012654 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.185293, 0.229637, 0.113075
+H, 0.277171, -0.7314, -0.0452028
+H, -0.725278, 0.706251, -0.68928
+H, -0.110508, 0.71254, 1.07419
+H, 2.76487, -3.42163, -1.68607
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  5.03  4.01   5.5  5.74
+
+Molpro::pot: 1-th molpro energy = -0.010958 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0123115 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0232695 kcal/mol
+molpro_pot: 1-th energy = -0.010958 kcal/mol
+
+(10,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.0585619, -0.155763, -0.228443
+H, 0.348961, 0.832325, 0.0907217
+H, -0.858314, -0.296546, -0.778021
+H, 0.686236, -1.00238, -0.000876949
+H, -0.874169, 2.32124, 3.4082
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   4.5  3.84  4.94  5.01
+
+Molpro::pot: 1-th molpro energy = -0.0407653 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0354836 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0762489 kcal/mol
+molpro_pot: 1-th energy = -0.0407653 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0951297, -0.250851, 0.0899704
+H, -0.396887, -0.291305, 1.04851
+H, -0.297232, -0.814648, -0.741116
+H, 0.977359, 0.355548, -0.0383718
+H, -1.41593, 3.73724, -1.34029
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   4.5  4.79  4.73  4.34
+
+Molpro::pot: 1-th molpro energy = -0.0605129 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0354595 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0959723 kcal/mol
+molpro_pot: 1-th energy = -0.0605129 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.0491031, 0.00835821, 0.278182
+H, 0.647033, -0.514027, -0.451275
+H, -0.788207, -0.487133, 0.742852
+H, 0.290157, 1.02477, 0.545225
+H, -0.733645, -0.123134, -4.14907
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   4.5  3.97  4.91  4.94
+
+Molpro::pot: 1-th molpro energy = -0.0476438 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0354851 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0831289 kcal/mol
+molpro_pot: 1-th energy = -0.0476438 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.215465, 0.098798, 0.15405
+H, 0.850795, -0.535193, -0.443383
+H, 0.599434, 0.551415, 1.05417
+H, -0.802491, 0.282664, -0.150056
+H, -3.21324, -1.47526, -2.29498
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   4.5  4.56  5.46  3.67
+
+Molpro::pot: 1-th molpro energy = -0.0121113 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0354787 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0475899 kcal/mol
+molpro_pot: 1-th energy = -0.0121113 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.180894, -0.130835, -0.173389
+H, 0.580083, 0.801669, -0.538902
+H, -0.867833, -0.211838, 0.0635283
+H, 0.829459, -0.982949, -0.0477429
+H, -2.69558, 1.95095, 2.58763
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5   4.5  4.67  3.79  5.29
+
+Molpro::pot: 1-th molpro energy = -0.0303536 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0354803 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0658339 kcal/mol
+molpro_pot: 1-th energy = -0.0303536 kcal/mol
+
+(11,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.0225785, 0.238012, 0.116657
+H, -0.618735, 1.0975, 0.22855
+H, 0.242618, -0.145503, -0.866713
+H, 0.44623, -0.235963, 0.987512
+H, -0.338953, -3.55, -1.73836
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  5.05  3.56  4.36
+
+Molpro::pot: 1-th molpro energy = -0.0511006 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0602304 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.111331 kcal/mol
+molpro_pot: 1-th energy = -0.0511006 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.195751, -0.17841, 0.0251688
+H, 0.364555, 0.483692, 0.665632
+H, 0.321433, -0.8271, -0.663482
+H, -1.27267, -0.19414, 0.0754343
+H, 2.91746, 2.66185, -0.377265
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  3.51  4.36  5.09
+
+Molpro::pot: 1-th molpro energy = -0.0406187 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0602273 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.100846 kcal/mol
+molpro_pot: 1-th energy = -0.0406187 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.145748, 0.189751, -0.11626
+H, -0.262159, 0.431301, -1.08465
+H, 1.2009, 0.311157, 0.0692991
+H, -0.501624, -0.17012, 0.667272
+H, -2.17252, -2.83167, 1.73237
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  4.72   4.9  3.32
+
+Molpro::pot: 1-th molpro energy = -0.0285986 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0602313 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0888299 kcal/mol
+molpro_pot: 1-th energy = -0.0285986 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.0212482, -0.226084, -0.139118
+H, -0.859428, 0.418599, 0.0714832
+H, 0.826049, 0.153696, -0.687181
+H, -0.0288925, -1.24926, 0.200835
+H, 0.31527, 3.36891, 2.07131
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  3.75  4.27  4.99
+
+Molpro::pot: 1-th molpro energy = -0.0746037 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0601963 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.1348 kcal/mol
+molpro_pot: 1-th energy = -0.0746037 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.126177, -0.0269492, 0.232754
+H, 0.140821, -0.738484, 0.997572
+H, -0.908587, 0.692061, 0.415452
+H, 0.391055, -0.0323064, -0.713271
+H, 1.87909, 0.399609, -3.47112
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  4.93  4.79  3.16
+
+Molpro::pot: 1-th molpro energy = 0.00822059 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0602184 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0519978 kcal/mol
+molpro_pot: 1-th energy = 0.00822059 kcal/mol
+
+(11,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, 0.212841, -0.155934, 0.0359457
+H, 0.929419, -0.589335, -0.643168
+H, 0.387985, 0.823765, 0.450714
+H, -0.680054, -0.700608, 0.297841
+H, -3.17161, 2.32286, -0.533386
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  5.03  3.99  4.01
+
+Molpro::pot: 1-th molpro energy = -0.0763984 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0601986 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.136597 kcal/mol
+molpro_pot: 1-th energy = -0.0763984 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.109897, -0.219704, -0.102831
+H, -0.930598, 0.0411592, -0.211618
+H, 0.804564, -0.00756474, -0.899671
+H, 0.456281, -0.689698, 0.803615
+H, -1.63877, 3.27208, 1.53207
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  3.74  4.76  4.54
+
+Molpro::pot: 1-th molpro energy = -0.0931652 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0601958 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.153361 kcal/mol
+molpro_pot: 1-th energy = -0.0931652 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.219082, -0.00457807, -0.15116
+H, -0.0922848, 0.60539, 0.728827
+H, -0.843057, 0.340051, -0.960112
+H, 0.280309, -0.957406, -0.223605
+H, 3.2636, 0.0664746, 2.25472
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  3.73  5.22  4.01
+
+Molpro::pot: 1-th molpro energy = -0.0308361 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0602081 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0910441 kcal/mol
+molpro_pot: 1-th energy = -0.0308361 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.151508, -0.108361, 0.189924
+H, 0.204571, 0.000958106, 1.26125
+H, 1.05637, -0.220347, -0.385571
+H, -0.806135, -0.108819, -0.305497
+H, -2.25879, 1.61844, -2.83158
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  5.04  4.51  3.39
+
+Molpro::pot: 1-th molpro energy = -0.0297471 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0602306 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0899776 kcal/mol
+molpro_pot: 1-th energy = -0.0297471 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.149311, 0.161961, -0.149716
+H, -1.05131, -0.415405, -0.02497
+H, 0.0702486, 0.971281, 0.528011
+H, 0.534452, -0.0717793, -0.949937
+H, 2.22443, -2.41254, 2.22954
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  4.23  4.45  4.36  4.29
+
+Molpro::pot: 1-th molpro energy = -0.127571 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.0601916 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.187763 kcal/mol
+molpro_pot: 1-th energy = -0.127571 kcal/mol
+
+(12,0)-th SURFACE:
+
+molpro_pot: coordinates (angstrom):
+
+C, -0.109834, -0.193018, 0.113806
+H, -0.127806, 0.1458, 1.13723
+H, -0.767259, -0.986958, -0.202375
+H, 0.56304, 0.26394, -0.593973
+H, 1.6398, 2.87545, -1.69594
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  3.97  4.31  4.79  3.03
+
+Molpro::pot: 1-th molpro energy = 0.0049813 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.101813 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.0968318 kcal/mol
+molpro_pot: 1-th energy = 0.0049813 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.110862, -0.221755, -0.0276252
+H, -0.84204, 0.278856, -0.089919
+H, 0.839638, 0.095958, 0.700704
+H, 0.333822, -1.04176, -0.691248
+H, -1.65144, 3.30734, 0.409393
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  3.97  3.17  4.07  4.91
+
+Molpro::pot: 1-th molpro energy = -0.011446 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.101829 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.113275 kcal/mol
+molpro_pot: 1-th energy = -0.011446 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, -0.163212, -0.126429, 0.139877
+H, 0.454193, -1.00322, 0.0277997
+H, -0.396268, 0.481686, -0.719425
+H, -0.550015, 0.140512, 1.11026
+H, 2.43543, 1.88639, -2.08413
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  3.97  4.09  3.44  4.71
+
+Molpro::pot: 1-th molpro energy = -0.138258 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.101844 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.240102 kcal/mol
+molpro_pot: 1-th energy = -0.138258 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.223323, 0.0963781, -0.0562925
+H, 0.809117, 0.836549, 0.464772
+H, 0.323569, -0.946606, 0.197978
+H, -0.464736, 0.399236, -0.829191
+H, -3.32702, -1.43674, 0.836707
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  3.97  4.73  3.74  3.79
+
+Molpro::pot: 1-th molpro energy = -0.157629 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.101791 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.259419 kcal/mol
+molpro_pot: 1-th energy = -0.157629 kcal/mol
+molpro_pot: coordinates (angstrom):
+
+C, 0.00293894, 0.0115726, -0.249274
+H, -0.0266052, -0.336865, -1.26919
+H, -0.746131, 0.700694, 0.106428
+H, 0.779374, -0.331301, 0.415637
+H, -0.0416317, -0.170321, 3.71519
+
+molpro_pot: interatomic distances matrix (angstrom):
+
+\     C1    H2    H3    H4
+H2  1.08
+H3  1.08  1.87
+H4  1.08  1.87  1.87
+H5  3.97  4.99  3.78   3.4
+
+Molpro::pot: 1-th molpro energy = -0.0225033 kcal/mole
+
+Molpro::pot: 0-th energy correction = -0.10181 kcal/mole
+Molpro::pot: 1-th energy correction = 0 kcal/mole
+molpro_pot: 0-th energy = -0.124313 kcal/mol
+molpro_pot: 1-th energy = -0.0225033 kcal/mol

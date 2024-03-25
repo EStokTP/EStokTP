@@ -1,0 +1,46 @@
+tmpr_grid       10      10      1.05     61      Kelvin  # temperature grid
+ener_grid       0       20      1.05    179     Kelvin  # energy grid
+amom_grid       0       3       1.1     50      au      # angular momentum grid
+
+pot_smp_max     5000
+pot_smp_min     200
+tot_smp_max     100000
+tot_smp_min     1000
+pot_smp_len     5
+
+flux_rel_err    5       nu
+flux_out_mode   ej-resolved
+min_atom_dist   1.5     Bohr
+priority_exp    0.   nu
+
+pot_name        molpro      # potential to use
+pot_type        molpro          #  potential type
+pot_file        molpro.inp
+pes_size        2
+
+opt_method      none
+
+sampling        multifacet
+face            0
+face_symm        1 
+ds_inp_file     divsur.inp
+ds_out_file     divsur.out
+
+mol_spec_file   structure.inp
+save_file       flux.save
+flux_file       flux.dat
+therm_flux_out  1
+therm_flux_name flux.out
+
+raw_smp_file    sampling.raw
+is_smp_out      0
+
+work_dir        scratch/node
+log_file        molpro.log
+run_time        3000000
+save_time       3000
+flux_debug      0
+comm_debug      0
+nice            0
+
+

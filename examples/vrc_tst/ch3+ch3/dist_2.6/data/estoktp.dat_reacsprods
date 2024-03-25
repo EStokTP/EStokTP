@@ -1,0 +1,30 @@
+ Debug  2
+ Prods
+
+Opt_Reac1
+ nOpt_Prod1 
+ nOpt_Prod2 
+Opt_Reac1_1
+ nOpt_Prod1_1 
+ nOpt_Prod2_1
+1dTau_Reac1 
+ n1dTau_Prod1 
+ n1dTau_Prod2 
+HL_Reac1
+ nHL_Prod1
+ nHL_Prod2
+Symm_reac1
+ nSymm_prod1
+ nSymm_prod2
+ nkTP
+
+Opt_Pr1_vrc
+Opt_Pr2_vrc
+
+End
+ 16,4
+ numprocll,numprochl
+ 400MW  1000MW
+ gmemll
+
+

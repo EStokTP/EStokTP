@@ -1,0 +1,181 @@
+--------------------------------------------------------------------------
+By default, for Open MPI 4.0 and later, infiniband ports on a device
+are not used by default.  The intent is to use UCX for these devices.
+You can override this policy by setting the btl_openib_allow_ib MCA parameter
+to true.
+
+  Local host:              node-6-11
+  Local adapter:           mlx4_0
+  Local port:              1
+
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+WARNING: There is at least non-excluded one OpenFabrics device found,
+but there are no active ports detected (or Open MPI was unable to use
+them).  This is most certainly not what you wanted.  Check your
+cables, subnet manager configuration, etc.  The openib BTL will be
+ignored for this job.
+
+  Local host: node-6-11
+--------------------------------------------------------------------------
+node 5: main: host = node-6-10, process =  199744
+node 3: main: host = node-6-10, process =  199742
+node 1: main: host = node-6-10, process =  199740
+node 2: main: host = node-6-10, process =  199741
+node 7: main: host = node-6-10, process =  199746
+node 12: main: host = node-6-10, process =  199753
+node 14: main: host = node-6-10, process =  199757
+node 8: main: host = node-6-10, process =  199747
+node 16: main: host = node-6-10, process =  199760
+node 9: main: host = node-6-10, process =  199748
+node 10: main: host = node-6-10, process =  199749
+node 4: main: host = node-6-10, process =  199743
+node 6: main: host = node-6-10, process =  199745
+node 15: main: host = node-6-10, process =  199758
+node 17: main: host = node-6-11, process =  180911
+node 18: main: host = node-6-11, process =  180912
+node 11: main: host = node-6-10, process =  199750
+node 13: main: host = node-6-10, process =  199755
+node 19: main: host = node-6-11, process =  180913
+node 20: main: host = node-6-11, process =  180914
+node 21: main: host = node-6-11, process =  180915
+node 22: main: host = node-6-11, process =  180916
+node 25: main: host = node-6-11, process =  180919
+node 24: main: host = node-6-11, process =  180918
+node 23: main: host = node-6-11, process =  180917
+node 26: main: host = node-6-11, process =  180920
+node 27: main: host = node-6-11, process =  180921
+node 28: main: host = node-6-11, process =  180922
+node 30: main: host = node-6-11, process =  180924
+node 29: main: host = node-6-11, process =  180923
+node 32: main: host = node-6-11, process =  180926
+node 31: main: host = node-6-11, process =  180925
+node 33: main: host = node-6-8, process =  107749
+node 34: main: host = node-6-8, process =  107750
+node 35: main: host = node-6-8, process =  107751
+node 38: main: host = node-6-8, process =  107754
+node 36: main: host = node-6-8, process =  107752
+node 37: main: host = node-6-8, process =  107753
+node 39: main: host = node-6-8, process =  107755
+node 40: main: host = node-6-8, process =  107756
+node 42: main: host = node-6-8, process =  107758
+node 41: main: host = node-6-8, process =  107757
+node 43: main: host = node-6-8, process =  107759
+Default parameters:
+gauss_inp_file  gauss.inp
+log_level  info
+molpro_inp_file  molpro.inp
+multipole_inp_file  multipole.inp
+opt_type  none
+sjk_inp_file  sjk.inp
+smp_out_flag  0
+smp_save_file  smp.save
+
+node 44: main: host = node-6-8, process =  107760
+node 46: main: host = node-6-8, process =  107763
+node 45: main: host = node-6-8, process =  107761
+master: main: host = node-6-10, process =  199739
+node 47: main: host = node-6-8, process =  107764
+
+master: main: Starting calculation ...
+
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+node 2: main: : exitting...
+node 7: main: : exitting...
+node 6: main: : exitting...
+node 13: main: : exitting...
+node 5: main: : exitting...
+node 16: main: : exitting...
+node 8: main: : exitting...
+node 1: main: : exitting...
+node 3: main: : exitting...
+node 10: main: : exitting...
+node 9: main: : exitting...
+node 14: main: : exitting...
+node 15: main: : exitting...
+master: main: flux through the 7-th surface is done
+master: main: no work to be done => exitting ...
+node 11: main: : exitting...
+node 12: main: : exitting...
+node 4: main: : exitting...
+node 23: main: : exitting...
+node 26: main: : exitting...
+node 44: main: : exitting...
+node 17: main: : exitting...
+node 45: main: : exitting...
+node 18: main: : exitting...
+node 34: main: : exitting...
+node 27: main: : exitting...
+node 42: main: : exitting...
+node 19: main: : exitting...
+node 47: main: : exitting...
+node 22: main: : exitting...
+node 35: main: : exitting...
+node 21: main: : exitting...
+node 39: main: : exitting...
+node 25: main: : exitting...
+node 33: main: : exitting...
+node 20: main: : exitting...
+node 38: main: : exitting...
+node 31: main: : exitting...
+node 37: main: : exitting...
+node 24: main: : exitting...
+node 41: main: : exitting...
+node 30: main: : exitting...
+node 40: main: : exitting...
+node 28: main: : exitting...
+node 46: main: : exitting...
+node 32: main: : exitting...
+node 43: main: : exitting...
+node 29: main: : exitting...
+node 36: main: : exitting...
+Comm::cleanup: MPI round up ...
+[node-6-10:199724] 47 more processes have sent help message help-mpi-btl-openib.txt / ib port not selected
+[node-6-10:199724] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[node-6-10:199724] 47 more processes have sent help message help-mpi-btl-openib.txt / no active ports found

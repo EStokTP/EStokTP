@@ -1,0 +1,11 @@
+MolproExecFile          /home/chimica2/cavallotti/bin/molpro
+GeometryPattern                 GEOMETRY_HERE
+EnergyPattern                   molpro_energy
+BaseFileName            	vrc_molpro
+DebugLevel                      5
+PotentialCorrectionTable   /software/cinetica/rotd2/pot_corr/libcorrpot.so    
+estoktp_vrc_corr_         1
+ParameterInteger    2
+dummy_corr_         1
+End
+

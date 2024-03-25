@@ -1,0 +1,101 @@
+nosym
+End1 
+
+!closed shell input
+
+ basis=cc-pvdz                                                         
+ hf                                                                   
+                                                                       
+ basis=aug-cc-pvtz                                                     
+ hf                                                                   
+ ccsd(t)                                                              
+ en_cc = energy                                                        
+
+ basis=cc-pcvtz
+ hf
+ {ccsd(t),maxit=50}
+ en_ccsdt_tz=energy
+
+ basis=cc-pcvtz
+ hf
+ {ccsd(t),maxit=50;core}
+ en_ccsdtcore_tz=energy
+                                       
+ gdirect                                                               
+ basis=aug-cc-pvtz                                                     
+ hf                                                                   
+ df-mp2                                                               
+ en_mp2_tz=energy                                                      
+                                                                       
+ basis=aug-cc-pvqz                                                     
+ rhf                                                                   
+ df-mp2                                                               
+ en_mp2_qz=energy                                                      
+
+!Martin  extrapolation scheme
+!Chemical Physics Letters 259 (1996) 669-678 
+! E=A+B/(L+1/2)^4
+
+ en_mp2_cbs=en_mp2_qz+0.5772*(en_mp2_qz-en_mp2_tz)
+                                                                     
+ CBSen = en_cc+(en_mp2_cbs-en_mp2_tz)+en_ccsdtcore_tz-en_ccsdt_tz                                    
+
+ put,molden,molpro.molden
+---
+
+End2
+
+!open shell input
+
+ basis=cc-pvdz                                                         
+ uhf                                                                   
+                                                                       
+ basis=cc-pvtz                                                         
+ uhf                                                                   
+ rhf                                                                   
+                                                                       
+ basis=aug-cc-pvtz                                                     
+ rhf                                                                   
+ uccsd(t)                                                              
+ en_cc = energy                                                        
+
+ basis=cc-pvtz
+ rhf
+ {uccsd(t),maxit=50}
+ en_ccsdt_tz=energy
+
+ basis=cc-pcvtz
+ rhf
+ {uccsd(t),maxit=50;core}
+ en_ccsdtcore_tz=energy
+                                       
+ gdirect                                                               
+ basis=aug-cc-pvtz                                                     
+ rhf                                                                   
+ df-rmp2                                                               
+ en_mp2_tz=energy                                                      
+                                                                       
+ basis=aug-cc-pvqz                                                     
+ rhf                                                                   
+ df-rmp2                                                               
+ en_mp2_qz=energy                                                      
+
+!Martin  extrapolation scheme
+!Chemical Physics Letters 259 (1996) 669-678
+! E=A+B/(L+1/2)^4
+
+ en_mp2_cbs=en_mp2_qz+0.5772*(en_mp2_qz-en_mp2_tz)
+                                                                       
+ CBSen = en_cc+en_mp2_cbs-en_mp2_tz+en_ccsdtcore_tz-en_ccsdt_tz                                    
+
+put,molden,molpro.molden
+
+---
+
+End3
+
+
+                                                                       
+                                                                       
+ put,molden,molpro.molden
+ ---

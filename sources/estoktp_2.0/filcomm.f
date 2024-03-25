@@ -13,7 +13,7 @@ c
       common /itsdat/ iabs,iadd,iiso,ibeta,ibarr,ifrozrts,isite,jsite
      $ ,ksite,ireact,irecov,iprojrcoo,ibstep
       common /ircdat/ivar,iresirc,imdtunn,inotunn,intfreq,
-     $ irotd_lr,irotd_sr
+     $ irotd_lr,irotd_sr,isurvive
       common /irtype/ irw,ipw,nts,ip1,ip2,ipr1
 c      common /strucword/ stoich
       common /igeom/ frozcoo,igeom_wellp,igeom_wellr

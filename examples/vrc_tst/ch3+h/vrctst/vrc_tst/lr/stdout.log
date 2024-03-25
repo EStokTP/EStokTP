@@ -1,0 +1,152 @@
+--------------------------------------------------------------------------
+By default, for Open MPI 4.0 and later, infiniband ports on a device
+are not used by default.  The intent is to use UCX for these devices.
+You can override this policy by setting the btl_openib_allow_ib MCA parameter
+to true.
+
+  Local host:              node-6-11
+  Local adapter:           mlx4_0
+  Local port:              1
+
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+WARNING: There is at least non-excluded one OpenFabrics device found,
+but there are no active ports detected (or Open MPI was unable to use
+them).  This is most certainly not what you wanted.  Check your
+cables, subnet manager configuration, etc.  The openib BTL will be
+ignored for this job.
+
+  Local host: node-6-11
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+WARNING: There was an error initializing an OpenFabrics device.
+
+  Local host:   node-6-10
+  Local device: mlx4_0
+--------------------------------------------------------------------------
+node 1: main: host = node-6-10, process =  13076
+node 3: main: host = node-6-10, process =  13078
+node 7: main: host = node-6-10, process =  13082
+node 5: main: host = node-6-10, process =  13080
+node 4: main: host = node-6-10, process =  13079
+node 2: main: host = node-6-10, process =  13077
+node 9: main: host = node-6-10, process =  13084
+node 6: main: host = node-6-10, process =  13081
+node 8: main: host = node-6-10, process =  13083
+node 10: main: host = node-6-10, process =  13085
+node 14: main: host = node-6-10, process =  13089
+node 16: main: host = node-6-10, process =  13091
+node 11: main: host = node-6-10, process =  13086
+node 12: main: host = node-6-10, process =  13087
+node 13: main: host = node-6-10, process =  13088
+node 15: main: host = node-6-10, process =  13090
+node 17: main: host = node-6-11, process =  22641
+node 18: main: host = node-6-11, process =  22642
+node 19: main: host = node-6-11, process =  22643
+node 20: main: host = node-6-11, process =  22644
+node 21: main: host = node-6-11, process =  22645
+node 22: main: host = node-6-11, process =  22646
+node 23: main: host = node-6-11, process =  22647
+node 25: main: host = node-6-11, process =  22649
+node 24: main: host = node-6-11, process =  22648
+node 26: main: host = node-6-11, process =  22650
+Default parameters:
+gauss_inp_file  gauss.inp
+log_level  info
+molpro_inp_file  molpro.inp
+multipole_inp_file  multipole.inp
+opt_type  none
+sjk_inp_file  sjk.inp
+smp_out_flag  0
+smp_save_file  smp.save
+
+node 27: main: host = node-6-11, process =  22651
+node 28: main: host = node-6-11, process =  22652
+node 30: main: host = node-6-11, process =  22655
+node 29: main: host = node-6-11, process =  22653
+master: main: host = node-6-10, process =  13075
+
+master: main: Starting calculation ...
+
+node 31: main: host = node-6-11, process =  22656
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+[node-6-10:13066] 31 more processes have sent help message help-mpi-btl-openib.txt / ib port not selected
+[node-6-10:13066] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+[node-6-10:13066] 14 more processes have sent help message help-mpi-btl-openib.txt / no active ports found
+[node-6-10:13066] 16 more processes have sent help message help-mpi-btl-openib.txt / error in device init
+master: main: flux through the 0-th surface is done
+master: main: flux through the 1-th surface is done
+master: main: flux through the 2-th surface is done
+master: main: flux through the 3-th surface is done
+master: main: flux through the 4-th surface is done
+master: main: flux through the 5-th surface is done
+master: main: flux through the 6-th surface is done
+master: main: flux through the 7-th surface is done
+master: main: flux through the 8-th surface is done
+master: main: flux through the 9-th surface is done
+master: main: flux through the 10-th surface is done
+master: main: flux through the 11-th surface is done
+master: main: flux through the 12-th surface is done
+master: main: no work to be done => exitting ...
+node 3: main: : exitting...
+node 12: main: : exitting...
+node 2: main: : exitting...
+node 1: main: : exitting...
+node 15: main: : exitting...
+node 5: main: : exitting...
+node 13: main: : exitting...
+node 8: main: : exitting...
+node 14: main: : exitting...
+node 4: main: : exitting...
+node 6: main: : exitting...
+node 9: main: : exitting...
+node 7: main: : exitting...
+node 11: main: : exitting...
+node 10: main: : exitting...
+node 16: main: : exitting...
+node 29: main: : exitting...
+node 30: main: : exitting...
+node 17: main: : exitting...
+node 24: main: : exitting...
+node 20: main: : exitting...
+node 27: main: : exitting...
+node 31: main: : exitting...
+node 21: main: : exitting...
+node 22: main: : exitting...
+node 19: main: : exitting...
+node 18: main: : exitting...
+node 28: main: : exitting...
+node 26: main: : exitting...
+node 23: main: : exitting...
+node 25: main: : exitting...
+Comm::cleanup: MPI round up ...

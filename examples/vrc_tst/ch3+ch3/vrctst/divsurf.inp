@@ -1,0 +1,46 @@
+ PivotPoints               2
+ Frame 0 0 0 0
+ #          ^ ^ ^ ^
+ # origin: 1
+ # orientation:
+ #  3
+ #  ^
+ #  |y
+ #  |  x
+ #  4--->2
+
+x1 =  0.00 +d1*sin(p1)*cos(a1) y1 =  0.00+d1*sin(p1)*sin(a1) z1 =  0.00 +d1*cos(p1)
+x2 =  0.00 -d1*sin(p1)*cos(a1) y2 =  0.00-d1*sin(p1)*sin(a1) z2 =  0.00 -d1*cos(p1)
+
+ PivotPoints               2
+ Frame 0 0 0 0
+
+x4 =  0.00 +d2*sin(p2)*cos(a2) y4 =  0.00+d2*sin(p2)*sin(a2) z4 =  0.00 +d2*cos(p2)
+x5 =  0.00 -d2*sin(p2)*cos(a2) y5 =  0.00-d2*sin(p2)*sin(a2) z5 =  0.00 -d2*cos(p2)
+
+ # interpointal distances
+ #
+
+ Distances
+
+r11 = r-d1/2-d2/2
+r12 = r-d1/2-d2/2
+r21 = r-d1/2-d2/2
+r22 = r-d1/2-d2/2
+
+ Conditions 2
+ d1-d2 < 0.1
+ d2-d1 < 0.1
+
+ Cycles            7
+
+ r = (8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5,5.0,4.5)
+ d1 = (0.01, 0.15, 0.3)
+ d2 = (0.01, 0.15, 0.3)
+p2 = (   0.00)
+a2 = (   0.00)
+p1 = ( 179.91)
+a1 = (   0.01)
+
+ EndSurface
+

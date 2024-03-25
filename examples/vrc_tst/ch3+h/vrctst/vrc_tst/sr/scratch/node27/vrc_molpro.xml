@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<molpro xmlns="http://www.molpro.net/schema/molpro-output"
+  xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+  xmlns:cml="http://www.xml-cml.org/schema"
+  xmlns:stm="http://www.xml-cml.org/schema"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+ <job>
+  <jobstep command="MULTI" commandset="MULTI">
+   <cml:molecule>
+    <cml:symmetry pointGroup="C1">
+    </cml:symmetry>
+    <cml:atomArray>
+     <cml:atom id="a1" elementType="C" x3="-0.525887E-01" y3="-0.129931" z3="0.292128E-01"/>
+     <cml:atom id="a2" elementType="H" x3="-0.589241" y3="0.719185" z3="0.42103"/>
+     <cml:atom id="a3" elementType="H" x3="-0.495075" y3="-1.11231" z3="0.698495E-01"/>
+     <cml:atom id="a4" elementType="H" x3="0.924842" y3="0.361713E-02" z3="-0.405891"/>
+     <cml:atom id="a5" elementType="H" x3="0.785639" y3="1.93657" z3="-0.432821"/>
+    </cml:atomArray>
+    <cml:bondArray>
+     <cml:bond atomRefs2="a1 a2"/>
+     <cml:bond atomRefs2="a1 a3"/>
+     <cml:bond atomRefs2="a1 a4"/>
+    </cml:bondArray>
+   </cml:molecule>
+   <property name="Energy" method="MCSCF" principal="true" stateSymmetry="1" stateNumber="1"
+     value="-40.047604985583"/>
+   <property name="Dipole moment" method="MCSCF" principal="true" stateSymmetry="1"
+     stateNumber="1"
+     value="-0.255652374397963E-01 -0.792411643805644E-01 0.246126327789083E-01"/>
+   <time start="09:12:00" end="09:12:01" cpu="0.65" system="0.32" real="1.23"/>
+   <storage units="megabyte" memory="0.0" sf="0.0" df="34.26" eaf="0.0"/>
+   <summary overall_method="MULTI/cc-pVDZ"/>
+  </jobstep>
+  <jobstep command="RS2" commandset="CIPRO">
+   <property name="Energy" method="RSPT2" principal="true" stateSymmetry="1" stateNumber="1"
+     value="-40.1839290197763"/>
+   <property name="Dipole moment" method="RSPT2" principal="true" stateSymmetry="1"
+     stateNumber="1"
+     value="-0.267603679066001E-01 -0.821534254651359E-01 0.252876043533097E-01"/>
+   <time start="09:12:01" end="09:12:01" cpu="0.07" system="0.02" real="0.13"/>
+   <storage units="megabyte" memory="0.0" sf="0.0" df="34.26" eaf="0.0"/>
+   <summary overall_method="RS2/cc-pVDZ"/>
+  </jobstep>
+  <stm:metadataList>
+   <stm:metadata name="dc:date" content="2023-06-03T09:12:01+02:00"/>
+   <stm:metadata name="dc:creator" content="cavallotti"/>
+   <stm:metadata name="cmlm:insilico" content="Molpro"/>
+  </stm:metadataList>
+  <platform>
+   <version major="2021" minor="2" SHA="1987c3f1b0c3ae76932bc24993909f2d7ae6b1f1"
+     integer_bits="64" parallelism="serial">
+    2021.2
+    <date year="2023" month="6" day="3" hour="9" minute="12" second="0">
+     2023-06-03T09:12:00
+    </date>
+   </version>
+   <licence id="polimi"/>
+   <parallel processes="1" nodes="1" all_processes="1" openmp="1"/>
+   <dimensions natom="400" nvalence="500" nvalence_pno="1000" nbasis="12000" nstate="100"
+     nsymm="16" nrec="512" nprim="2" ncol="100"/>
+  </platform>
+  <input>
+   <p> memory,         400 ,m</p>
+   <p>symmetry, nosym; orient, noorient</p>
+   <p>angstrom</p>
+   <p>geomtyp=xyz</p>
+   <p>geometry={</p>
+   <p>5</p>
+   <p>rotational dynamics</p>
+   <p>C, -0.0525887, -0.129931, 0.0292128</p>
+   <p>H, -0.589241, 0.719185, 0.42103</p>
+   <p>H, -0.495075, -1.11231, 0.0698495</p>
+   <p>H, 0.924842, 0.00361713, -0.405891</p>
+   <p>H, 0.785639, 1.93657, -0.432821</p>
+   <p>}</p>
+   <p> basis=cc-pvdz</p>
+   <p> {multi;closed, 4;occ, 6;wf, 10,1,0,;state,1;maxiter,40}</p>
+   <p> if (iterations.ge.0) then</p>
+   <p>    {rs2,shift=0.2;orbital,IGNORE_ERROR;state,1}</p>
+   <p>    molpro_energy = energy +   40.192865169999997</p>
+   <p> else</p>
+   <p>    molpro_energy = 10.0</p>
+   <p> endif</p>
+   <p> ===</p>
+  </input>
+  <diagnostics warnings="0"/>
+ </job>
+</molpro>

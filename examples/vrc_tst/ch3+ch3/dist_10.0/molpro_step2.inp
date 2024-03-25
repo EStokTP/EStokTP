@@ -1,0 +1,75 @@
+ nosym                                                                                                                                                                                                   
+                                                                                                                                                                                                         
+ End1                                                                                                                                                                                                    
+ geometry={angstrom
+   C1                                                        
+   H2   C1   R1                                              
+   H3   C1   R2   H2   A2                                    
+   H4   C1   R3   H2   A3   H3   D3                          
+   C21 C1 BB H2 ANG1 H3 DH1                                  
+   H22 C21 R21 C1 ANG2 H2 DH2                                
+   H23 C21 R22 H22 A22 C1 DH3                                
+   H24 C21 R23 H22 A23 H23 D23                               
+ }
+ R1                             =    1.0782000000000000     
+ R2                             =    1.0783000000000000     
+ R3                             =    1.0783000000000000     
+ A2                             =    119.97820000000000     
+ A3                             =    120.02470000000000     
+ D3                             =    179.97690000000000     
+ R21                            =    1.0782000000000000     
+ R22                            =    1.0783000000000000     
+ R23                            =    1.0782000000000000     
+ A22                            =    119.96220000000000     
+ A23                            =    120.02750000000000     
+ D23                            =    180.05950000000001     
+ ANG2                           =    89.906199999999998     
+ DH3                            =    89.384699999999995     
+ DH2                            =    59.510300000000001     
+ DH1                            =    89.560199999999995     
+ ANG1                           =    89.947000000000003     
+ BB                             =    10.000000000000000     
+
+                                                                                                                                                                                                         
+ !closed shell input                                                                                                                                                                                     
+ nosym                                                                                                                                                                                                   
+                                                                                                                                                                                                         
+ ! generate AS                                                                                                                                                                                           
+ uhf                                                                                                                                                                                                     
+ SET,SPIN=           0
+ {multi;closed, 8;occ,10;wf, 18,1,0,;state,1;maxiter,40}                                                                                                                                                 
+ End1
+
+ {multi;closed, 8;occ,10;wf, 18,1,0,;state,1;maxiter,40}                                                                                                                                                 
+                                                                                                                                                                                                         
+   basis=aug-cc-pvtz                                                                                                                                                                                     
+   ! singlet caspt2                                                                                                                                                                                      
+ SET,SPIN=           0
+ {multi;closed, 8;occ,10;wf, 18,1,0,;state,1;maxiter,40}                                                                                                                                                 
+  {rs2,shift=0.2;orbital,IGNORE_ERROR ;state,1}                                                                                                                                                          
+   en_s = energy                                                                                                                                                                                         
+                                                                                                                                                                                                         
+   ! triplet caspt2                                                                                                                                                                                      
+ SET,SPIN=           2
+ {multi;closed, 8;occ,10;wf, 18,1,2,;state,1;maxiter,40}                                                                                                                                                 
+  {rs2,shift=0.2;orbital,IGNORE_ERROR ;state,1}                                                                                                                                                          
+  en_t = energy                                                                                                                                                                                          
+                                                                                                                                                                                                         
+ ! coupled cluster on triplet                                                                                                                                                                            
+ SET,SPIN=2
+ {multi;closed, 8;occ,10;wf, 18,1,2,;state,1;maxiter,40;canorb,2101.2}                                                                                                                                   
+ {rhf;wf, 18,1,2;start,2101.2}                                                                                                                                                                           
+ !  CC_CC                                                                                                                                                                                                
+ {uccsd(t)}                                                                                                                                                                                              
+                                                                                                                                                                                                         
+  en_cc = energy                                                                                                                                                                                         
+                                                                                                                                                                                                         
+   CBSen = en_cc - (en_t - en_s)                                                                                                                                                                         
+   put,molden,molpro.molden                                                                                                                                                                              
+                                                                                                                                                                                                         
+ ---                                                                                                                                                                                                     
+                                                                                                                                                                                                         
+ End2
+ put,molden,molpro.molden
+ ---
+ End3

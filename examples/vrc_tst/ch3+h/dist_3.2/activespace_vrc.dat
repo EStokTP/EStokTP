@@ -1,0 +1,6 @@
+           1
+{multi;closed, 4;occ, 6;wf, 10,1,0,;state,1;maxiter,40}
+ commands for spin splitting
+{multi;closed, 4;occ, 6;wf, 10,1,2,;state,1;maxiter,40}
+{multi;closed, 4;occ, 6;wf, 10,1,2,;state,1;maxiter,40;canorb,2101.2}
+{rhf;wf, 10,1,2;start,2101.2}

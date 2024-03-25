@@ -218,7 +218,7 @@ cmdt start thermo
       ithermo_ts=0
       iprintall=0
 cmdt end thermo
-
+      isurvive=0
 
   100 continue
 c  lc Opt words initialization 
@@ -313,9 +313,11 @@ c         stop
       if (WORD.EQ.'PROJRCOO') then
          iprojrcoo = 0
       endif
-
       if (WORD.EQ.'NOTUNNEL') then
          inotunn = 1
+      endif
+      if (WORD.EQ.'SURVIVEALL') then
+         isurvive = 1
       endif
       if (WORD.EQ.'PRODS') then
          ip1 = 1
@@ -6496,6 +6498,8 @@ cc read scaling factor for frequencies.
             if(ibstep.eq.21)then
                if(ispin.eq.1)then
                   ispin=3
+c                  write(*,*)'passing from here'
+c                  write(*,*)'nbonds is ',nbonds
                   call activespace(nbonds-1,nlps,nstates,neltot,ispin)
                else
                   call activespace(nbonds,nlps,nstates,neltot,ispin)
@@ -7265,17 +7269,26 @@ c      write(*,*)'ilin is ',ilin
 c      stop
 
       if(vtotr.gt.0)then
-         write(7,*)'failed in level1 calculations'
-         write(7,*)'in subroutine level1'
-         write(7,*)'with vtot ',vtotr
-         write(7,*)'terminating code with error'
-         open(unit=99,file='failed',status='unknown')
-         write(99,*)'failed in level1 calculations'
-         write(99,*)'in subroutine level1'
-         write(99,*)'with vtot ',vtotr
-         write(99,*)'terminating code with error'
-         close(99)
-         stop
+         if(isurvive.eq.0)then
+            write(7,*)'failed in level1 calculations'
+            write(7,*)'in subroutine level1'
+            write(7,*)'with vtot ',vtotr
+            write(7,*)'terminating code with error'
+            open(unit=99,file='failed',status='unknown')
+            write(99,*)'failed in level1 calculations'
+            write(99,*)'in subroutine level1'
+            write(99,*)'with vtot ',vtotr
+            write(99,*)'terminating code with error'
+            close(99)
+            stop
+         else if (isurvive.eq.1)then
+            open (unit=65,status='unknown')
+            read (65,*) vtotr
+            close(65)
+            write(7,*)'not converged at level 1'
+            write(7,*)'found I will survive keyword'
+            write(7,*)'continue at your own peril'
+         endif
       endif
 
       if (inp_type.eq.1) then
@@ -21801,7 +21814,7 @@ c      endif
       numclosedtot=nbonds+nlps
       numopentot=nbonds
       if(ispin.eq.2)numopentot=numopentot+1
-      if(ispin.eq.3)numopentot=numopentot+2
+c      if(ispin.eq.3)numopentot=numopentot+2
       open(unit=101,file='activespace.dat',status='unknown')
       if(numclosedtot.eq.0.and.ispin.eq.3)then
 c        write(101,*)2
@@ -22457,33 +22470,33 @@ c      stop
 c      write(*,*)'ok2 '
 
 
-      open(unit=10,file='temp1.xyz',status='unknown')
-      do j=1,ncoord
-         write(10,*)intcoor(j),xint(j),xinti(j),abs(xint(j)-xinti(j))
-      enddo
-      close(10)
+c      open(unit=10,file='temp1.xyz',status='unknown')
+c      do j=1,ncoord
+c         write(10,*)intcoor(j),xint(j),xinti(j),abs(xint(j)-xinti(j))
+c      enddo
+c      close(10)
 
-      do j=1,ncoord
-         xint(j)=xinti(j)
-      enddo
+c      do j=1,ncoord
+c         xint(j)=xinti(j)
+c      enddo
+
+
+c     open(unit=10,file='temp2.xyz',status='unknown')
+c      write(10,*)natom
+c      write(10,*)'test'
+c      inda=0
+c      do j=1,natom
+c         aname1(j)=atname(j)
+c         if(idummy(j).ne.1)then
+c            inda=inda+1
+c      endif
+c      write(10,*)aname1(inda),coox(j),cooy(j),cooz(j)
+c      enddo
+c      close(10)
 
 c      stop
 
-      open(unit=10,file='temp2.xyz',status='unknown')
-      write(10,*)natom
-      write(10,*)'test'
-      inda=0
-      do j=1,natom
-         aname1(j)=atname(j)
-         if(idummy(j).ne.1)then
-            inda=inda+1
-      endif
-      write(10,*)aname1(inda),coox(j),cooy(j),cooz(j)
-      enddo
-      close(10)
-
-
-cc now we update the coordinates using those etransformed in our procedure for consistentcy
+cc now we update the coordinates using those transformed in our procedure for consistentcy
 cc with dimension of dihedral angles
 
       do j=1,ncoord
@@ -32745,7 +32758,8 @@ c               write(*,*)intcoor(icoord)
 c      stop
 
 cc initialize vectors
-      do j=1,ncoord 
+c      do j=1,ncoord 
+      do j=1,natomt
          bname(j)=''
          anname(j)=''
          dname(j)=''

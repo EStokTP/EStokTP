@@ -1,0 +1,72 @@
+nosym
+
+End1 
+
+!closed shell input
+nosym
+
+! generate AS  
+uhf
+active_space1
+
+  basis=aug-cc-pvtz                                                                                                
+  ! singlet caspt2                                                                                   
+ active_space2
+ {rs2,shift=0.2;orbital,IGNORE_ERROR ;state,1}                         
+  en_s = energy                                                                   
+                                                                          
+  ! triplet caspt2                                                                                                               
+ active_space2_t
+ {rs2,shift=0.2;orbital,IGNORE_ERROR ;state,1} 
+ en_t = energy                                                                                      
+  
+! coupled cluster on triplet 
+  active_space2_rhf
+!  CC_CC
+{uccsd(t)} 
+ 
+ en_cc = energy
+
+  CBSen = en_cc - (en_t - en_s)                                                                    
+  put,molden,molpro.molden  
+
+---
+
+End2
+
+!open shell input
+nosym
+! generate AS  
+uhf
+ {multi;closed,4;occ,6;wf,10,1,0}
+
+  basis=aug-cc-pvtz                                                                                  
+                                                                                                     
+  ! singlet caspt2                                                                                   
+ {multi;closed,4;occ,6;wf,10,1,0}                                                                                                  
+  {rs2,shift=0.2;wf,10,1,0}                                                                                    
+                                                                                                     
+  en_s = energy                                                                                      
+                                                                                                     
+  ! triplet caspt2                                                                                                               
+  {multi;closed,4;occ,6;wf,10,1,2;canorb,2101.2}                                                                                           
+  {rs2,shift=0.2;wf,10,1,2}                                                                                    
+                                                                                                     
+  en_t = energy                                                                                      
+  
+! coupled cluster on triplet  
+ {rhf;wf,10,1,2;start,2101.2}                                                                                              
+ {uccsd(t);wf,10,1,2}                                                                                            
+  en_cc = energy
+
+  CBSen = en_cc - (en_t - en_s)                                                                                                       
+                                                                                                     
+  put,molden,molpro.molden  
+
+---
+
+End3
+
+
+
+

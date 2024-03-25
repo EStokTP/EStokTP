@@ -1,0 +1,14 @@
+basis=cc-pvdz
+active_space1
+ENERGY {rs2,shift=0.2;orbital,IGNORE_ERROR;state,1} 
+if (iterations.ge.0) then
+   {rs2,shift=0.2;orbital,IGNORE_ERROR;state,1}
+   ENCORR
+else
+   molpro_energy = 10.0
+endif
+---
+End
+
+
+

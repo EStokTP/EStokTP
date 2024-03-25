@@ -134,7 +134,7 @@ c      if(iskgeo.eq.1)stop
          go to 200
       endif
       if(iskgeo.ne.1)then
-         write (10,*) comline1
+         write (10,*) comline1(1:len_trim(comline1))
          if(iaspace.eq.1)write(98,*) comline1(1:len_trim(comline1))
       endif
       goto 100
@@ -257,7 +257,7 @@ c      write(7,*)comline1
          goto 101
       endif
       if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE2_T')then
-c        if(ispin.eq.1)then
+         if(ispin.eq.1)then
             open(unit=15,file='activespace.dat',status='unknown')
             read(15,*)nlines
             do j=1,nlines
@@ -270,12 +270,12 @@ c        if(ispin.eq.1)then
             write (98,*) 'SET,SPIN=',ispin+1
             write (98,*) comline1(1:len_trim(comline1))
             close(15)
-c         endif
+          endif
          goto 101
       endif
 
       if(iaspace.eq.1.and.word2.eq.'ACTIVE_SPACE2_RHF')then
-c        if(ispin.eq.1)then
+         if(ispin.eq.1)then
             open(unit=15,file='activespace.dat',status='unknown')
             read(15,*)nlines
             do j=1,nlines
@@ -293,7 +293,7 @@ c        if(ispin.eq.1)then
 c            write (10,*) comline1(1:len_trim(comline1))
             write (98,*) comline1(1:len_trim(comline1))
             close(15)
-c         endif
+          endif
          goto 101
       endif
 
@@ -364,7 +364,9 @@ c        if(ispin.eq.1)then
             enddo
             read(15,'(A100)')
             read(15,'(A100)')comline1
+            write (10,*) 'SET,SPIN=',ispin+1
             write (10,*) comline1(1:len_trim(comline1))
+            write (98,*) 'SET,SPIN=',ispin+1
             write (98,*) comline1(1:len_trim(comline1))
             close(15)
 c         endif
@@ -381,7 +383,13 @@ c        if(ispin.eq.1)then
             read(15,'(A100)')
             read(15,'(A100)')
             read(15,'(A100)')comline1
+            write (10,*) 'SET,SPIN=3'
+            write (98,*) 'SET,SPIN=3'
             write (10,*) comline1(1:len_trim(comline1))
+            write (98,*) comline1(1:len_trim(comline1))
+            read(15,'(A200)')comline1
+            write (10,*) comline1(1:len_trim(comline1))
+c            write (10,*) comline1(1:len_trim(comline1))
             write (98,*) comline1(1:len_trim(comline1))
             close(15)
 c         endif

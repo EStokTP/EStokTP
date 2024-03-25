@@ -1,0 +1,8 @@
+ nosym
+ End1
+ basis=cc-pvdz                                                         
+ {multi;closed, 8;occ,10;wf, 18,1,0,;state,1;maxiter,40}               
+ {RS2,SHIFT=0.2;ORBITAL,IGNORE_ERROR;STATE,1}                                                                                                                    
+ CBSen = energy
+ End2
+ End3

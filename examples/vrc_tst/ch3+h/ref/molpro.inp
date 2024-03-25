@@ -1,0 +1,64 @@
+ memory,        1000 ,m
+ nosym                                                                                                                                                                                                   
+ geometry={angstrom
+ C1                                                          
+ H2   C1   R1                                                
+ H3   C1   R2   H2   A2                                      
+ H4   C1   R3   H2   A3   H3   D3                            
+ H21 C1 BB H2 ANG1 H3 DH1                                    
+ }
+ R1                             =    1.0878000000000001     
+ R2                             =    1.0878000000000001     
+ R3                             =    1.0878000000000001     
+ A2                             =    109.47600000000000     
+ A3                             =    109.46920000000000     
+ D3                             =    239.99270000000001     
+ BB                             =    1.0878000000000001     
+ ANG1                           =    109.47270000000000     
+ DH1                            =    120.00109999999999     
+
+                                                                                                                                                                                                         
+ !closed shell input                                                                                                                                                                                     
+                                                                                                                                                                                                         
+  basis=cc-pvdz                                                                                                                                                                                          
+  hf                                                                                                                                                                                                     
+                                                                                                                                                                                                         
+  basis=aug-cc-pvtz                                                                                                                                                                                      
+  hf                                                                                                                                                                                                     
+  ccsd(t)                                                                                                                                                                                                
+  en_cc = energy                                                                                                                                                                                         
+                                                                                                                                                                                                         
+  basis=cc-pcvtz                                                                                                                                                                                         
+  hf                                                                                                                                                                                                     
+  {ccsd(t),maxit=50}                                                                                                                                                                                     
+  en_ccsdt_tz=energy                                                                                                                                                                                     
+                                                                                                                                                                                                         
+  basis=cc-pcvtz                                                                                                                                                                                         
+  hf                                                                                                                                                                                                     
+  {ccsd(t),maxit=50;core}                                                                                                                                                                                
+  en_ccsdtcore_tz=energy                                                                                                                                                                                 
+                                                                                                                                                                                                         
+  gdirect                                                                                                                                                                                                
+  basis=aug-cc-pvtz                                                                                                                                                                                      
+  hf                                                                                                                                                                                                     
+  df-mp2                                                                                                                                                                                                 
+  en_mp2_tz=energy                                                                                                                                                                                       
+                                                                                                                                                                                                         
+  basis=aug-cc-pvqz                                                                                                                                                                                      
+  rhf                                                                                                                                                                                                    
+  df-mp2                                                                                                                                                                                                 
+  en_mp2_qz=energy                                                                                                                                                                                       
+                                                                                                                                                                                                         
+ !Martin  extrapolation scheme                                                                                                                                                                           
+ !Chemical Physics Letters 259 (1996) 669-678                                                                                                                                                            
+ ! E=A+B/(L+1/2)^4                                                                                                                                                                                       
+                                                                                                                                                                                                         
+  en_mp2_cbs=en_mp2_qz+0.5772*(en_mp2_qz-en_mp2_tz)                                                                                                                                                      
+                                                                                                                                                                                                         
+  CBSen = en_cc+(en_mp2_cbs-en_mp2_tz)+en_ccsdtcore_tz-en_ccsdt_tz                                                                                                                                       
+                                                                                                                                                                                                         
+  put,molden,molpro.molden                                                                                                                                                                               
+ ---                                                                                                                                                                                                     
+                                                                                                                                                                                                         
+ put,molden,molpro.molden
+ ---

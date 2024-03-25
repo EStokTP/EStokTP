@@ -1,0 +1,132 @@
+!***************************************************
+!               GLOBAL SECTION
+!***************************************************
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!
+TemperatureList[K]                      300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400 2500  
+PressureList[atm]                       0.1    1.   10.  1000.
+!
+!
+EnergyStepOverTemperature               .2         ! [Discretization energy step (global relax matrix)] / T                   
+ExcessEnergyOverTemperature             30         ! [Highest barrier in the model (global relax matrix)] / T                      
+ModelEnergyLimit[kcal/mol]              400        ! Highest reference energy used in the calculation ( or ReferenceEnergy[kcal/mol])
+!
+CalculationMethod                       direct     ! direct or low-eigenvalue                     
+!
+WellCutoff                              20         ! well truncation parameter : Max { dissociation limit (min barrier rel. to bottom of the well) / T }
+ChemicalEigenvalueMax                   0.2        ! Max chemical eigenvalue / Lowest Collision relaxation eigenvalue 
+!
+ReductionMethod                         diagonalization ! [low eigenvalue method only] diagonalization or projection (default)
+!      
+!!!!!!!!!test!!!!!!!!!!!!!!!!!!!!
+!WellCutoff                            10
+!ChemicalEigenvalueMin                 1.e-6          #only for direct diagonalization method
+!!!!!!!!test!!!!!!!!!!!!!!!!!!!!!!!!!!
+AtomDistanceMin[bohr]                  1.3
+!!
+RateOutput                              rate.out                        ! output file name for rate coefficients                         
+!
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!***************************************************
+!               MODEL SECTION
+!***************************************************
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!                          
+Model        
+!                                                           
+  EnergyRelaxation                                                      ! Default collisional energy relaxation kernel                              
+    Exponential                                                         ! Currently the only possible energy relaxation model              
+       Factor[1/cm]                     260                             ! (Delta_E_down)^(0) @ standard T (300 K)                          
+       Power                            0.85                           ! Power n in the expression (Delta_E_down) = (Delta_E_down)^(0) (T/T0)^(n)
+       ExponentCutoff                   10                              ! if (Delta_E) / (Delta_E_down) > value  transition probability is zero     
+    End  
+!                                                               
+  CollisionFrequency                                                    ! Collision frequency model
+    LennardJones                                                        ! Currently the only possible collisional frequency model  based on LJ potential
+       Epsilons[K]                       128.8  128.8               ! Not valid
+       Sigmas[angstrom]                  3.4    3.4                 ! Not valid
+       Masses[amu]                       39.95  16.0                ! Masses of the buffer gas molecule and of the complex (check order)
+    End      
+!
+!*************************************************
+!
+!***************************************************
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!***************************************************
+!  REACTANTS					
+!***************************************************
+
+
+ Well REACS
+ Species
+ RRHO     
+ Geometry[angstrom]               5
+ C    0.00000   0.00000   0.00000                                     
+ H    0.00000   0.00000   1.08779                                     
+ H    1.02555   0.00000  -0.36268                                     
+ H   -0.51292   0.88814  -0.36257                                     
+ H   -0.51281  -0.88818  -0.36263                                     
+         Core    RigidRotor
+                SymmetryFactor    12.000000000000000     
+         End
+     Frequencies[1/cm]            9
+   1341.1      1341.6      1341.6      1562.7      1563.0      3043.6      3161.6      3161.9      3162.0    
+  ZeroEnergy[kcal/mol]             0.
+  ElectronicLevels[1/cm]                      1
+   0.0000000000000000        1.0000000000000000     
+ End 
+ End
+ !************************************
+ Bimolecular PRODS
+ Fragment PROD1
+ RRHO     
+ Geometry[angstrom]               4
+ C    0.00000   0.00000   0.00000                                     
+ H    0.00000   0.00000   1.07819                                     
+ H    0.93401   0.00000  -0.53865                                     
+ H   -0.93351  -0.00314  -0.53941                                     
+         Core    RigidRotor
+                SymmetryFactor    6.0000000000000000     
+         End
+     Frequencies[1/cm]            6
+   527.01      1409.5      1409.9      3122.9      3303.8      3304.4    
+  ZeroEnergy[kcal/mol]             0.
+  ElectronicLevels[1/cm]                      1
+   0.0000000000000000        2.0000000000000000     
+   
+ End
+ !************************************
+ Fragment Prod2
+  Atom
+  Name H 
+  ElectronicLevels[1/cm]                      1
+   0.0000000000000000        2.0000000000000000     
+   
+ End
+ GroundEnergy[kcal/mol]   102.69 
+ End
+ !************************************
+ Barrier TS REACS PRODS
+ RRHO     ! transition state
+ Geometry[angstrom]               5
+ C    0.00000   0.00000   0.00000                                     
+ H    0.00000   0.00000   1.07832                                     
+ H    0.93388   0.00000  -0.53898                                     
+ H   -0.93383  -0.00196  -0.53905                                     
+ H    0.01994  -3.79991   0.01575                                     
+         Core    RigidRotor
+                SymmetryFactor    3.0000000000000000     
+         End
+     Frequencies[1/cm]            8
+   80.466      106.85      527.22      1409.5      1409.8      3122.2      3303.0      3303.8    
+  ZeroEnergy[kcal/mol]              102.25  
+  ElectronicLevels[1/cm]                      1
+   0.0000000000000000        1.0000000000000000     
+ End 
+ End 
+ !************************************
+End
+End

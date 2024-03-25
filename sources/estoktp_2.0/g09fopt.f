@@ -99,6 +99,13 @@ c      common /itsdat/ iabs,iadd,ivar,isite,ji,ki
 c      common /strucword/ stoich
       include 'filcomm.f'
 
+cc make sure tha intcoor is in upper cases
+      ncoord = natom*3-6-ntau
+      do j=1,ncoord
+         call upcase2(intcoor(j))
+      enddo
+cc
+
 c111   continue
 c  lc mod, setting lc_flag locally to -1:  
       lc_flag=-1 
@@ -202,6 +209,7 @@ c initialize word, word2, word3, word4, word5
       ilin_fr=0
       ifilu=0
       ifreq_save=ifreq
+      ireadfc=0
       if(natom.eq.2)ilin=0
       if(ilin.eq.1) ilin_fr=1
  999  continue
@@ -366,10 +374,14 @@ c   3) Check if the route contains freq and opt togheter
      &     .and.
      &    (index(vlstring,'opt') .gt. 0) 
      &    .and.
-     &    (index(vlstring,'maxcyc=1') .eq. 0))then
+     &    (index(vlstring,'maxcyc=1,') .eq. 0))then
          OptFreq=.True.
          write(10,'(A)') '--link1--'
       end if
+      if (
+     &     (index(vlstring,'readfc') .gt. 0))then
+         ireadfc=1
+      endif
       if (
      &   index(vlstring,',ef,') .gt. 0
      &      .or.
@@ -740,6 +752,12 @@ c         write (10,*) '#','guess=read geom=allcheck ChkBasis'
          write (10,*) 
          command1=
      &    "sed -i -E ':a;N;$!ba;s/opt=?\(([^()]*)\)/ /2' geom.com"
+         call commrun(command1)
+         command1=
+     &    "sed -i -E ':a;N;$!ba;s/guess=mix/ /2' geom.com"
+         call commrun(command1)
+         command1=
+     &    "sed -i -E ':a;N;$!ba;s/mix/ /2' geom.com"
          call commrun(command1)
          command1=
      &    "sed -i -E ':a;N;$!ba;s/freq(=?\(([^()]*)\))?/ /1' geom.com"
@@ -1540,6 +1558,11 @@ c         if(ired.eq.1)then
      $    ,idconn,bname,anname,dname,atname,coox,cooy,cooz,xint,tauopt,
      $       ntau,idummy,ilin_fr,aconnt,bconnt,dconnt,atomlabel,ifilu)
             if(xint(1).eq.0)then
+               do j=1,natomt
+                  write(*,*) 'iaconn ',j,iaconn(j)
+                  write(*,*) 'idconn ',j,idconn(j)
+               enddo
+c               stop
                write(*,*)'failed in updating geometry'
                write(*,*)'probably error of g09, check output'
                write(*,*)'stopping now'
@@ -1562,19 +1585,32 @@ cc      if(ichecken.eq.0.and.gkeyword.ne.'level1')then
      $ ,idconn,bname,anname,dname,atname,coox,cooy,cooz,xint,tauopt,
      $  ntau,idummy,ilin_fr,aconnt,bconnt,dconnt,atomlabel,ifilu)
          if(xint(1).eq.0)then
+            do j=1,natomt
+               write(*,*) 'coox ',j,coox(j)
+               write(*,*) 'xint ',j,xint(j)
+               write(*,*) 'intcoor ',j,intcoor(j)
+               write(*,*) 'atame ',j,atname(j)
+               write(*,*) 'bname ',j,bname(j)
+               write(*,*) 'iaconn ',j,iaconn(j)
+               write(*,*) 'idconn ',j,idconn(j)
+            enddo
             write(*,*)'failed in updating geometry'
             write(*,*)'probably error of g09, check output'
             write(*,*)'stopping now'
             stop
          endif
       endif
-      
+
+      if(ichecken.eq.0.and.ireadfc.eq.1)then
+         ichecken=1
+      endif
 
       if(ichecken.eq.0)then
          write(*,*)'did not found energy in the output'
          write(*,*)'or error of g09'
          write(*,*)'check you have indicated the proper gkey'
          write(*,*)'or if g09 has failed'
+         write(*,*)'ireadfc is ',ireadfc
          stop
       endif
       write(*,*)'out of g09opt' 
@@ -2200,19 +2236,31 @@ C     *****************************
 c      stop
       if(ispecies.eq.0) then
          if(ifine.eq.0) then
-            comline4='opt(calcfc,ts,maxcyc=1,noeigentest)  
+c            comline4='opt(calcfc,ts,maxcyc=1,noeigentest)  
+c     $ iop(7/33=1) guess=read geom=check'
+            comline4=' freq=readfc 
      $ iop(7/33=1) guess=read geom=check'
+
          else
-          comline4='opt(calcfc,ts,maxcyc=1,noeigentest)  
+c          comline4='opt(calcfc,ts,maxcyc=1,noeigentest)  
+c     $ iop(7/33=1) guess=read geom=check int=ultra 
+c     $'
+
+          comline4=' freq=readfc  
      $ iop(7/33=1) guess=read geom=check int=ultra 
      $'
+
          endif
       else
          if(ifine.eq.0) then
-            comline4='opt(calcfc,maxcyc=1,noeigentest) iop(7/33=1) 
+c            comline4='opt(calcfc,maxcyc=1,noeigentest) iop(7/33=1) 
+c     $ guess=read geom=check'
+            comline4='freq=readfc iop(7/33=1) 
      $ guess=read geom=check'
          else
-      comline4='opt(calcfc,maxcyc=1,noeigentest) iop(7/33=1)  
+c      comline4='opt(calcfc,maxcyc=1,noeigentest) iop(7/33=1)  
+c     $ guess=read geom=check int=ultra'
+      comline4='freq=readfc iop(7/33=1)  
      $ guess=read geom=check int=ultra'
          endif
       endif
@@ -2289,10 +2337,14 @@ c      rewind (99)
       write(*,*)'comline 5 is ',comline5
 c      stop
       if(ispecies.eq.0) then
-         comline6='opt(calcfc,ts,maxcycle=1,noeigentest) iop(7/33=1) 
+c         comline6='opt(calcfc,ts,maxcycle=1,noeigentest) iop(7/33=1) 
+c     $ guess=read geom=check'
+         comline6='freq=readfc iop(7/33=1) 
      $ guess=read geom=check'
       else
-         comline6='opt(calcfc,maxcycle=1) iop(7/33=1) guess=read 
+c         comline6='opt(calcfc,maxcycle=1) iop(7/33=1) guess=read 
+c     $ geom=check'
+         comline6='freq=readfc iop(7/33=1) guess=read 
      $ geom=check'
       endif
 

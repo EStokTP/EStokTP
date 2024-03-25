@@ -1,0 +1,190 @@
+command is mkdir -p output                                                                                      
+command is mkdir -p geoms                                                                                       
+command is mkdir -p irc_files                                                                                   
+command is mkdir -p me_files                                                                                    
+command is mkdir -p me_blocks                                                                                   
+command is mkdir -p hl_logs                                                                                     
+command is mkdir -p hr_geoms                                                                                    
+command is mkdir -p md_tunn                                                                                     
+command is rm -f ./finished                                                                                     
+command is pwd > temp.log                                                                   
+command is date > temp.log                                                                  
+command is hostname > temp.log                                                              
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is sed -ie 's/\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/ 999999/g'         fort.64                                                     
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/reac1_01.xyz                                                                   
+command is cp -f optgeom.tmp output/reac1_opt_01.out                                                            
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is sed -ie 's/\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/ 999999/g'         fort.64                                                     
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is sed -ie 's/\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/ 999999/g'         fort.64                                                     
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is sed -ie 's/\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/ 999999/g'         fort.64                                                     
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is sed -ie 's/\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/ 999999/g'         fort.64                                                     
+command is sed -ie 's/=/ /g' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is sed -ie 's/\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/ 999999/g'         fort.64                                                     
+command is cat headgeom.tmp geom.xyz > g4
+
+eom1.xyz                                                                
+command is cp -f geom1.xyz geoms/reac1_l1.xyz                                                                   
+command is cp -f geom.log geoms/reac1_l1.log                                                                    
+command is cp -f me_files/reac1_ge.me                                       me_files/reac1_1dge.me              
+command is cp -f ./me_files/reac1_fr.me                                            ./me_files/reac1_unpfr.me    
+command is cp -f output/prod1_opt.out output/pr1_vrc_opt.out                                                    
+command is sed -ie 's/=/ /g' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is sed -ie 's/\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/ 999999/g'         fort.64                                                     
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/pr1vr_l1.xyz                                                                   
+command is cp -f geom.log geoms/pr1vr_l1.log                                                                    
+command is cp -f geom.log geoms/pr1vr_l1.log                                                                    
+command is cp -f output/prod2_opt.out output/pr2_vrc_opt.out                                                    
+command is sed -ie 's/=/ /g' temp.tmp                                                                                               
+command is sed -ie 's/\// /' temp.tmp                                                                                               
+command is egrep Frame geom.log > temp1.dat                                                                                         
+command is cat temp0.dat temp1.dat > temp.dat                                                                                       
+command is tail -n 1 temp.dat > temp1.dat                                                                                           
+command is  sed -ie 's/\[/ /g' temp1.dat                                                                                            
+command is egrep Freq geom.log > temp.dat                                                                                           
+command is wc temp.dat > temp1.dat                                                                                                  
+command is cat headgeom.tmp geom.xyz > geom1.xyz                                                                
+command is cp -f geom1.xyz geoms/pr2vr_l1.xyz                                                                   
+command is cp -f geom.log geoms/pr2vr_l1.log                                                                    
+command is cp -f geom.log geoms/pr2vr_l1.log                                                                    
+command is symmetry_number symm.inp > symmt.out                                                                                                         
+command is echo '0 0' > temp.out                                                                                                                        
+command is cat symmt.out temp.out > symm.out                                                                                                            
+command is head -n -3  me_files/reac1_1dge.me                > temp.me                                                                                  
+command is cat temp.me  me_files/reac1_symm.me               > me_files/reac1_ge.me                                                                     
+command is cp -f ./data/hl_molpro.dat ./hl_molpro.dat                                                           
+command is sed -ie 's/MW/ /' temp.tmp                                                                           
+command is rm -f molpro.xml                                                                                     
+command is rm -f molpro.log_*                                                                                   
+command is rm -f molpro.out                                                                                     
+command is  molprop -n 4 molpro.inp 
+command is tail -n 1 molpro.out > temp.log                                                                      
+command is egrep 'PROGRAM \* OPT|No conv' molpro.out > temp.log                                                 
+command is tail -n 1 molpro.out > temp.log                                                                      
+command is cp -f molpro.out geom.log                                                                            
+command is rm -f temp1.log temp2.log temp3.log temp4.log temp.log                                               
+command is egrep CBSEN molpro.out > temp1.log                                                                   
+command is egrep 'CBSEN\(1' molpro.out >> temp1.log                                                             
+command is egrep CBSENINT molpro.out > temp2.log                                                                
+command is head -n 1 temp2.log > temp3.log                                                                      
+command is cat temp1.log temp3.log > temp4.log                                                                  
+command is tail -n 1 temp4.log > temp.log                                                                       
+command is rm -f temp1.log temp2.log temp3.log temp4.log temp.log                                               
+command is  egrep R1=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep R2=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep R3=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep A2=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep A3=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep D3=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep BB=                  molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep ANG1=                molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is  egrep DH1=                 molpro.molden > temp.log                                                 
+command is sed -ie 's/=/ /g' temp.log                                                                           
+command is grep -q "\[FREQ" molpro.molden && echo 1 > temp.log ||    echo 0 > temp.log                          
+command is cp -f temp.log ./me_files/reac1_en.me                                                                
+command is cp -f molpro.out ./hl_logs/reac1_molpro.out                                                          
+command is rm -f temp0.dat                                                                  
+command is rm -f temp1.dat*                                                                 
+command is rm -f temp1.log                                                                  
+command is rm -f temp1.xyz                                                                  
+command is rm -f temp.dat                                                                   
+command is rm -f temp.log*                                                                  
+command is rm -f temp2.log*                                                                 
+command is rm -f temp.tmp*                                                                  
+command is rm -f testcc.log*                                                                
+command is rm -f fort.*                                                                     
+command is rm -f *.me                                                                       
+command is rm -f optgeom.tmp                                                                
+command is rm -f tmp1.dat                                                                   
+command is rm -f tmp2.dat                                                                   
+command is rm -f tmp3.dat                                                                   
+command is rm -f tmp.dat                                                                    
+command is rm -f temp21a.me*                                                                
+command is rm -f temp3.me*                                                                  
+command is rm -f tmp1.log                                                                   
+command is rm -f tmp.log                                                                    
+command is rm -f tsgeom.tmp                                                                 
+command is rm -f temp.xyz                                                                   
+command is rm -f geom1.xyz                                                                  
+command is rm -f geom.xyz                                                                   
+command is rm -f geom_temp.out                                                              
+command is rm -f headgeom.tmp                                                               
+command is rm -f num.log                                                                    
+command is rm -f temp.out                                                                   
+command is rm -f stoich.dat*                                                                
+command is rm -f stoich.res                                                                 
+command is rm -f anim_freq.xyz                                                              
+command is rm -f Cart_displ.txt                                                             
+command is rm -f freqs1.txt                                                                 
+command is rm -f freqs_orig.txt                                                             
+command is rm -f freqs.txt                                                                  
+command is rm -f Km_res.txt                                                                 
+command is rm -f L_orig_save.txt                                                            
+command is rm -f Lderiv.txt                                                                 
+command is rm -f L_save.txt                                                                 
+command is rm -f dthetaE.txt                                                                
+command is rm -f mueff.txt                                                                  
+command is rm -f VaG.txt                                                                    
+command is rm -f Transmission_coefficient.txt                                               
+command is rm -f energy1a.tmp                                                               
+command is rm -f energy1b.tmp                                                               
+command is rm -f energy1.tmp                                                                
+command is rm -f fresub.dat                                                                 
+command is rm -f rotmass.dat                                                                

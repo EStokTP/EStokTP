@@ -1,0 +1,282 @@
+irun 0
+sed: -e expression #1, char 2: extra characters after command
+Your job 140682 ("qes2k2") has been submitted
+./dist_2.0/finished 
+Proceed to step 2
+Your job 140683 ("qes2k2") has been submitted
+Your job 140684 ("qes2k2") has been submitted
+Your job 140685 ("qes2k2") has been submitted
+Your job 140686 ("qes2k2") has been submitted
+Your job 140687 ("qes2k2") has been submitted
+Your job 140688 ("qes2k2") has been submitted
+Your job 140689 ("qes2k2") has been submitted
+Your job 140690 ("qes2k2") has been submitted
+Your job 140691 ("qes2k2") has been submitted
+Your job 140692 ("qes2k2") has been submitted
+sed: can't read output/ts_asl1_step2.inp: No such file or directory
+Your job 140693 ("qes2k2") has been submitted
+./dist_2.2/finished 
+1
+./dist_2.6/finished 
+2
+./dist_2.8/finished 
+3
+./dist_3.0/finished 
+4
+./dist_2.2/finished 
+1
+./dist_2.6/finished 
+2
+./dist_2.8/finished 
+3
+./dist_3.0/finished 
+4
+./dist_3.2/finished 
+5
+./dist_2.2/finished 
+1
+./dist_2.4/finished 
+2
+./dist_2.6/finished 
+3
+./dist_2.8/finished 
+4
+./dist_3.0/finished 
+5
+./dist_3.2/finished 
+6
+./dist_3.4/finished 
+7
+./dist_3.6/finished 
+8
+./dist_3.8/finished 
+9
+./dist_2.2/finished 
+1
+./dist_2.4/finished 
+2
+./dist_2.6/finished 
+3
+./dist_2.8/finished 
+4
+./dist_3.0/finished 
+5
+./dist_3.2/finished 
+6
+./dist_3.4/finished 
+7
+./dist_3.6/finished 
+8
+./dist_3.8/finished 
+9
+./dist_4.0/finished 
+10
+./dist_10.0/finished 
+11
+Proceed to step 3
+Your job 140694 ("qes2k2") has been submitted
+Your job 140695 ("qes2k2") has been submitted
+Your job 140696 ("qes2k2") has been submitted
+Your job 140697 ("qes2k2") has been submitted
+Your job 140698 ("qes2k2") has been submitted
+Your job 140699 ("qes2k2") has been submitted
+Your job 140700 ("qes2k2") has been submitted
+Your job 140701 ("qes2k2") has been submitted
+Your job 140702 ("qes2k2") has been submitted
+Your job 140703 ("qes2k2") has been submitted
+Your job 140704 ("qes2k2") has been submitted
+./dist_2.0/finished 
+1
+./dist_2.2/finished 
+2
+./dist_2.4/finished 
+3
+./dist_2.6/finished 
+4
+./dist_3.0/finished 
+5
+./dist_3.2/finished 
+6
+./dist_3.4/finished 
+7
+./dist_3.6/finished 
+8
+./dist_2.0/finished 
+1
+./dist_2.2/finished 
+2
+./dist_2.4/finished 
+3
+./dist_2.6/finished 
+4
+./dist_2.8/finished 
+5
+./dist_3.0/finished 
+6
+./dist_3.2/finished 
+7
+./dist_3.4/finished 
+8
+./dist_3.6/finished 
+9
+./dist_3.8/finished 
+10
+./dist_4.0/finished 
+11
+Proceed to step 4
+taking data from directory ../dist_2.0
+option is 
+taking data from directory ../dist_2.2
+option is 
+taking data from directory ../dist_2.4
+option is 
+taking data from directory ../dist_2.6
+option is 
+taking data from directory ../dist_2.8
+option is 
+taking data from directory ../dist_3.0
+option is 
+taking data from directory ../dist_3.2
+option is 
+taking data from directory ../dist_3.4
+option is 
+taking data from directory ../dist_3.6
+option is 
+taking data from directory ../dist_3.8
+option is 
+taking data from directory ../dist_4.0
+option is 
+numfiles is 11
+Your job 140705 ("qes2k2") has been submitted
+Your job 140706 ("qes2k2") has been submitted
+Your job 140707 ("qes2k2") has been submitted
+Your job 140708 ("qes2k2") has been submitted
+Your job 140709 ("qes2k2") has been submitted
+Your job 140710 ("qes2k2") has been submitted
+Your job 140711 ("qes2k2") has been submitted
+Your job 140712 ("qes2k2") has been submitted
+Your job 140713 ("qes2k2") has been submitted
+Your job 140714 ("qes2k2") has been submitted
+Your job 140715 ("qes2k2") has been submitted
+Your job 140716 ("qes2k2") has been submitted
+Your job 140717 ("qes2k2") has been submitted
+./dist_2.0/finished 
+1
+./dist_2.2/finished 
+2
+./dist_2.4/finished 
+3
+./dist_3.0/finished 
+4
+./dist_3.4/finished 
+5
+./dist_2.0/finished 
+1
+./dist_2.2/finished 
+2
+./dist_2.4/finished 
+3
+./dist_2.6/finished 
+4
+./dist_2.8/finished 
+5
+./dist_3.0/finished 
+6
+./dist_3.2/finished 
+7
+./dist_3.4/finished 
+8
+./dist_3.6/finished 
+9
+./dist_3.8/finished 
+10
+./dist_4.0/finished 
+11
+./dist_10.0/finished 
+12
+Proceed to step 5
+command is mkdir -p output                                                                                      
+command is mkdir -p geoms                                                                                       
+command is mkdir -p irc_files                                                                                   
+command is mkdir -p me_files                                                                                    
+command is mkdir -p me_blocks                                                                                   
+command is mkdir -p hl_logs                                                                                     
+command is mkdir -p hr_geoms                                                                                    
+command is mkdir -p md_tunn                                                                                     
+command is rm -f ./finished                                                                                     
+command is pwd > temp.log                                                                   
+command is date > temp.log                                                                  
+command is hostname > temp.log                                                              
+command is mkdir -p vrc_tst                                                                 
+command is mkdir -p ./vrc_tst/scratch                                                       
+command is cp -f ./data/vrc_tst.inp ./vrc_tst/tst_sr.inp                                    
+command is  sed -ie 's/FSYMM/  2 /' ./vrc_tst/tst_sr.inp                                    
+command is cp -f ./data/vrc_tst.inp ./vrc_tst/tst_lr.inp                                    
+command is sed -ie 's/FSYMM/ 1 /' ./vrc_tst/tst_lr.inp                                      
+command is cp -f ./data/vrc_molpro.inp ./vrc_tst/molpro.inp                                 
+command is sed -ie 's/MW/ /' temp.tmp                                                       
+command is  sed -ie 's/ //g' stoich.dat                                 
+command is cp -f ./vrc_tst/divsur_lr.inp ./divsur.inp                                       
+command is cp -f ./vrc_tst/convert.inp .                                                    
+command is cp -f ./vrc_tst/structure.inp .                                                  
+command is cp -f ./vrc_tst/tst_sr.inp .                                                     
+command is cp -f ./vrc_tst/molpro.inp .                                                     
+command is cp -f ./vrc_tst/vrc_molpro.tml .                                                 
+command is tst_test tst_sr.inp > structure.out                                              
+command is cp -f ./vrc_tst/divsur_lr.inp ./divsurf.inp                                      
+command is cp -f ./vrc_tst/tst_lr.inp ./tst.inp                                             
+command is tst_test tst.inp > vrc_tst/tst_test_lr.out                                       
+command is cp -f ./divsur.out ./vrc_tst/divsurf_lr.out                                      
+command is cp -f ./vrc_tst/divsur_sr.inp ./divsurf.inp                                      
+command is cp -f ./vrc_tst/tst_sr.inp ./tst.inp                                             
+command is tst_test tst.inp > vrc_tst/tst_test_sr.out                                       
+command is cp -f ./divsur.out ./vrc_tst/divsurf_sr.out                                      
+command is rm -f temp0.dat                                                                  
+command is rm -f temp1.dat*                                                                 
+command is rm -f temp1.log                                                                  
+command is rm -f temp1.xyz                                                                  
+command is rm -f temp.dat                                                                   
+command is rm -f temp.log*                                                                  
+command is rm -f temp2.log*                                                                 
+command is rm -f temp.tmp*                                                                  
+command is rm -f testcc.log*                                                                
+command is rm -f fort.*                                                                     
+command is rm -f *.me                                                                       
+command is rm -f optgeom.tmp                                                                
+command is rm -f tmp1.dat                                                                   
+command is rm -f tmp2.dat                                                                   
+command is rm -f tmp3.dat                                                                   
+command is rm -f tmp.dat                                                                    
+command is rm -f temp21a.me*                                                                
+command is rm -f temp3.me*                                                                  
+command is rm -f tmp1.log                                                                   
+command is rm -f tmp.log                                                                    
+command is rm -f tsgeom.tmp                                                                 
+command is rm -f temp.xyz                                                                   
+command is rm -f geom1.xyz                                                                  
+command is rm -f geom.xyz                                                                   
+command is rm -f geom_temp.out                                                              
+command is rm -f headgeom.tmp                                                               
+command is rm -f num.log                                                                    
+command is rm -f temp.out                                                                   
+command is rm -f stoich.dat*                                                                
+command is rm -f stoich.res                                                                 
+command is rm -f anim_freq.xyz                                                              
+command is rm -f Cart_displ.txt                                                             
+command is rm -f freqs1.txt                                                                 
+command is rm -f freqs_orig.txt                                                             
+command is rm -f freqs.txt                                                                  
+command is rm -f Km_res.txt                                                                 
+command is rm -f L_orig_save.txt                                                            
+command is rm -f Lderiv.txt                                                                 
+command is rm -f L_save.txt                                                                 
+command is rm -f dthetaE.txt                                                                
+command is rm -f mueff.txt                                                                  
+command is rm -f VaG.txt                                                                    
+command is rm -f Transmission_coefficient.txt                                               
+command is rm -f energy1a.tmp                                                               
+command is rm -f energy1b.tmp                                                               
+command is rm -f energy1.tmp                                                                
+command is rm -f fresub.dat                                                                 
+command is rm -f rotmass.dat                                                                
+completed calculation

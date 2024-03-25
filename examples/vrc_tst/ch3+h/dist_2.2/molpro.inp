@@ -1,0 +1,25 @@
+ memory,         400 ,m
+  nosym                                                                                                                                                                                                  
+ geometry={angstrom
+   C1                                                        
+   H2   C1   R1                                              
+   H3   C1   R2   H2   A2                                    
+   H4   C1   R3   H2   A3   H3   D3                          
+   H21 C1 BB H2 ANG1 H3 DH1                                  
+ }
+ R1                             =    1.0785000000000000     
+ R2                             =    1.0786000000000000     
+ R3                             =    1.0786000000000000     
+ A2                             =    118.45399999999999     
+ A3                             =    118.44420000000000     
+ D3                             =    204.84510000000000     
+ DH1                            =    102.40610000000000     
+ ANG1                           =    97.282499999999999     
+ BB                             =    2.2000000000000002     
+
+  basis=cc-pvdz                                                                                                                                                                                          
+  {multi;closed, 4;occ, 6;wf, 10,1,0,;state,1;maxiter,40}                                                                                                                                                
+  {RS2,SHIFT=0.2;ORBITAL,IGNORE_ERROR;STATE,1}                                                                                                                                                           
+  CBSen = energy                                                                                                                                                                                         
+ put,molden,molpro.molden
+ ---

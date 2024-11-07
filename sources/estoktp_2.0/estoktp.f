@@ -29449,7 +29449,7 @@ cadl Add compatibility to molpro24 and keep backcompatibility
 cadl         read(99,*)cjunk,cjunk,vtotref,cjunk
          read(99,'(A)')line
          close(99)
-         niindex=INDEX('SETTING',line)
+         niindex=INDEX(line,'SETTING')
          if(niindex .ne. 0)then
              line = line(niindex + 7:)
          endif

@@ -524,11 +524,11 @@ cadl      read(99,*)cjunk,cjunk,cjunk,vtot
 cadl Adapt code to Molpro24 but keep backcompatibility
       read(99,'(A)')line
       close(99)
-      print *,line
-      niindex=INDEX('SETTING',line)
+      niindex=INDEX(line,'SETTING')
       if(niindex .ne. 0)then
           line = line(niindex + 7:)
       endif
+      print *,niindex
       print *,line
       read(line,*)cjunk,cjunk,vtot
       write(*,*)'vtot is',vtot

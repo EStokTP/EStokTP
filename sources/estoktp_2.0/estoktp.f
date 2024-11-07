@@ -29445,8 +29445,15 @@ c      if(ilev0code.eq.2.and.ilevhlcode.eq.0) then
          command1='egrep CBSEN  hl_logs/ts_molpro.out > en.dat'
          call commrun(command1)
          open (unit=99,file='./en.dat',status='old')
-         read(99,*)cjunk,cjunk,cjunk,vtotref
+cadl Add compatibility to molpro24 and keep backcompatibility
+cadl         read(99,*)cjunk,cjunk,vtotref,cjunk
+         read(99,'(A)')line
          close(99)
+         niindex=INDEX('SETTING',line)
+         if(niindex .ne. 0)then
+             line = line(niindex + 7:)
+         endif
+         read(line,*)cjunk,cjunk,vtotref
       else if (ilev1code.eq.1.or.ilev1code.eq.3) then
          command1='egrep SCF  hl_logs/ts_g09.out > en.dat'
          call commrun(command1)

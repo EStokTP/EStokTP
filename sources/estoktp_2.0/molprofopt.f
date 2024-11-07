@@ -520,8 +520,17 @@ cc first get energy
       call commrun(command1)
 
       open (unit=99,status='unknown',file='temp.log')
-      read(99,*)cjunk,cjunk,cjunk,vtot
+cadl      read(99,*)cjunk,cjunk,cjunk,vtot
+cadl Adapt code to Molpro24 but keep backcompatibility
+      read(99,'(A)')line
       close(99)
+      print *,line
+      niindex=INDEX('SETTING',line)
+      if(niindex .ne. 0)then
+          line = line(niindex + 7:)
+      endif
+      print *,line
+      read(line,*)cjunk,cjunk,vtot
       write(*,*)'vtot is',vtot
       command1='rm -f temp1.log temp2.log temp3.log temp4.log temp.log'
       call commrun(command1)
@@ -637,18 +646,18 @@ cc then read frequencies
          do while (WORD.ne.'[FREQ]')
             CALL LineRead (100)
          enddo
-         index=0.
+         iindex=0.
          nread=3*natom
          do j=1,nread
             read(100,*)freqread
 c            write(*,*)'freq ',j,' is ',freqread
             if(freqread.gt.0.5)then
-               index=index+1
-               freq(index)=freqread
+               iindex=iindex+1
+               freq(iindex)=freqread
 cc now assign negative value to imaginary frequency
-               if(freq(index).lt.freq(index-1))then
-                  freq(index-1)=-freq(index-1)
-c                  index=index-1
+               if(freq(iindex).lt.freq(iindex-1))then
+                  freq(iindex-1)=-freq(iindex-1)
+c                  iindex=iindex-1
                endif
             endif
          enddo
@@ -656,11 +665,11 @@ c                  index=index-1
          if(ilin.eq.1)  nfreq=3*natom-5
          if(natom.eq.2)  nfreq=1
 c         if(ispecies.eq.0)nfreq=nfreq-1
-         if(nfreq.ne.index)then
+         if(nfreq.ne.iindex)then
             write(*,*)' there is disagreement between '
             write(*,*)' expected and read frequencies'
             write(*,*)' the program will be stopped'
-            write(*,*)' read frequencies ',index
+            write(*,*)' read frequencies ',iindex
             write(*,*)' expected frequencies ',nfreq
             stop
          endif
@@ -858,7 +867,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       CHARACTER*1000 line,string
       CHARACTER*160 sename,word,word2,word3,title,title1,
      $ word4,word5,word6,word7
-  
+
       include 'filcomm.f'
 
       command1='tail -n 1 molpro.out > temp.log'

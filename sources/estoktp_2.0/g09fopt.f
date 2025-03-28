@@ -589,6 +589,13 @@ c        a file will be used to storage these
          open(unit=157,file='freezecoord.dat',status='unknown')
       end if 
       write (10,*)
+
+c      nint=natom*3-6
+c      do j=1,nint
+c         write(*,*)intcoor(j),xint(j)
+c      enddo
+c      stop
+
       if(ixyz.eq.0)then
          ncoord = natom*3-6-ntau-ircons
          if (natom.eq.2) ncoord = 1
@@ -653,9 +660,9 @@ c         write (10,*)
                   icordummy(j)=iprog
                endif
             enddo
-c            do j=1,natomt
-c               write(*,*)'icordummy(j) ',icordummy(j)
-c            enddo
+            do j=1,natomt
+               write(*,*)'icordummy(j) ',icordummy(j)
+            enddo
 c            stop
             if(ircons.eq.1)then
 cc            check bond
@@ -666,6 +673,14 @@ cc            check bond
 c               write(10,801)iatfix,ibconn(iatfix)
                write(10,801)iatc,
      +               ibconn(iatfix)-icordummy(ibconn(iatfix))
+
+               if(idummy(ibconn(iatfix)).eq.1)then
+                  write(7,*)'problem with constraints'
+                  write(7,*)'red coord and constraint of dummy'
+                  write(7,*)'are inconsistent'
+                  close(7)
+                  stop
+               endif
                if(iatfix.eq.0)then
 c     c            check angle
                   do j=1,ncoord
@@ -676,6 +691,20 @@ c                  write(10,802)iatfix,ibconn(iatfix),iaconn(iatfix)
                   write(10,802)iatc,
      +               ibconn(iatfix)-icordummy(ibconn(iatfix)),
      +               iaconn(iatfix)-icordummy(iaconn(iatfix))
+                  if(idummy(ibconn(iatfix)).eq.1)then
+                     write(7,*)'problem with constraints'
+                     write(7,*)'red coord and constraint of dummy'
+                     write(7,*)'are inconsistent'
+                     close(7)
+                     stop
+                  endif
+                  if(idummy(iaconn(iatfix)).eq.1)then
+                     write(7,*)'problem with constraints'
+                     write(7,*)'red coord and constraint of dummy'
+                     write(7,*)'are inconsistent'
+                     close(7)
+                     stop
+                  endif
                endif
                if(iatfix.eq.0)then
 c     c            check dihedral
@@ -689,6 +718,27 @@ c     +                         idconn(iatfix)
      +               ibconn(iatfix)-icordummy(ibconn(iatfix)),
      +               iaconn(iatfix)-icordummy(iaconn(iatfix)),
      +               idconn(iatfix)-icordummy(idconn(iatfix))
+                  if(idummy(ibconn(iatfix)).eq.1)then
+                     write(7,*)'problem with constraints'
+                     write(7,*)'red coord and constraint of dummy'
+                     write(7,*)'are inconsistent'
+                     close(7)
+                     stop
+                  endif
+                  if(idummy(iaconn(iatfix)).eq.1)then
+                     write(7,*)'problem with constraints'
+                     write(7,*)'red coord and constraint of dummy'
+                     write(7,*)'are inconsistent'
+                     close(7)
+                     stop
+                  endif
+                  if(idummy(idconn(iatfix)).eq.1)then
+                     write(7,*)'problem with constraints'
+                     write(7,*)'red coord and constraint of dummy'
+                     write(7,*)'are inconsistent'
+                     close(7)
+                     stop
+                  endif
                endif
             endif
             if(ircons.gt.1)then
@@ -703,6 +753,13 @@ cc            check bond
 c                     write(10,801)iatfix,ibconn(iatfix)
                      write(10,801)iatc,ibconn(iatfix)
      +                        -icordummy(ibconn(iatfix))
+                     if(idummy(ibconn(iatfix)).eq.1)then
+                        write(7,*)'problem with constraints'
+                        write(7,*)'red coord and constraint of dummy'
+                        write(7,*)'are inconsistent'
+                        close(7)
+                        stop
+                     endif
                   endif
                   if(iatfix.eq.0)then
 c     c            check angle
@@ -715,6 +772,18 @@ c                       write(10,802)iatfix,ibconn(iatfix),iaconn(iatfix)
                         write(10,802)iatc,
      +                       ibconn(iatfix)-icordummy(ibconn(iatfix)),
      +                       iaconn(iatfix)-icordummy(iaconn(iatfix))
+                        if(idummy(ibconn(iatfix)).eq.1)then
+                           write(7,*)'problem with constraints'
+                           write(7,*)'red coord and constraint of dummy'
+                           write(7,*)'are inconsistent'
+                           stop
+                        endif
+                        if(idummy(iaconn(iatfix)).eq.1)then
+                           write(7,*)'problem with constraints'
+                           write(7,*)'red coord and constraint of dummy'
+                           write(7,*)'are inconsistent'
+                           stop
+                        endif
                      endif
                   endif
                   if(iatfix.eq.0)then
@@ -730,6 +799,24 @@ c     +                    idconn(iatfix)
      +                       ibconn(iatfix)-icordummy(ibconn(iatfix)),
      +                       iaconn(iatfix)-icordummy(iaconn(iatfix)),
      +                       idconn(iatfix)-icordummy(idconn(iatfix))
+                        if(idummy(ibconn(iatfix)).eq.1)then
+                           write(7,*)'problem with constraints'
+                           write(7,*)'red coord and constraint of dummy'
+                           write(7,*)'are inconsistent'
+                           stop
+                        endif
+                        if(idummy(iaconn(iatfix)).eq.1)then
+                           write(7,*)'problem with constraints'
+                           write(7,*)'red coord and constraint of dummy'
+                           write(7,*)'are inconsistent'
+                           stop
+                        endif
+                        if(idummy(idconn(iatfix)).eq.1)then
+                           write(7,*)'problem with constraints'
+                           write(7,*)'red coord and constraint of dummy'
+                           write(7,*)'are inconsistent'
+                           stop
+                        endif
                       endif
                   endif
                enddo
@@ -1118,6 +1205,7 @@ c           functionals
          ichecken=1
          close(65)
       endif
+      igeo=0
 114   CONTINUE
       CALL LineRead (0)
       CALL LineRead (11)
@@ -1292,7 +1380,8 @@ cc     negligible forces'
 cc lc:   for ef algo, the keyword is **  CONVERGENCE 
       IF (
      &(WORD2.EQ.'COMPLETED.'.OR.WORD2.EQ.'COMPLETED') .OR.
-     &(WORD2.EQ.'CONVERGENCE'.AND. WORD5.EQ.'SATISFIED')
+     &(WORD2.EQ.'CONVERGENCE'.AND. WORD5.EQ.'SATISFIED').OR.
+     &(natom.eq.1.AND.igeo.eq.0)
      & ) THEN
 c  This part relies on the completed optimization, the problem 
 c  relies on single point calculations
@@ -1443,6 +1532,8 @@ c            write(*,*)'check ',ijunk,iatype,ijunk
  1222       continue
             write(64,*)
             close(64)
+            igeo=1
+            if(natom.eq.1) goto 114
             goto 264
          endif
 
@@ -2459,15 +2550,16 @@ c      rewind (99)
       write(*,*)'comline 5 is ',comline5
 c      stop
       if(ispecies.eq.0) then
-c         comline6='opt(calcfc,ts,maxcycle=1,noeigentest) iop(7/33=1) 
-c     $ guess=read geom=check'
-         comline6='freq=readfc iop(7/33=1) 
+         comline6='opt(calcfc,ts,maxcycle=1,noeigentest) iop(7/33=1) 
      $ guess=read geom=check'
+cc pb modified by LC, reverted to orginal
+cc         comline6='freq=readfc iop(7/33=1) 
+cc     $ guess=read geom=check'
       else
-c         comline6='opt(calcfc,maxcycle=1) iop(7/33=1) guess=read 
-c     $ geom=check'
-         comline6='freq=readfc iop(7/33=1) guess=read 
+         comline6='opt(calcfc,maxcycle=1) iop(7/33=1) guess=read 
      $ geom=check'
+cc         comline6='freq=readfc iop(7/33=1) guess=read 
+cc     $ geom=check'
       endif
 
  100  format(A30,A20)

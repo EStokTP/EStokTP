@@ -518,19 +518,12 @@ cc first get energy
       call commrun(command1)
       command1='tail -n 1 temp4.log > temp.log'
       call commrun(command1)
+      command1="sed -ie 's/SETTING/ /g' temp.log"
+      call commrun(command1)
 
       open (unit=99,status='unknown',file='temp.log')
-cadl      read(99,*)cjunk,cjunk,cjunk,vtot
-cadl Adapt code to Molpro24 but keep backcompatibility
-      read(99,'(A)')line
+      read(99,*)cjunk,cjunk,vtot
       close(99)
-      niindex=INDEX(line,'SETTING')
-      if(niindex .ne. 0)then
-          line = line(niindex + 7:)
-      endif
-      print *,niindex
-      print *,line
-      read(line,*)cjunk,cjunk,vtot
       write(*,*)'vtot is',vtot
       command1='rm -f temp1.log temp2.log temp3.log temp4.log temp.log'
       call commrun(command1)
@@ -646,18 +639,18 @@ cc then read frequencies
          do while (WORD.ne.'[FREQ]')
             CALL LineRead (100)
          enddo
-         iindex=0.
+         index=0.
          nread=3*natom
          do j=1,nread
             read(100,*)freqread
 c            write(*,*)'freq ',j,' is ',freqread
             if(freqread.gt.0.5)then
-               iindex=iindex+1
-               freq(iindex)=freqread
+               index=index+1
+               freq(index)=freqread
 cc now assign negative value to imaginary frequency
-               if(freq(iindex).lt.freq(iindex-1))then
-                  freq(iindex-1)=-freq(iindex-1)
-c                  iindex=iindex-1
+               if(freq(index).lt.freq(index-1))then
+                  freq(index-1)=-freq(index-1)
+c                  index=index-1
                endif
             endif
          enddo
@@ -665,11 +658,11 @@ c                  iindex=iindex-1
          if(ilin.eq.1)  nfreq=3*natom-5
          if(natom.eq.2)  nfreq=1
 c         if(ispecies.eq.0)nfreq=nfreq-1
-         if(nfreq.ne.iindex)then
+         if(nfreq.ne.index)then
             write(*,*)' there is disagreement between '
             write(*,*)' expected and read frequencies'
             write(*,*)' the program will be stopped'
-            write(*,*)' read frequencies ',iindex
+            write(*,*)' read frequencies ',index
             write(*,*)' expected frequencies ',nfreq
             stop
          endif
@@ -867,7 +860,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       CHARACTER*1000 line,string
       CHARACTER*160 sename,word,word2,word3,title,title1,
      $ word4,word5,word6,word7
-
+  
       include 'filcomm.f'
 
       command1='tail -n 1 molpro.out > temp.log'
@@ -1064,6 +1057,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       En1=0.
       isk=0
+      command1="sed -ie 's/SETTING/ /g' geom.log"
+      call commrun(command1)
+      command1="sed -ie 's/CBSen/ /g' geom.log"
+      call commrun(command1)
+      command1="sed -ie 's/CBSenint/ /g' geom.log"
+      call commrun(command1)
+
       OPEN (unit=11,status='old',file='geom.log')
       rewind (11)
 114   CONTINUE
@@ -1072,16 +1072,20 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 cc read energy
 
-      if((WORD.EQ.'SETTING').AND.(WORD2.EQ.'CBSENINT').
+cc      if((WORD.EQ.'SETTING').AND.(WORD2.EQ.'CBSENINT').
+      if((WORD.EQ.'CBSENINT').
      + AND.(ISK.EQ.0))then
-         read(word4,100)En1
+c         read(word4,100)En1
+         read(word3,100)En1
          isk=1
       endif
 
-      if((WORD.EQ.'SETTING').AND.(WORD2.EQ.'CBSEN').AND.(ISK.EQ.0))then
+      if((WORD.EQ.'CBSEN').AND.(ISK.EQ.0))then
+c      if((WORD.EQ.'SETTING').AND.(WORD2.EQ.'CBSEN').AND.(ISK.EQ.0))then
 c         gradval=0.
 
-         read(word4,100)En1
+         read(word3,100)En1
+c         read(word4,100)En1
          read(11,*)cjunk
          read(11,*)cjunk
 

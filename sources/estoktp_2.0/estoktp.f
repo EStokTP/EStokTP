@@ -623,6 +623,7 @@ c  lc:   TolNum implicitly defined in double precision
          if (WORD2.EQ.'GUESS') ipotguess=1
          if (WORD2.EQ.'INF'.and.WORD3.eq.'INF') ipottype=5
          if (WORD2.EQ.'INF_HL') ipottype=6
+         if (WORD2.EQ.'INF'.and.WORD3.eq.'HL') ipottype=6
       endif
       if (WORD.EQ.'VRC_TST') then
          ismooth=0
@@ -11868,12 +11869,13 @@ cc rewrite vectors
             if(imhrfr.eq.1) then
                ixyz=0
                ired=0
+               comline1=comline5
+               comline2=comline6
 
                if(ilev1code.eq.1) then
-                  comline1=comline5
-                  comline2=comline6
                   atomlabel(1)=' '
                   atomlabel(2)=' '
+                  
 
                   call g09fopt(ilev1code,tau,ntau,natom,natomt,numproc,
      $   gmem,coord,vtot_0,vtot,freq,ifreq,ilin,ismp,comline1,
@@ -11882,6 +11884,8 @@ cc rewrite vectors
 
                   atomlabel(1)= atomlabel_save(1)
                   atomlabel(2)= atomlabel_save(2)
+
+c                  stop
 
                else if (ilev1code.eq.2) then
                   command1='cp -f fcmat.log ./geom.log '
@@ -15744,6 +15748,7 @@ cc lowest eigenvalue of the HR in calculating the HR partition function
          zpe_irc(inumpoints)=zpe
          rc_ene_kcal(inumpoints)=(rc_ene(inumpoints)+zpe)*cautokcal
          if(inumpoints.eq.numpointsf+1)Ets=rc_ene_kcal(inumpoints)
+c         write(*,*)'en irc',rc_ene(inumpoints)*cautokcal,zpe*cautokcal
 c         if(inumpoints.eq.numpointsf+1.and.ionlyfor.eq.1)then
 c            Ets=rc_ene_kcal(1)
 c         endif
@@ -15903,7 +15908,7 @@ cc now rescale potential if requested
 
          if(iallen.eq.1)then
             write(7,*)'the rescale 2 option is not necessary'
-            write(7,*)'is the allen keyword is used'
+            write(7,*)'if the allen keyword is used'
             write(7,*)'change values and restart'
             close(7)
             stop
@@ -19565,6 +19570,16 @@ c         write(*,*)'stoich_wellr is ',stoich_wellr
          write (123,*) '  RRHO '
          write (123,*) '    Stoichiometry  ',stoich_well
          write (123,*) '    Core PhaseSpaceTheory'
+cc check if multirotor model
+         nmulti=0
+         command1='egrep MultiRotor me_files/reac1_hr.me > temp.log'
+         call commrun(command1)
+         command1='wc temp.log > temp1.log'
+         call commrun(command1)
+         open(unit=124,file='temp1.log',status='unknown')
+         read(124,*)nmulti
+         close(124)
+cc
          open(unit=124,file='me_files/reac1_ge.me',status='unknown')
          read(124,*)
          read(124,*)
@@ -19575,8 +19590,12 @@ c         write(*,*)'stoich_wellr is ',stoich_wellr
             read(124,'(A80)')cread
             write(123,'(A80)')cread
          enddo
-         read(124,*)
-         read(124,*)cread,symr1
+         if(nmulti.eq.0)then
+            read(124,*)
+            read(124,*)cread,symr1
+         else
+            symr1=1
+         endif
          close(124)
 cc now write geometry of second fragment
          open(unit=124,file='me_files/reac2_ge.me',status='unknown')
@@ -25567,6 +25586,8 @@ c         write(7,*)'ref atoms: ',j,cooxp1(1),cooyp1(1),coozp1(1)
 c         write(7,*)'ref atoms: ',j,cooxp1(2),cooyp1(2),coozp1(2)
 c         write(7,*)'ref atoms: ',j,cooxp1(6),cooyp1(6),coozp1(6)
 
+c     stop
+
             xsitep1=xsitep1-cooxp1(nrat1(j))
             ysitep1=ysitep1-cooyp1(nrat1(j))
             zsitep1=zsitep1-coozp1(nrat1(j))
@@ -27351,6 +27372,8 @@ cc proceed to compute CFact factor for LZ theory
 
       commandcopy='cp -f na_tst/natst_V1.log geom.log'
       call commrun(commandcopy)
+c      write(*,*)'ilev code ', ilevcode
+c      stop
 
 cc get xyz geometry
 
@@ -27407,6 +27430,7 @@ c         call readxyzgeom_g09(natom,coox,cooy,cooz)
             grad_xyz1(j)=grad_xyz1(j)/sqrt(amass(j))
 c            write(*,*)'mass grad',j,amass(j),grad_xyz1(j)
          enddo
+c         stop
 
          commandcopy='cp -f ./na_tst/natst_V2_xyz.log geom.log'
          call commrun(commandcopy)
@@ -28045,7 +28069,9 @@ c     $ ,atname(natommx),bconnt(natommx),aconnt(natommx),dconnt(natommx)
       jbond=0
       kbond=0
       jcheck=0
-      write(7,*)'entering subroutine level1'
+      write(7,*)'entering subroutine pot_corr'
+      write(7,*)'correction potential keyword  is',ipottype
+c      stop
 
 cc get data from react1 file
 
@@ -28495,6 +28521,7 @@ cc
 c         stop
 
          if(ipottype.eq.5)goto 3000
+         if(ipottype.eq.6)goto 1000
 
          open(unit=11,file='level0_molpro.dat',status='unknown')
          open(unit=12,file='./level0_molpro1.dat',status='unknown')
@@ -28596,6 +28623,7 @@ c  lc :  active space generation (?)
 
 c        stop
          if(ipottype.eq.5)goto 3000
+         if(ipottype.eq.6)goto 1000
       endif
 
 c      stop
@@ -28818,6 +28846,11 @@ cc
       ispecies=0
       ires=0
 
+c      do j=1,nint
+c         write(*,*)intcoor(j),xint(j)
+c      enddo
+c      stop
+
       if(ipottype.eq.4.and.ilev0code.eq.2)then
          open(unit=10,file='output/vrc_asl1_guess.dat',status='unknown')
          open(unit=11,file='output/vrc_as_guess.dat',status='unknown')
@@ -28908,13 +28941,13 @@ c        and the transitional coordinates only.
 c        modredundant keyword + "A" gaussian flag
 c        for internal coordinates that specify the transitionale
 c        degrees of freedom 
-         if (ipottype.eq.6) then 
-               open(unit=91,file='skipgeominf.dat',status='new',
-     &          iostat=i_status,action='write')
-               if (i_status .ne. 0) stop 
-               write(91,*) 6
-               close(91,status='keep')
-         end if
+c         if (ipottype.eq.6) then 
+c               open(unit=91,file='skipgeominf.dat',status='new',
+c     &          iostat=i_status,action='write')
+c               if (i_status .ne. 0) stop 
+c               write(91,*) 6
+c               close(91,status='keep')
+c         end if
 
          call g09fopt(ilev0code,tau,ntau,natom,natomt,numproc,gmem,
      $        coord,vtot_0,vtotr,freq,ifreq,ilin,ismp,
@@ -28967,14 +29000,18 @@ cc with full relaxation
 
       check=(-vtotr+vtotref)*627.5
       check1=(-vtot_0+vtotref)*627.5
+cc theshold for considering a geom corr pot successful 
+cc even if not converged according to gaussian criteria
+cc in kcal/mol
+      en_thresh=0.2
       if(check.gt.1)then
-         if(abs(check1).lt.0.1)then
+         if(abs(check1).lt.en_thresh)then
             check=-1.0
             vtotr=vtot_0
          endif
       endif
       if(vtotr.gt.0)then
-         if(abs(check1).lt.0.1)then
+         if(abs(check1).lt.en_thresh)then
             check=-1.0
             vtotr=vtot_0
          endif
@@ -29028,6 +29065,8 @@ cc with full relaxation
       endif
 
  1000 continue
+c      write(*,*)'skipped geom'
+c      stop
 
 c      if(ipottype.eq.3)then
 
@@ -29445,15 +29484,8 @@ c      if(ilev0code.eq.2.and.ilevhlcode.eq.0) then
          command1='egrep CBSEN  hl_logs/ts_molpro.out > en.dat'
          call commrun(command1)
          open (unit=99,file='./en.dat',status='old')
-cadl Add compatibility to molpro24 and keep backcompatibility
-cadl         read(99,*)cjunk,cjunk,vtotref,cjunk
-         read(99,'(A)')line
+         read(99,*)cjunk,cjunk,cjunk,vtotref
          close(99)
-         niindex=INDEX(line,'SETTING')
-         if(niindex .ne. 0)then
-             line = line(niindex + 7:)
-         endif
-         read(line,*)cjunk,cjunk,vtotref
       else if (ilev1code.eq.1.or.ilev1code.eq.3) then
          command1='egrep SCF  hl_logs/ts_g09.out > en.dat'
          call commrun(command1)
@@ -30434,12 +30466,15 @@ c                  read(dname(j),111)dihed
 c               read(bname(j),*)bd
 c               read(anname(j),*)ang
 c               read(dname(j),*)dihed
-c     write(*,*)' bd now is ',bd
-c     write(*,*)' ang now is ',ang
-c     write(*,*)' dihed now is ',dihed
+c      write(*,*)' bd now is ',bd
+c      write(*,*)' ang now is ',ang
+c      write(*,*)' dihed now is ',dihed
  111           format(f7.4)
 c                  stop
 c            endif
+c      write(*,*)' bd now is ',bd
+c      write(*,*)' ang now is ',ang
+c      write(*,*)' dihed now is ',dihed
 c            enddo
             call zmat_to_xyz(xa,ya,za,coox(ibconn(j)),cooy(ibconn(j)),
      $ cooz(ibconn(j)),coox(iaconn(j)),cooy(iaconn(j)),
@@ -31160,7 +31195,7 @@ c parameter initialization
       iprod_geom=0
       iaspace=0
 
-      iadd_gsm=1
+      iadd=1
       ibreak=1
       inumbond=1
       iang=1
@@ -31224,11 +31259,11 @@ c check if info is given to write isomers file ADDED KEYWORDS
             call LineRead (25)
             if (WORD.EQ.'END') then
                write (26,*) 'no add keword found'
-               iadd_gsm=0
+               iadd=0
                exit
             endif
          enddo
-         if (iadd_gsm.NE.0) then
+         if (iadd.NE.0) then
             open (unit=57,file='addedbonds.tmp',status='unknown')
             read (25,*) iadded
             do j=1,iadded
@@ -31601,7 +31636,7 @@ c      enddo
          open (unit=59,file='./ISOMERS0001',status='unknown')
 
          write (59,*) 'NEW'
-         if (iadd_gsm.EQ.0) then
+         if (iadd.EQ.0) then
             write (59,*) 'ADD ',isite,ireact
          else
             open (unit=57,file='addedbonds.tmp',status='unknown')
@@ -31801,7 +31836,7 @@ coadl copy everything into gsm/ and interesting stuff into output
          call commrun(command1)
          command1='mv inpfileq gstart initial0001.xyz ./gsm/'
          call commrun(command1)
-         command1='cp  stringfile.xyz0001 ./geoms/gsm_traj.xyz'
+         command1='cp  stringfile.xyz0001 ./geoms/traj_gsm.xyz'
          call commrun(command1)
          command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
          call commrun(command1)
@@ -31809,16 +31844,15 @@ coadl copy everything into gsm/ and interesting stuff into output
             command1='mv  ISOMERS0001 ./gsm/'
             call commrun(command1)
          endif
-         inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
+         inquire(FILE='./scratch/tsq0001.xyz', EXIST=ex)
          if (.not.ex) then
             write (26,*) 'Did not find tsq0001.xyz file'
-            inquire(FILE='./gsm/stringfile.xyz0001', EXIST=ex)
+            inquire(FILE='./stringfile.xyz0001', EXIST=ex)
             if (.not.ex) then
                write (26,*) 'Did not find stringfile.xyz0001'
                stop
             endif
-            open (unit=59,file='./gsm/stringfile.xyz0001', 
-     &            status='unknown')
+            open (unit=59,file='./stringfile.xyz0001',status='unknown')
             zen = -99999.99
             zmaxen = -99999.99
             inodets = 0
@@ -31869,18 +31903,17 @@ c                  return
          write (26,*) 'Done :)'
       else
          write (26,*) 'Skipped GSM calculation :) | Recovery now'
-         command1='cp  ./gsm/stringfile.xyz0001 '// 
-     $    './geoms/gsm_traj.xyz'
+         command1='cp  gsm/stringfile.xyz0001 '// 
+     $    './geoms/traj_gsm.xyz'
          call commrun(command1)
          inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
          if (.not.ex) then
             write (26,*) 'Did not find tsq0001.xyz file'
-            inquire(FILE='./gsm/stringfile.xyz0001', EXIST=ex)
             if (.not.ex) then
                write (26,*) 'Did not find stringfile.xyz0001'
                stop
             endif
-            open (unit=59,file='./gsm/stringfile.xyz0001',
+            open (unit=59,file='gsm/stringfile.xyz0001',
      $         status='unknown')
             zen = -99999.99
             zmaxen = -99999.99
@@ -33550,6 +33583,7 @@ c         write(66,*)'ok up to here'
          read (15,*) icharge,ispin
          do iatom = 1 , natomt
             read (15,'(A80)') atomlabel(iatom)
+            call upcase2(atomlabel(iatom))
          enddo
          rewind(15)
 
@@ -33569,6 +33603,7 @@ c         write(66,*)'ok up to here'
                read(15,*) intcoor(icoord),xint(icoord)
                intcoorM(icoord)=intcoor(icoord)
                call upcase2(intcoorM(icoord))
+               call upcase2(intcoor(icoord))
 c               write(*,*)intcoor(icoord)
             enddo
             rewind(15)
@@ -33616,13 +33651,49 @@ c      enddo
 c      stop
 cc this does not account for dummy atoms defined with  given quantities
 
+c      do k=1,natomt
       do k=1,natomt
+         ibdf=0
+         iadf=0
+         if(k.lt.4)iadf=1
+         iddf=0
+         if(k.lt.4)iddf=1
          do j=1,ncoord
-            if(intcoor(j).eq.bname(k))bval(k)=xint(j)
-            if(intcoor(j).eq.anname(k))aval(k)=xint(j)
-            if(intcoor(j).eq.dname(k))dval(k)=xint(j)
+c            if(intcoor(j).eq.bname(k))bval(k)=xint(j)
+c            if(intcoor(j).eq.anname(k))aval(k)=xint(j)
+c            if(intcoor(j).eq.dname(k))dval(k)=xint(j)
+c         enddo
+c      enddo
+            if(intcoor(j).eq.bname(k))then
+               bval(k)=xint(j)
+               ibdf=1
+            endif
+            if(intcoor(j).eq.anname(k))then
+               aval(k)=xint(j)
+               iadf=1
+            endif
+            if(intcoor(j).eq.dname(k))then
+               dval(k)=xint(j)
+               iddf=1
+            endif
+c               endif
          enddo
+         write(*,*)'an name ',anname(k)
+         if(ibdf.eq.0)then
+            read(bname(k),*)bval(k)
+         endif
+         if(iadf.eq.0)then
+            write(*,*)'an name ',anname(k)
+            read(anname(k),*)aval(k)
+         endif
+         if(iddf.eq.0)then
+            read(dname(k),*)dval(k)
+         endif
       enddo
+c      enddo
+
+
+
 c      write(*,*)'aval4 is ',aval(4)
 
 
@@ -33787,7 +33858,7 @@ c         write(10,100)intcoor(j),xint(j)
 c      enddo
 c      close(10)
 
- 100  format(A4,1X,3(F12.6))
+ 100  format(A4,1X,3(F22.16))
 
       if (ispecies.eq.666) then
          command1='rm -f fort.99'

@@ -29445,8 +29445,15 @@ c      if(ilev0code.eq.2.and.ilevhlcode.eq.0) then
          command1='egrep CBSEN  hl_logs/ts_molpro.out > en.dat'
          call commrun(command1)
          open (unit=99,file='./en.dat',status='old')
-         read(99,*)cjunk,cjunk,cjunk,vtotref
+cadl Add compatibility to molpro24 and keep backcompatibility
+cadl         read(99,*)cjunk,cjunk,vtotref,cjunk
+         read(99,'(A)')line
          close(99)
+         niindex=INDEX(line,'SETTING')
+         if(niindex .ne. 0)then
+             line = line(niindex + 7:)
+         endif
+         read(line,*)cjunk,cjunk,vtotref
       else if (ilev1code.eq.1.or.ilev1code.eq.3) then
          command1='egrep SCF  hl_logs/ts_g09.out > en.dat'
          call commrun(command1)
@@ -31153,7 +31160,7 @@ c parameter initialization
       iprod_geom=0
       iaspace=0
 
-      iadd=1
+      iadd_gsm=1
       ibreak=1
       inumbond=1
       iang=1
@@ -31217,11 +31224,11 @@ c check if info is given to write isomers file ADDED KEYWORDS
             call LineRead (25)
             if (WORD.EQ.'END') then
                write (26,*) 'no add keword found'
-               iadd=0
+               iadd_gsm=0
                exit
             endif
          enddo
-         if (iadd.NE.0) then
+         if (iadd_gsm.NE.0) then
             open (unit=57,file='addedbonds.tmp',status='unknown')
             read (25,*) iadded
             do j=1,iadded
@@ -31594,7 +31601,7 @@ c      enddo
          open (unit=59,file='./ISOMERS0001',status='unknown')
 
          write (59,*) 'NEW'
-         if (iadd.EQ.0) then
+         if (iadd_gsm.EQ.0) then
             write (59,*) 'ADD ',isite,ireact
          else
             open (unit=57,file='addedbonds.tmp',status='unknown')
@@ -31794,7 +31801,7 @@ coadl copy everything into gsm/ and interesting stuff into output
          call commrun(command1)
          command1='mv inpfileq gstart initial0001.xyz ./gsm/'
          call commrun(command1)
-         command1='cp  stringfile.xyz0001 ./geoms/traj_gsm.xyz'
+         command1='cp  stringfile.xyz0001 ./geoms/gsm_traj.xyz'
          call commrun(command1)
          command1='mv  stringfile.xyz0001 stringfile.xyz0001fr ./gsm/'
          call commrun(command1)
@@ -31802,15 +31809,16 @@ coadl copy everything into gsm/ and interesting stuff into output
             command1='mv  ISOMERS0001 ./gsm/'
             call commrun(command1)
          endif
-         inquire(FILE='./scratch/tsq0001.xyz', EXIST=ex)
+         inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
          if (.not.ex) then
             write (26,*) 'Did not find tsq0001.xyz file'
-            inquire(FILE='./stringfile.xyz0001', EXIST=ex)
+            inquire(FILE='./gsm/stringfile.xyz0001', EXIST=ex)
             if (.not.ex) then
                write (26,*) 'Did not find stringfile.xyz0001'
                stop
             endif
-            open (unit=59,file='./stringfile.xyz0001',status='unknown')
+            open (unit=59,file='./gsm/stringfile.xyz0001', 
+     &            status='unknown')
             zen = -99999.99
             zmaxen = -99999.99
             inodets = 0
@@ -31861,17 +31869,18 @@ c                  return
          write (26,*) 'Done :)'
       else
          write (26,*) 'Skipped GSM calculation :) | Recovery now'
-         command1='cp  gsm/stringfile.xyz0001 '// 
-     $    './geoms/traj_gsm.xyz'
+         command1='cp  ./gsm/stringfile.xyz0001 '// 
+     $    './geoms/gsm_traj.xyz'
          call commrun(command1)
          inquire(FILE='./gsm/scratch/tsq0001.xyz', EXIST=ex)
          if (.not.ex) then
             write (26,*) 'Did not find tsq0001.xyz file'
+            inquire(FILE='./gsm/stringfile.xyz0001', EXIST=ex)
             if (.not.ex) then
                write (26,*) 'Did not find stringfile.xyz0001'
                stop
             endif
-            open (unit=59,file='gsm/stringfile.xyz0001',
+            open (unit=59,file='./gsm/stringfile.xyz0001',
      $         status='unknown')
             zen = -99999.99
             zmaxen = -99999.99

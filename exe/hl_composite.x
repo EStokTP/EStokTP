@@ -369,7 +369,9 @@ for i,en in enumerate(EN):
     elif en[0][0]=="MRCC":
       runCheck = [ "which" , "mrccp" ]
       runJob = [ [ "mrccp" , "-n" , en[0][1] , fname + zi + ".inp" ] ,\
-                 [ "mv" , "mrcc.log" , fname + zi + ".log" ] ]
+                 [ "mv" , "mrcc.log" , fname + zi + ".log" ] ,\
+                 [ "mv" , "iface" , fname + zi + ".iface" ] ,\
+                 [ "mv" , "MOLDEN" , fname + zi + ".molden" ] ]
     if comm( runCheck )[0]=="":
       Msg( "    WARNING - cannot run %s, moving on." % ( en[0][0] ) , 0 )
       fail.append( en[1] )
@@ -424,8 +426,8 @@ for i,en in enumerate(EN):
         Msg( "    WARNING - no normal termination occurred, moving on." , 0 )
         fail.append( en[1] )
         continue
-      com.append( comm( [ "grep" , "-B" , "5" , "Normal" , fname + zi + ".log" ] ) )
-      EQ[ en[1] ] = str( float( com[-1][0].split("\n")[0].split()[-1] ) )
+      com.append( comm( [ "grep" , "ENERGY" , fname + zi + ".iface" ] ) )
+      EQ[ en[1] ] = str( float( com[-1][0].split("\n")[-2].split()[5] ) )
       Msg( "    Setting '%s' equal to %s." % ( en[1] , EQ[ en[1] ] ) , 0 )
       com.append( comm( [ "cp" , "%s.log" % ( fname + zi ) , "hl_logs/%s.log" % ( fname + zi ) ] ) )
       Msg( "    Output file stored as 'hl_logs/%s.log'." % ( fname + zi ) , 0 )

@@ -14,8 +14,12 @@ cd /data/scratch/
 
 echo 'ok1'
 
-# replace /software/mrcc with the full path to mrcc executable
-/software/mrcc > $SUB_DIR/mrcc.log
+# replace /software/dmrcc with the full path to mrcc executable
+/software/dmrcc > $SUB_DIR/mrcc.log
+
+for f in iface MOLDEN; do
+ test -f /data/scratch/$f && cp /data/scratch/$f $SUB_DIR/
+done
 
 echo 'ok2'
 

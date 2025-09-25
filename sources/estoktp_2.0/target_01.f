@@ -92,8 +92,8 @@ C     *****************************
 
       LOGICAL leof,lsec,ltit
       
-      character*70 comline1,comline2
-      character*70 comline3,comline4
+      character*300 comline1,comline2
+      character*300 comline3,comline4
       character*30 intcoor(3*natommx)
       character*80 atomlabel(natommx)
       character*20 bislab(ntaumx)
@@ -141,10 +141,10 @@ c      stop
       read(15,*)cjunk
       read(15,*)ilevcode
       if(ilevcode.eq.1.or.ilevcode.eq.3)then
-         read(15,'(A70)')comline1
-         read(15,'(A70)')comline2
-         read(15,'(A70)')comline3
-         read(15,'(A70)')comline4
+         read(15,'(A300)')comline1
+         read(15,'(A300)')comline2
+         read(15,'(A300)')comline3
+         read(15,'(A300)')comline4
       else if (ilevcode.eq.2)then
          read(15,'(A30)')namepes1
          read(15,'(A30)')namepes2
@@ -210,13 +210,13 @@ c      stop
 
       endif
    
-      open (unit=15,file='geom_pes1.xyz',status='unknown')
-      write(15,*)natomt
-      write(15,*)'point on PES1'
-      do j=1,natomt
-         write(15,*)j,(coord(j,idim),idim=1,3)
-      enddo
-      close(15)
+c      open (unit=15,file='geom_pes1.xyz',status='unknown')
+c      write(15,*)natomt
+c      write(15,*)'point on PES1'
+c      do j=1,natomt
+c         write(15,*)j,(coord(j,idim),idim=1,3)
+c      enddo
+c      close(15)
 
 c      stop
       En1 = vtot_0
@@ -265,8 +265,8 @@ C     *****************************
 
       LOGICAL leof,lsec,ltit
       
-      character*70 comline1,comline2
-      character*70 comline3,comline4
+      character*300 comline1,comline2
+      character*300 comline3,comline4
       character*30 intcoor(3*natommx)
       character*80 atomlabel(natommx)
       character*20 bislab(ntaumx)
@@ -314,10 +314,10 @@ c      stop
       read(15,*)ilevcode
 
       if(ilevcode.eq.1.or.ilevcode.eq.3)then
-         read(15,'(A70)')comline1
-         read(15,'(A70)')comline2
-         read(15,'(A70)')comline3
-         read(15,'(A70)')comline4
+         read(15,'(A300)')comline1
+         read(15,'(A300)')comline2
+         read(15,'(A300)')comline3
+         read(15,'(A300)')comline4
       else if (ilevcode.eq.2)then
          read(15,'(A30)')namepes1
          read(15,'(A30)')namepes2
@@ -372,8 +372,8 @@ c      ilevcode=1
             call commrun(commandcopy)
          endif
          call elstructopt(ilevcode,tau,ntau,natom,natomt,numproc,gmem,
-     $        coord,vtot_0,vtot,freq,ifreq,ilin,ismp,comline1,
-     $        comline2,icharge,ispin,ircons,
+     $        coord,vtot_0,vtot,freq,ifreq,ilin,ismp,comline3,
+     $        comline4,icharge,ispin,ircons,
      $        atomlabel,intcoor,bislab,tauopt,xint,abcrot,
      $        ires,ixyz,ired,ispecies,iaspace)
 
@@ -453,9 +453,9 @@ C     *****************************
       dimension grad(3*natommx)
       dimension ibond(nmdmx)
 
-      character*30 cjunk
+      character*50 cjunk
       character*100 commandcopy
-      character*80 atomlabel(natommx)
+      character*80 atomlabel(3*natommx)
 
 c      implicit none
 c      integer n
@@ -466,14 +466,16 @@ c      double precision q(n), dz(n)
       open (unit=15,file='na_input.dat',status='unknown')
       read(15,*)cjunk
       read(15,*)natom,natomt,np,nconst
-
+      
       do j=1,natomt
          read(15,*)cjunk
       enddo
       do j=1,np
          read(15,*)atomlabel(j),cjunk,ibond(j)
+c         write(*,*)j,atomlabel(j),cjunk
       enddo
 
+c      stop
       read(15,*)cjunk
       read(15,*)ilevcode
       read(15,*)cjunk
@@ -519,13 +521,17 @@ cc               grad(j)=grad(j)
 
 c      En1=0.
 c      call V1(q,En1)
-      write(*,*)'last grad value is ',dz(nint)
+c      do j=1,nint
+c         write(*,*)atomlabel(j),q(j),grad(j)
+c      enddo
+      write(*,*)'last var and  grad value is ',q(nint),dz(nint)
 c      stop
 
 c      dz(1) = 2.0D0*q(1)
 c      dz(2) = 2.0D0*q(2)
       write(*,*)'out of dv1'
-
+c      stop
+      
  100     format (A8,2X,F9.5,2X,F9.5)
 
       end subroutine
@@ -546,7 +552,7 @@ C     *****************************
 
       character*30 cjunk
       character*100 commandcopy
-      character*80 atomlabel(natommx)
+      character*80 atomlabel(3*natommx)
 
 c      implicit none
 c      integer n
@@ -620,9 +626,10 @@ C     *****************************
       dimension dz(nmdmx)
       dimension grad(3*natommx)
 
-      character*30 cjunk
+      character*300 cjunk
       character*30 gkeyword,igkey
-      character*70 comline1,comline2
+      character*300 comline1,comline2
+      character*300 comline3,comline4
       character*100 commandcopy
 
 c      implicit none
@@ -637,6 +644,7 @@ c      write(*,*)'nvar is ',nint
 
       commandcopy='cp -f natst_V1.log geom.log'
       call commrun(commandcopy)
+c      stop
 
       open (unit=15,file='na_input.dat',status='unknown')
       read(15,*)cjunk
@@ -651,10 +659,12 @@ c      write(*,*)'nvar is ',nint
 
       read(15,*)cjunk
       read(15,*)ilevcode
-      read(15,'(A70)')comline1
-      read(15,'(A70)')comline2
-      read(15,*)cjunk
-      read(15,*)cjunk
+      read(15,'(A300)')comline1
+      read(15,'(A300)')comline2
+      read(15,'(A300)')comline3
+      read(15,'(A300)')comline4
+c      read(15,*)cjunk
+c      read(15,*)cjunk
       read(15,*)cjunk
       read(15,*)icharge,ispin,iguess
       close(15)
@@ -820,7 +830,7 @@ c         gradval=0.
          iprog=0
          do ip = 1 , natom
             read(11,*)cjunk,cjunk,ianum(iprog+1)
-            write(*,*)cjunk,cjunk,ianum(iprog+1)
+c            write(*,*)cjunk,cjunk,ianum(iprog+1)
             ianum(iprog+2)=ianum(iprog+1)
             ianum(iprog+3)=ianum(iprog+1)
             iprog=iprog+3
@@ -850,7 +860,7 @@ cc read gradient
          do iread = 1 , nvar
             read(11,*)cjunk,cjunk,cjunk,cjunk,cjunk,gradval
             grad_xyz(iread)=gradval
-            write(*,*)'grad is ',grad_xyz(iread)
+c            write(*,*)'grad is ',grad_xyz(iread)
          enddo
       endif
       if (WORD.eq.'ENDFILE')goto 9001

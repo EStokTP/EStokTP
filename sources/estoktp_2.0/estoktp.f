@@ -155,6 +155,7 @@ cadl end modified part
       i1dtau_wellr=0
       i1dtau_wellp=0
       i1dtau_ts=0
+      iresmdtau=0
       imdtau_reac1=0
       imdtau_reac2=0
       imdtau_prod1=0
@@ -548,30 +549,51 @@ c         itotcalc=itotcalc+1
       if (WORD.EQ.'MDTAU_REAC1') then
          imdtau_reac1=1
          itotcalc=itotcalc+1
+         if(WORD2.EQ.'RESTART')then
+            iresmdtau=1
+         endif
       endif
       if (WORD.EQ.'MDTAU_REAC2') then
          imdtau_reac2=1
          itotcalc=itotcalc+1
+         if(WORD2.EQ.'RESTART')then
+            iresmdtau=1
+         endif
       endif
       if (WORD.EQ.'MDTAU_PROD1') then
          imdtau_prod1=1
          itotcalc=itotcalc+1
+         if(WORD2.EQ.'RESTART')then
+            iresmdtau=1
+         endif
       endif
       if (WORD.EQ.'MDTAU_PROD2') then
          imdtau_prod2=1
          itotcalc=itotcalc+1
+         if(WORD2.EQ.'RESTART')then
+            iresmdtau=1
+         endif
       endif
       if (WORD.EQ.'MDTAU_WELLR') then
          imdtau_wellr=1
          itotcalc=itotcalc+1
+         if(WORD2.EQ.'RESTART')then
+            iresmdtau=1
+         endif
       endif
       if (WORD.EQ.'MDTAU_WELLP') then
          imdtau_wellp=1
          itotcalc=itotcalc+1
+         if(WORD2.EQ.'RESTART')then
+            iresmdtau=1
+         endif
       endif
       if (WORD.EQ.'MDTAU_TS') then
          imdtau_ts=1
          itotcalc=itotcalc+1
+         if(WORD2.EQ.'RESTART')then
+            iresmdtau=1
+         endif
       endif
       if (WORD.EQ.'SYMM_REAC1') then
          isymm_reac1=1
@@ -1060,39 +1082,39 @@ c determine multi-dimensional torsional potentials
       if (imdtau_reac1.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting mdtau_reac1'
          ispecies=1
-         call mdtau(ispecies)
+         call mdtau(ispecies,iresmdtau)
       endif
       if (imdtau_reac2.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting mdtau_reac2'
          ispecies=2
-         call mdtau(ispecies)
+         call mdtau(ispecies,iresmdtau)
       endif
       if (imdtau_prod1.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting mdtau_prod1'
          ispecies=3
-         call mdtau(ispecies)
+         call mdtau(ispecies,iresmdtau)
       endif
       if (imdtau_prod2.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting mdtau_prod2'
          ispecies=4
-         call mdtau(ispecies)
+         call mdtau(ispecies,iresmdtau)
       endif
       if (imdtau_wellr.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting mdtau_wellr'
          ispecies=5
          if(igeom_wellr.eq.1.or.igeom_wellr.eq.2) ispecies=51
-         call mdtau(ispecies)
+         call mdtau(ispecies,iresmdtau)
       endif
       if (imdtau_wellp.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting mdtau_wellp'
          ispecies=6
          if(igeom_well.eq.1.or.igeom_wellp.eq.2) ispecies=61
-         call mdtau(ispecies)
+         call mdtau(ispecies,iresmdtau)
       endif
       if (imdtau_ts.eq.1) then
          if (idebug.ge.1) write (6,*) 'starting mdtau_ts'
          ispecies=0
-         call mdtau(ispecies)
+         call mdtau(ispecies,iresmdtau)
       endif
 
 c determine symmetry factors
@@ -10471,7 +10493,7 @@ c         write (19,*)'End '
       end
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      subroutine mdtau(ispecies)
+      subroutine mdtau(ispecies,iresmdtau)
 
       implicit double precision (a-h,o-z)
       implicit integer (i-n)
@@ -10480,7 +10502,6 @@ cc    this is the multi dimensional hindered rotor section
 
       include 'data_estoktp.fi'
       include 'param_estoktp.fi'
-
 
       dimension dhindmn(nhindmx),dhindmx(nhindmx),
      $ freq1d(noptmdmx,nmdmx),
@@ -11529,8 +11550,11 @@ c               read (21,'(A300)') comline6
                imhrfr=1
 c               write(*,*)'imhrf is ',imhrfr
 c               stop
+c               if(ilev1code.eq.1.or.ilev1code.eq.3)then
+c                 call comline56_g09(ispecies,comline1,comline2,
+c     +           comline5,comline6)
                if(ilev1code.eq.1.or.ilev1code.eq.3)then
-                 call comline56_g09(ispecies,comline1,comline2,
+                 call comline56_g16(ispecies,comline1,comline2,
      +           comline5,comline6)
                endif
             endif
@@ -12113,6 +12137,64 @@ cc start hindered rotor scan:
       comsave2=comline2
       comlineref1=comline1
       comlineref2=comline2
+      if(iresmdtau.eq.1)then
+         open (unit=99,status='unknown')
+         rewind (99)
+         write(99,1203)word_2dhrout,ihind
+         rewind (99)
+         read (99,'(A35)') namefile
+         close (99)
+         
+         open (unit=99,status='unknown')
+         rewind (99)
+         write(99,1204)word_2dhrout,ihind
+         rewind (99)
+         read (99,'(A35)') namefile2
+         close (99)
+         iscanhindinta=0
+         iscanhindintb=0
+         refen_res=0
+         if(imhrfr.eq.1)open(unit=17,file=namefile,status='unknown')
+         open (unit=14,file=namefile2,status='unknown')
+         if(imhrfr.eq.1) read(17,*)iscanhindinta,iscanhindintb
+         read(14,*)iscanhindinta,iscanhindintb,refen_res
+         write(*,*)iscanhindinta,iscanhindintb
+         
+         if(imhrfr.eq.1)read(17,*)buffer
+         read(14,*)buffer
+
+c             if(imhrfr.eq.1)write(17,*)
+c             write(14,*)
+
+         nfreq=3*natom-6-ntau_fr
+         if (natom.eq.2) nfreq=1
+         if (ispecies.eq.0) nfreq=3*natom-6-ntau_fr-1
+
+         do i=1,iscanhindinta
+            ireadscanb=0
+            if(i.eq.iscanhindinta)then
+               ireadscanb=iscanhindintb
+            else
+               ireadscanb=nhindsteps2Db(ihind)
+            endif
+            do j=1,ireadscanb
+               if(imhrfr.eq.1) then
+                  read(17,*)buffer,buffer,vref2D(i,j),
+     $                 (freq2d(i,j,k),k=1,nfreq)
+c                  write(*,*)i,j,vref2D(i,j),nfreq,freq2d(i,j,1)
+               endif
+               read(14,*)buffer,buffer,vref2D(i,j)
+            enddo
+         enddo
+         close (14)
+         close(17)
+
+c         write(*,*)iscanhindinta,iscanhindintb,vref2D(3,7),freq2d(3,7,1)
+
+c         stop
+
+
+      endif
 
       do ihind = 1 , nhind2d
 
@@ -12199,7 +12281,16 @@ cc save coordinates
 
          refen=0.
 
-         do iscanhinda=1,nhindsteps2Da(ihind)
+         istarthinda=1
+         istarthindb=1
+         irescycle=0
+         ireshindb=0
+         if(iresmdtau.eq.1)then
+            istarthinda=iscanhindinta
+            refen=refen_res
+         endif
+
+         do iscanhinda=istarthinda,nhindsteps2Da(ihind)
 
 cc start scan on nhind scan points
 
@@ -12212,6 +12303,24 @@ cc start scan on nhind scan points
 
 c            ihalf=nhindsteps(ihind)/2
             xint(ncoord)=xstartb
+
+            if(irescycle.eq.1) istarthindb=1
+            if(iresmdtau.eq.1.and.irescycle.eq.0) then
+               istarthindb=iscanhindintb+1
+               irescycle=1
+            endif
+
+            if(iresmdtau.eq.1.and.ireshindb.eq.0)then
+               xint(ncoord-1)= xstarta+ihind_stepa*(iscanhinda-1)
+               if (xint(ncoord-1).gt.360.)then
+                  xint(ncoord-1)= xint(ncoord-1)-360.
+               endif
+               xint(ncoord)=xstartb+ihind_stepb*(istarthindb-1)
+               if (xint(ncoord).gt.360.)then
+                  xint(ncoord)= xint(ncoord)-360.
+               endif
+               ireshindb=1
+            endif
 c            iprog=0
 
             comline1=comsave1
@@ -12229,7 +12338,8 @@ c            iprog=0
             enddo
  111     continue
 
-            do iscanhindb=1,nhindsteps2Db(ihind)
+
+            do iscanhindb=istarthindb,nhindsteps2Db(ihind)
 
 c               if(iscanhind.le.ihalf+1)iprog=iscanhind
 c               if(iscanhind.gt.ihalf+1)iprog=nhindsteps(ihind)
@@ -12366,7 +12476,7 @@ c                     xint(ncoord-1)=xstarta
                   ixyz=0
                   ired=0
  
-                  if(ilev1code.eq.1) then
+                  if(ilev1code.eq.1.or.ilev1code.eq.3) then
                      comline1=comline5
                      comline2=comline6
                      atomlabel(1)=' '
@@ -12542,7 +12652,65 @@ c               write (16,*) xint(ncoord-1),xint(ncoord),vtot
                endif
 
 
+
+cc now save intermediate results of 2D PES rotational scan
+
+             open (unit=99,status='unknown')
+             rewind (99)
+             write(99,1203)word_2dhrout,ihind
+             rewind (99)
+             read (99,'(A35)') namefile
+             close (99)
+            
+             open (unit=99,status='unknown')
+             rewind (99)
+             write(99,1204)word_2dhrout,ihind
+             rewind (99)
+             read (99,'(A35)') namefile2
+             close (99)
+         
+             ref=0.
+             if(imhrfr.eq.1)open(unit=17,file=namefile,status='unknown')
+             open (unit=14,file=namefile2,status='unknown')
+             if(imhrfr.eq.1) write(17,*)iscanhinda,iscanhindb
+             write(14,*)iscanhinda,iscanhindb,refen
+             if(imhrfr.eq.1)write(17,8011)(k,k=1,nfreq)
+             write(14,*)'nofreq'
+             if(imhrfr.eq.1)write(17,*)
+             write(14,*)
+             do i=1,iscanhinda
+                iwritescanb=0
+                if(i.eq.iscanhinda)then
+                   iwritescanb=iscanhindb
+                else
+                   iwritescanb=nhindsteps2Db(ihind)
+                endif
+c                write(*,*)'test',i,iscanhinda,iscanhindb,iwritescanb
+c                stop
+                do j=1,iwritescanb
+                   if(i.eq.1.and.j.eq.1)then
+                      if(imhrfr.eq.1)then
+                         write(17,8010)i,j,ref,(freq2d(i,j,k),k=1,nfreq)
+                      endif
+                      write(14,*)i,j,ref
+c      write (19,8010) (freq(j),j=1,nfreq)
+c
+                   else
+                      if(imhrfr.eq.1) then
+                         write(17,8010)i,j,vref2D(i,j),
+     $                        (freq2d(i,j,k),k=1,nfreq)
+                      endif
+                      write(14,*)i,j,vref2D(i,j)
+                   endif
+                enddo
+             enddo
+             close (14)
+             close(17)
+
+cc end of intermediate save
+
             enddo
+
 cc end of 2D hindered rotors PES scan for rotor b
 
 c            write (16,*) xint(ncoord-1),vtot
@@ -12551,9 +12719,9 @@ c            write (16,*) xint(ncoord-1),vtot
                xint(ncoord-1)= xint(ncoord-1)-360.
             endif
 cc now update saved coords coordinates
-         do iint = 1 , ncoord
-            xint_save(iint) = xint(iint)
-         enddo
+            do iint = 1 , ncoord
+               xint_save(iint) = xint(iint)
+            enddo
 
          enddo
 cc end of 2D hindered rotors PES scan for rotor a
@@ -13662,6 +13830,8 @@ cc now copy mr file to hr file and update other files accordingly
 
  1201 format ( "./me_files/"A10"_"I0.2".dat")
  1202 format ( "./me_files/"A10"_nofr"I0.2".dat")
+ 1203 format ( "./output/"A10"_"I0.2"int.dat")
+ 1204 format ( "./output/"A10"_nofr"I0.2"int.dat")
  7111 format (100(1X,f7.2))
  1717 format (3(1X,f7.2),1X,F10.5)
  2000 format (A80,1X,I10)
@@ -15923,6 +16093,7 @@ cc now rescale potential if requested
                read (107,*)cjunk,rc_ene_hl(ij)
             enddo
             close(107)
+            intres=intres+1
            write(96,*)'restarting HL IRC energy scan from point ',intres
            write(7,*)
            write(7,*)'restarting HL IRC energy scan from point ',intres
@@ -15934,7 +16105,11 @@ cc in which case the skipall option is used to bypass this step
 
          if(iskiphl.ne.1) then
             numproc=numprochl
-            do inump=1,numpointstot
+            inump_st=1
+            if(iresirc.eq.3)then
+               inump_st=intres
+            endif
+            do inump=inump_st,numpointstot
                open (unit=107, file='input.xyz', status='unknown')
                write (107,*)
                do iatom = 1, natom
@@ -16001,7 +16176,11 @@ c
             open (unit=99, status='unknown')
             write(99,*)atgeom_me(isite,i)
             write(99,*)atgeom_me(jsite,i)
-            write(99,*)atgeom_me(natom1+1,i)
+            if(iabs.eq.1)then
+               write(99,*)atgeom_me(natom1+1,i)
+            else
+               write(99,*)atgeom_me(natom1,i)
+            endif
             rewind(99)
             read(99,*)cjunk,atcentx,atcenty,atcentz
             read(99,*)cjunk,atreax,atreay,atreaz
@@ -16744,14 +16923,18 @@ cc      else if (word3.eq.'RESCALE3'.and.ispecies.eq.0)then
          if(ibarr.gt.1.and.ilev1code.eq.2)then
             command1='egrep -w CBSEN  hl_logs/ts_molpro.out > en.dat'
             call commrun(command1)
+            command1="sed -ie 's/SETTING/ /g' en.dat"
+            call commrun(command1)
             open (unit=99,file='./en.dat',status='old')
-            read(99,*)cjunk,cjunk,cjunk,ts_en_l1
+            read(99,*)cjunk,cjunk,ts_en_l1
             close(99)
             command1='egrep -w CBSEN  ../100/hl_logs/ts_molpro.out > 
      $ en.dat'
             call commrun(command1)
+            command1="sed -ie 's/SETTING/ /g' en.dat"
+            call commrun(command1)
             open (unit=99,file='./en.dat',status='old')
-            read(99,*)cjunk,cjunk,cjunk,prod_en_l1
+            read(99,*)cjunk,cjunk,prod_en_l1
             close(99)
          else if (ibarr.gt.1.and.
      $    (ilev1code.eq.1.or.ilev1code.eq.3))then
@@ -26492,7 +26675,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       dimension vref(noptmx),tauo(ntaumx,noptmx),
      $ xinto(3*natommx,noptmx),dist(noptmx)
       dimension tauopt(ntaumx)
-      dimension ibond(natommx),ibondi(natommx)
+      dimension ibond(3*natommx),ibondi(3*natommx)
       dimension ianum(3*natommx)
       dimension ianum_at(natommx)
       dimension idummy(natommx)
@@ -26617,8 +26800,10 @@ c update output file
 
 c     initialize parameters
 
-
-c initialize word, word2, word3, word4, word5
+      do j=1,3*natommx
+         con_name(j)=''
+      enddo
+c     initialize word, word2, word3, word4, word5
       call LineRead (0)
 
 c input data
@@ -27096,7 +27281,7 @@ cc check if intcoor coordinate is a bond
          ibond(j)=0
       enddo
       open(unit=21,file='temp.dat',status='unknown')
-      do j=i,natomt
+      do j=1,natomt
          word3=''
          rewind(21)
          write(21,*)atomlabel(j)
@@ -27108,7 +27293,8 @@ cc check if intcoor coordinate is a bond
             endif
          enddo
       enddo
-
+      close(21)
+      
 cc if constrained optimization, then re-order coordinates
       write(*,*)'inatst_const is ',inatst_const
       write(*,*)'con_name is ',con_name(1)
@@ -27160,10 +27346,10 @@ cc write input file for NA-TST
          write(15,*)'Theory for NA-TST'
          write(15,*)ilevcode
          if(ilevcode.eq.1.or.ilevcode.eq.3)then
-            write(15,*)comline1
-            write(15,*)comline2
-            write(15,*)comline3
-            write(15,*)comline4
+            write(15,'(A300)')comline1
+            write(15,'(A300)')comline2
+            write(15,'(A300)')comline3
+            write(15,'(A300)')comline4
          else if (ilevcode.eq.2)then
             write(15,*)'./data/natst_pes1_molpro.dat'
             write(15,*)'./data/natst_pes2_molpro.dat'
@@ -29483,7 +29669,7 @@ c      if(ilev0code.eq.2.and.ilevhlcode.eq.0) then
       if(ilev1code.eq.2) then
          command1='egrep CBSEN  hl_logs/ts_molpro.out > en.dat'
          call commrun(command1)
-         command1="sed -ie 's/SETTING/ /g' temp.log"
+         command1="sed -ie 's/SETTING/ /g' en.dat"
          call commrun(command1)
          open (unit=99,file='./en.dat',status='old')
          read(99,*)cjunk,cjunk,vtotref

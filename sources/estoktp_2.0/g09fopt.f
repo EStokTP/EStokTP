@@ -2508,7 +2508,7 @@ C     *****************************
       close(99)
       command1="sed -ie 's/=/ /g' temp.tmp"
       call commrun(command1)
-
+      
       ifine=0
       open(unit=99,file='temp.tmp',status='unknown')
       call Lineread(99)
@@ -2569,6 +2569,55 @@ cc     $ geom=check'
       end
 
 C     *****************************
+      subroutine comline56_g16(ispecies,comline1,comline2,comline5,
+     +   comline6)
+
+      implicit double precision (a-h,o-z)
+      implicit integer (i-n)
+
+      character*30 gkeyword,igkey
+      character*(*) comline1
+      character*(*) comline2
+      character*(*) comline5
+      character*(*) comline6
+      character*180 command1
+      LOGICAL leof,lsec,ltit
+
+      CHARACTER*1000 line,string
+      CHARACTER*160 sename,word,word2,word3
+     $ ,title,title1,word4,word5,word6,word7
+
+      include 'filcomm.f'
+
+      open(unit=99,file='temp.tmp',status='unknown')
+      write(99,*)comline1
+c      write(99,*)comline2,'freq iop(7/33=1) guess=read geom=check'
+      write(99,*)comline2
+      close(99)
+
+      command1=
+     & "sed -i -E ':a;N;$!ba;s/opt(=?\(([^()]*)\))?/ iop\(7\/33=1\)
+     &  geom=check opt\(calcfc,ts,maxcycle=1,noeigentest\) guess=read/1'
+     &   temp.tmp"
+         call commrun(command1)
+
+      open(unit=99,file='temp.tmp',status='unknown')
+      read(99,101)comline5
+      read(99,101)comline6
+      close(99)
+
+      write(*,*)'comline 5  is ',comline5
+      write(*,*)'comline 6 is ',comline6
+c      stop
+
+ 101  format(A300)
+
+      return
+      end
+
+C     *****************************
+
+
       subroutine readgrad_g09(nvar,grad)
 
       implicit double precision (a-h,o-z)

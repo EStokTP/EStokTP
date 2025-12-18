@@ -1,0 +1,13 @@
+ nosym
+ End1
+ basis=cc-pvtz                                                                                                                                                                                                                                                                                               
+ {multi;closed,16;occ,18;wf, 34,1,0,;state,1;maxiter,40}                                                                                                                                                                                                                                                     
+ ! Uncomment to guide creation of AS for MC sampling                                                                                                                                                                                                                                                         
+ ! (also needs uncommented lines in run.sh)                                                                                                                                                                                                                                                                  
+ !ACTIVESPACE2_T                                                                                                                                                                                                                                                                                             
+ !ACTIVESPACE2                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                             
+ RS2C,SHIFT=0.2                                                                                                                                                  
+ CBSen = energy
+ End2
+ End3

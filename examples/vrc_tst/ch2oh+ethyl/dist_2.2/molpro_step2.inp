@@ -1,0 +1,91 @@
+ nosym
+ 
+ End1
+ geometry={angstrom
+   C1                                                                            
+   O2   C1   R1                                                                  
+   H3   C1   R2   O2   A2                                                        
+   H4   C1   R3   O2   A3   H3   D3                                              
+   H5   O2   R4   C1   A4   H3   D4                                              
+   C21 C1 BB O2 ANG1 H3 DH1                                                      
+   C22 C21 R21 C1 ANG2 O2 DH2                                                    
+   H23 C21 R22 C22 A22 C1 DH3                                                    
+   H24 C21 R23 C22 A23 H23 D23                                                   
+   H25 C22 R24 C21 A24 H23 D24                                                   
+   H26 C22 R25 C21 A25 H25 D25                                                   
+   H27 C22 R26 C21 A26 H25 D26                                                   
+ }
+ R1                             =    1.3704000000000001     
+ R2                             =    1.0826000000000000     
+ R3                             =    1.0880000000000001     
+ R4                             =   0.95679999999999998     
+ A2                             =    110.40830000000000     
+ A3                             =    115.67310000000001     
+ A4                             =    109.37500000000000     
+ D3                             =    228.88630000000001     
+ R21                            =    1.5009999999999999     
+ R22                            =    1.0859000000000001     
+ R23                            =    1.0846000000000000     
+ R24                            =    1.0946000000000000     
+ R25                            =    1.0909000000000000     
+ R26                            =    1.0906000000000000     
+ A22                            =    115.28060000000001     
+ A23                            =    115.70790000000000     
+ A24                            =    111.46220000000000     
+ A25                            =    111.47369999999999     
+ A26                            =    111.39919999999999     
+ D23                            =    133.43570000000000     
+ D25                            =    119.71259999999999     
+ D26                            =    240.28160000000000     
+ ANG2                           =    107.85220000000000     
+ DH2                            =    180.62490000000000     
+ DH3                            =    113.63079999999999     
+ D4                             =    175.79859999999999     
+ D24                            =    293.95280000000002     
+ DH1                            =    112.97280000000001     
+ ANG1                           =    112.36790000000001     
+ BB                             =    2.2000000000000002     
+
+ 
+ !closed shell input
+ nosym
+ 
+ ! generate AS
+ uhf
+ SET,SPIN=           0
+ {multi;closed,16;occ,18;wf, 34,1,0,;state,1;maxiter,40}
+ End1
+
+ {multi;closed,16;occ,18;wf, 34,1,0,;state,1;maxiter,40}
+ 
+   basis=aug-cc-pvtz
+   ! singlet caspt2
+ SET,SPIN=           0
+ {multi;closed,16;occ,18;wf, 34,1,0,;state,1;maxiter,40}
+  {rs2,maxiti=2000,shift=0.2;orbital,IGNORE_ERROR ;state,1}
+   en_s = energy
+ 
+   ! triplet caspt2
+ SET,SPIN=           2
+ {multi;closed,16;occ,18;wf, 34,1,2,;state,1;maxiter,40}
+  {rs2,maxiti=2000,shift=0.2;orbital,IGNORE_ERROR ;state,1}
+  en_t = energy
+ 
+ ! coupled cluster on triplet
+ SET,SPIN=2
+ {multi;closed,16;occ,18;wf, 34,1,2,;state,1;maxiter,40;canorb,2101.2}
+ {rhf;wf, 34,1,2;start,2101.2}
+ !  CC_CC
+ {uccsd(t)}
+ 
+  en_cc = energy
+ 
+   CBSen = en_cc - (en_t - en_s)
+   put,molden,molpro.molden
+ 
+ ---
+ 
+ End2
+ put,molden,molpro.molden
+ ---
+ End3

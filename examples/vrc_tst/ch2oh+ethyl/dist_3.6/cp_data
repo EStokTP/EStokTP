@@ -1,0 +1,15 @@
+#!/bin/python3
+
+import os
+
+#os.popen("cp ../ref/geoms/prod1* ./geoms/.")
+#os.popen("cp ../ref/me_files/prod1* ./me_files/.")
+#os.popen("cp ../ref/output/prod1* ./output/.")
+
+
+os.popen("cp ../ref/geoms/pr1* ./geoms/.")
+os.popen("cp ../ref/me_files/pr1* ./me_files/.")
+os.popen("cp ../ref/output/pr1* ./output/.")
+os.popen("cp ../ref/geoms/pr2* ./geoms/.")
+os.popen("cp ../ref/me_files/pr2* ./me_files/.")
+os.popen("cp ../ref/output/pr2* ./output/.")

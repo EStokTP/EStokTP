@@ -1,0 +1,32 @@
+ PivotPoints     1
+ Frame 0 0 0 0
+ #          ^ ^ ^ ^
+ # origin: 1
+ # orientation:
+ #  3
+ #  ^
+ #  |y
+ #  |  x
+ #  4--->2
+
+ x1 = 0. y1 = 0 z1 = 0.
+ PivotPoints     1
+ Frame 0 0 0 0
+
+ x2 = 0. y2 = 0 z2 = 0.
+
+ # interpointal distances
+ #
+
+ Distances
+
+ r11 = r
+
+ Conditions 0
+
+ Cycles 1
+
+ r = ( 20., 17., 15.5, 14.2, 13., 12.1, 11.3, 10.6,     10.0, 9.5, 8.5, 8., 7.5)
+
+ EndSurface
+

@@ -1,0 +1,19 @@
+ Debug  2
+ ReactionType Barrierless decomp STEPN
+ Prods
+ variational rotd_sr rotd_lr
+ nGrid_Opt_ts 
+ ntauo_ts
+ nOpt_ts_1
+ n1dTau_ts
+ nHL_ts
+ nSymm_ts
+ npot_corr 
+ vrc_tst
+ nkTP
+End
+ 32,4
+ numprocll,numprochl
+ 400MW  1000MW
+ gmemll
+

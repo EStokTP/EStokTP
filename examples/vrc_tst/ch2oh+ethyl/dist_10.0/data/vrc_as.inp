@@ -1,0 +1,19 @@
+basis=cc-pvtz
+active_space1
+! Uncomment to guide creation of AS for MC sampling
+! (also needs uncommented lines in run.sh)
+!ACTIVESPACE2_T
+!ACTIVESPACE2
+
+ENERGY rs2c,shift=0.2 
+if (iterations.ge.0) then
+   rs2c,shift=0.2
+   ENCORR
+else
+   molpro_energy = 10.0
+endif
+---
+End
+
+
+

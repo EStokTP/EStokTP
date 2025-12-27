@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<molpro xmlns="http://www.molpro.net/schema/molpro-output"
+  xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+  xmlns:cml="http://www.xml-cml.org/schema"
+  xmlns:stm="http://www.xml-cml.org/schema"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+ <job>
+  <jobstep command="MULTI" commandset="MULTI">
+   <cml:molecule>
+    <cml:symmetry pointGroup="C1">
+    </cml:symmetry>
+    <cml:atomArray>
+     <cml:atom id="a1" elementType="C" x3="-0.287351932150745" y3="-0.551659929405634"
+       z3="-1.52674915367144"/>
+     <cml:atom id="a2" elementType="O" x3="0.264728637406228" y3="0.259492144576692"
+       z3="-2.46427769595259"/>
+     <cml:atom id="a3" elementType="H" x3="0.323209379722236" y3="-1.40110403843849"
+       z3="-1.26730276215034"/>
+     <cml:atom id="a4" elementType="H" x3="-1.363277031219" y3="-0.578597350817454"
+       z3="-1.4224934750604"/>
+     <cml:atom id="a5" elementType="H" x3="-0.34964263768348" y3="0.957675208230378"
+       z3="-2.69123944597184"/>
+     <cml:atom id="a6" elementType="C" x3="-0.133127922896092" y3="0.783718017028741"
+       z3="1.81285871180411"/>
+     <cml:atom id="a7" elementType="C" x3="0.162399510589551" y3="-0.497824607927115"
+       z3="2.49770020914393"/>
+     <cml:atom id="a8" elementType="H" x3="-1.13081980410495" y3="1.19840111055501"
+       z3="1.82422058283925"/>
+     <cml:atom id="a9" elementType="H" x3="0.663483827300508" y3="1.3991728651531"
+       z3="1.42195071832107"/>
+     <cml:atom id="a10" elementType="H" x3="0.35036021572498" y3="-0.351322359556895"
+       z3="3.57024370688538"/>
+     <cml:atom id="a11" elementType="H" x3="-0.670906441293188" y3="-1.19821766466031"
+       z3="2.42175156441125"/>
+     <cml:atom id="a12" elementType="H" x3="1.05084254211072" y3="-0.978045533198126"
+       z3="2.08630369399907"/>
+    </cml:atomArray>
+    <cml:bondArray>
+     <cml:bond atomRefs2="a1 a2"/>
+     <cml:bond atomRefs2="a1 a3"/>
+     <cml:bond atomRefs2="a1 a4"/>
+     <cml:bond atomRefs2="a2 a5"/>
+     <cml:bond atomRefs2="a6 a7"/>
+     <cml:bond atomRefs2="a6 a8"/>
+     <cml:bond atomRefs2="a6 a9"/>
+     <cml:bond atomRefs2="a7 a10"/>
+     <cml:bond atomRefs2="a7 a11"/>
+     <cml:bond atomRefs2="a7 a12"/>
+    </cml:bondArray>
+   </cml:molecule>
+   <property name="Energy" method="MCSCF" principal="true" stateSymmetry="1" stateNumber="1"
+     value="-193.082854738607"/>
+   <property name="Dipole moment" method="MCSCF" principal="true" stateSymmetry="1"
+     stateNumber="1"
+     value="-0.573062516242996 0.110867463033088 0.530518171047398E-01"/>
+   <time start="09:28:41" end="09:29:37" cpu="41.41" system="5.73" real="56.41"/>
+   <storage units="megabyte" memory="0.0" sf="350.23" df="565.14" eaf="3457.66" ga="0.0"/>
+   <summary overall_method="MULTI/cc-pVTZ"/>
+  </jobstep>
+  <jobstep command="RS2C" commandset="CIPRO">
+   <property name="Energy" method="RSPT2" principal="true" stateSymmetry="1" stateNumber="1"
+     value="-193.827707820033"/>
+   <time start="09:29:37" end="09:29:50" cpu="8.83" system="1.86" real="12.87"/>
+   <storage units="megabyte" memory="0.0" sf="446.37" df="565.14" eaf="3457.66" ga="0.0"/>
+   <summary overall_method="RS2C/cc-pVTZ"/>
+  </jobstep>
+  <stm:metadataList>
+   <stm:metadata name="dc:date" content="2024-06-20T09:29:50+02:00"/>
+   <stm:metadata name="dc:creator" content="mditeodoro"/>
+   <stm:metadata name="cmlm:insilico" content="Molpro"/>
+  </stm:metadataList>
+  <platform>
+   <version major="2021" minor="2" SHA="1987c3f1b0c3ae76932bc24993909f2d7ae6b1f1"
+     integer_bits="64" parallelism="mpp">
+    2021.2
+    <date year="2024" month="6" day="20" hour="9" minute="28" second="41">
+     2024-06-20T09:28:41
+    </date>
+   </version>
+   <licence id="polimi"/>
+   <parallel processes="4" nodes="1" all_processes="4" openmp="1"/>
+   <dimensions natom="400" nvalence="500" nvalence_pno="1000" nbasis="12000" nstate="100"
+     nsymm="16" nrec="512" nprim="2" ncol="100"/>
+  </platform>
+  <input>
+   <p> memory,         400 ,m</p>
+   <p>  nosym</p>
+   <p> geometry={angstrom</p>
+   <p>    C1</p>
+   <p>    O2   C1   R1</p>
+   <p>    H3   C1   R2   O2   A2</p>
+   <p>    H4   C1   R3   O2   A3   H3   D3</p>
+   <p>    H5   O2   R4   C1   A4   H3   D4</p>
+   <p>    C21 C1 BB O2 ANG1 H3 DH1</p>
+   <p>    C22 C21 R21 C1 ANG2 O2 DH2</p>
+   <p>    H23 C21 R22 C22 A22 C1 DH3</p>
+   <p>    H24 C21 R23 C22 A23 H23 D23</p>
+   <p>    H25 C22 R24 C21 A24 H23 D24</p>
+   <p>    H26 C22 R25 C21 A25 H25 D25</p>
+   <p>    H27 C22 R26 C21 A26 H25 D26</p>
+   <p> }</p>
+   <p> R1                             =    1.3571000000000000</p>
+   <p> R2                             =    1.0778000000000001</p>
+   <p> R3                             =    1.0812999999999999</p>
+   <p> R4                             =   0.95730000000000004</p>
+   <p> A2                             =    114.01120000000000</p>
+   <p> A3                             =    119.09670000000000</p>
+   <p> A4                             =    109.79349999999999</p>
+   <p> D3                             =    205.78620000000001</p>
+   <p> R21                            =    1.4827999999999999</p>
+   <p> R22                            =    1.0805000000000000</p>
+   <p> R23                            =    1.0799000000000001</p>
+   <p> R24                            =    1.0987000000000000</p>
+   <p> R25                            =    1.0911999999999999</p>
+   <p> R26                            =    1.0905000000000000</p>
+   <p> A22                            =    120.72180000000000</p>
+   <p> A23                            =    120.84580000000000</p>
+   <p> A24                            =    111.69799999999999</p>
+   <p> A25                            =    111.73980000000000</p>
+   <p> A26                            =    111.63760000000001</p>
+   <p> D23                            =    170.60239999999999</p>
+   <p> D25                            =    119.20460000000000</p>
+   <p> D26                            =    240.60290000000001</p>
+   <p> ANG2                           =    96.684200000000004</p>
+   <p> DH2                            =    218.90289999999999</p>
+   <p> DH3                            =    101.62330000000000</p>
+   <p> D4                             =    176.22860000000000</p>
+   <p> D24                            =    276.63940000000002</p>
+   <p> DH1                            =    104.41450000000000</p>
+   <p> ANG1                           =    113.68590000000000</p>
+   <p> BB                             =    3.6000000000000001</p>
+   <p> SET,SPIN=           0</p>
+   <p>  basis=cc-pvtz</p>
+   <p>  {multi;closed,16;occ,18;wf, 34,1,0,;state,1;maxiter,40}</p>
+   <p>  ! Uncomment to guide creation of AS for MC sampling</p>
+   <p>  ! (also needs uncommented lines in run.sh)</p>
+   <p>  !ACTIVESPACE2_T</p>
+   <p>  !ACTIVESPACE2</p>
+   <p>  RS2C,SHIFT=0.2</p>
+   <p>  CBSen = energy</p>
+   <p> put,molden,molpro.molden</p>
+   <p> ===</p>
+  </input>
+  <diagnostics warnings="0"/>
+ </job>
+</molpro>

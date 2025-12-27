@@ -1,0 +1,611 @@
+master: floating-point exception: inexact
+node 24: floating-point exception: inexact
+node 26: floating-point exception: inexact
+node 2: floating-point exception: inexact
+node 4: floating-point exception: inexact
+node 6: floating-point exception: inexact
+node 8: floating-point exception: inexact
+node 10: floating-point exception: inexact
+node 12: floating-point exception: inexact
+node 14: floating-point exception: inexact
+node 16: floating-point exception: inexact
+node 18: floating-point exception: inexact
+node 20: floating-point exception: inexact
+node 28: floating-point exception: inexact
+node 22: floating-point exception: inexact
+node 7: floating-point exception: inexact
+node 13: floating-point exception: inexact
+node 21: floating-point exception: inexact
+node 29: floating-point exception: inexact
+node 1: floating-point exception: inexact
+node 3: floating-point exception: inexact
+node 5: floating-point exception: inexact
+node 9: floating-point exception: inexact
+node 15: floating-point exception: inexact
+node 17: floating-point exception: inexact
+node 19: floating-point exception: inexact
+node 27: floating-point exception: inexact
+node 11: floating-point exception: inexact
+node 25: floating-point exception: inexact
+node 23: floating-point exception: inexact
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+node 1: main: host = node-6-9, process =  116063
+
+
+
+
+
+
+
+
+node 8: main: host = node-6-9, process =  116070
+node 10: main: host = node-6-9, process =  116072
+node 4: main: host = node-6-9, process =  116066
+node 7: main: host = node-6-9, process =  116069
+node 9: main: host = node-6-9, process =  116071
+
+
+
+
+
+
+
+
+
+
+
+
+node 3: node 5: main: host = node-6-9, process =  116067
+node 11: main: host = node-6-9, process =  116073
+node 2: main: host = node-6-9, process =  116064
+main: host = node-6-9, process =  116065
+node 6: main: host = node-6-9, process =  116068
+node 12: main: host = node-6-9, process =  116074
+
+
+
+
+
+
+
+
+
+
+
+
+node 13: main: host = node-6-9, process =  116075
+
+
+
+
+
+
+
+
+
+
+
+
+node 14: main: host = node-6-9, process =  116076
+
+
+
+
+
+
+
+
+
+
+
+
+node 15: main: host = node-6-9, process =  116077
+
+
+
+
+
+
+
+
+
+
+
+
+node 16: main: host = node-6-9, process =  116078
+
+
+
+
+
+
+
+
+
+
+
+
+node 17: main: host = node-6-9, process =  116079
+
+
+
+
+
+
+
+
+
+
+
+
+node 18: main: host = node-6-9, process =  116080
+
+
+
+
+
+
+
+
+
+
+
+
+node 19: main: host = node-6-9, process =  116081
+
+
+
+
+
+
+
+
+
+
+
+
+node 20: main: 
+
+
+
+
+
+
+
+
+
+
+
+host = node-6-9, process =  116082
+node 21: main: host = node-6-9
+
+
+
+
+
+
+
+
+
+
+
+, process =  116083
+node 22: 
+
+
+
+
+
+
+
+
+
+
+
+main: host = node-6-9, process =  116084
+node 23: main: host = node-6-9, process =  116085
+
+
+
+
+
+
+
+
+
+
+
+
+node 24: main: host = node-6-9, process =  116086
+
+
+
+
+
+
+
+
+
+
+
+
+node 25: main: host = node-6-9, process =  116087
+
+
+
+
+
+
+
+
+
+
+
+
+node 26: main: host = node-6-9, process =  116088
+Default parameters:
+gauss_inp_file  gauss.inp
+log_level  info
+molpro_inp_file  molpro.inp
+multipole_inp_file  multipole.inp
+opt_type  none
+sjk_inp_file  sjk.inp
+smp_out_flag  0
+smp_save_file  smp.save
+
+
+
+
+
+
+
+
+
+
+
+
+
+node 27: main: host = node-6-9, process =  116089
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+node 29: main: host = node-6-9, process =  116091
+node 28: main: host = node-6-9, process =  116090
+
+
+
+
+
+
+
+
+
+
+
+
+master: main: host = node-6-9, process =  116062
+
+master: main: Starting calculation ...
+
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+Molpro::init: FailurePattern is not found in molpro.inp; using the default: molpro_failure
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 0-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 1-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 2-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 3-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 4-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 5-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 6-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 7-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 8-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 9-th surface is done
+master: main: intermediate flux data saved in flux.save file
+master: main: intermediate flux data saved in flux.save file
+master: main: flux through the 10-th surface is done
+node 21: MultiFlux::MultiFlux: potential energy, -2.26869 kcal/mol, is too negative, trancating
+node 21: MultiFlux::MultiFlux: potential energy, -2.13774 kcal/mol, is too negative, trancating
+master: main: intermediate flux data saved in flux.save file
+node 8: MultiFlux::MultiFlux: potential energy, -2.13042 kcal/mol, is too negative, trancating
+node 8: MultiFlux::MultiFlux: potential energy, -2.1199 kcal/mol, is too negative, trancating
+master: main: flux through the 11-th surface is done
+master: main: intermediate flux data saved in flux.save file
+node 6: MultiFlux::MultiFlux: potential energy, -2.14468 kcal/mol, is too negative, trancating
+node 6: MultiFlux::MultiFlux: potential energy, -2.12601 kcal/mol, is too negative, trancating
+node 7: MultiFlux::MultiFlux: potential energy, -5.76882 kcal/mol, is too negative, trancating
+node 7: MultiFlux::MultiFlux: potential energy, -5.76882 kcal/mol, is too negative, trancating
+node 7: MultiFlux::MultiFlux: potential energy, -5.23577 kcal/mol, is too negative, trancating
+node 7: MultiFlux::MultiFlux: potential energy, -5.23577 kcal/mol, is too negative, trancating
+node 20: MultiFlux::MultiFlux: potential energy, -2.04442 kcal/mol, is too negative, trancating
+node 20: MultiFlux::MultiFlux: potential energy, -2.02244 kcal/mol, is too negative, trancating
+node 1: MultiFlux::MultiFlux: potential energy, -2.1436 kcal/mol, is too negative, trancating
+node 1: MultiFlux::MultiFlux: potential energy, -2.12062 kcal/mol, is too negative, trancating
+node 17: MultiFlux::MultiFlux: potential energy, -2.26381 kcal/mol, is too negative, trancating
+node 17: MultiFlux::MultiFlux: potential energy, -2.21778 kcal/mol, is too negative, trancating
+node 8: MultiFlux::MultiFlux: potential energy, -2.48694 kcal/mol, is too negative, trancating
+node 8: MultiFlux::MultiFlux: potential energy, -2.33713 kcal/mol, is too negative, trancating
+node 25: MultiFlux::MultiFlux: potential energy, -2.18907 kcal/mol, is too negative, trancating
+node 25: MultiFlux::MultiFlux: potential energy, -2.06654 kcal/mol, is too negative, trancating
+node 9: MultiFlux::MultiFlux: potential energy, -2.45411 kcal/mol, is too negative, trancating
+node 9: MultiFlux::MultiFlux: potential energy, -2.31209 kcal/mol, is too negative, trancating
+node 5: MultiFlux::MultiFlux: potential energy, -2.20318 kcal/mol, is too negative, trancating
+node 5: MultiFlux::MultiFlux: potential energy, -2.19019 kcal/mol, is too negative, trancating
+node 9: MultiFlux::MultiFlux: potential energy, -2.40243 kcal/mol, is too negative, trancating
+node 9: MultiFlux::MultiFlux: potential energy, -2.23939 kcal/mol, is too negative, trancating
+node 26: MultiFlux::MultiFlux: potential energy, -2.97376 kcal/mol, is too negative, trancating
+node 26: MultiFlux::MultiFlux: potential energy, -2.96171 kcal/mol, is too negative, trancating
+master: main: intermediate flux data saved in flux.save file
+node 15: MultiFlux::MultiFlux: potential energy, -2.12051 kcal/mol, is too negative, trancating
+node 15: MultiFlux::MultiFlux: potential energy, -2.10672 kcal/mol, is too negative, trancating
+master: main: flux through the 12-th surface is done
+master: main: no work to be done => exitting ...
+node 1: main: : exitting...
+node 2: main: : exitting...
+node 6: main: : exitting...
+node 4: main: : exitting...
+node 7: main: : exitting...
+node 9: main: : exitting...
+node 10: main: : exitting...
+node 3: main: : exitting...
+node 8: main: : exitting...
+node 13: main: : exitting...
+node 15: main: : exitting...
+node 16: main: : exitting...
+node 17: main: : exitting...
+node 18: main: : exitting...
+node 20: main: : exitting...
+node 21: main: : exitting...
+node 22: main: : exitting...
+node 24: main: : exitting...
+node 5: main: : exitting...
+node 14: main: : exitting...
+node 23: main: : exitting...
+node 26: main: : exitting...
+node 27: main: : exitting...
+node 11: main: : exitting...
+node 25: main: : exitting...
+node 12: main: : exitting...
+node 19: main: : exitting...
+node 29: node 28: main: : exitting...
+main: : exitting...
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+WARNING: Builtin communicator 44000000 has pending 1 references.
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Comm::cleanup: MPI round up ...
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH
+Attempting to use an MPI routine (internal_Finalize) before initializing or after finalizing MPICH

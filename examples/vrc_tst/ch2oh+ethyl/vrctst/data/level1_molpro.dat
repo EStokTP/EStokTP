@@ -1,0 +1,53 @@
+nosym
+
+End1 
+!closed shell input
+
+nosym
+
+basis=cc-pvdz
+
+uhf
+
+{multi;closed,15;occ,16;wf,31,1,0}
+{multi;closed,14;occ,17;wf,31,1,0}
+!active_space1
+
+basis=aug-cc-pvtz
+
+{multi;closed,14;occ,17;wf,31,1,0}
+
+{rs2,shift=0.2}
+
+{optg,maxit=10;method,diis,25,STEP;STEP,0.1,0.2,3,0.1,4.;inactive,}
+{optg,maxit=50;method,diis,25,STEP;STEP,0.1,0.2,3,0.1,4.;inactive,}
+{optg;inactive,}
+
+{frequencies;print,hessian}
+
+CBSen = energy
+
+End2
+
+!open shell input
+
+nosym
+
+basis=cc-pvdz
+
+uhf
+
+{multi;closed,0;occ,1;wf,1,1,1}
+{multi;closed,0;occ,1;wf,1,1,1}
+!active_space1
+put,molden,molpro.molden
+
+basis=aug-cc-pvtz
+{multi;closed,0;occ,1;wf,1,1,1}
+
+{rs2,shift=0.2}
+
+CBSen = energy
+
+End3
+
